@@ -1,0 +1,9 @@
+.video-card {
+    margin-top: 0px;
+    /* Ajuste a margem superior conforme necessário */
+}
+
+.music-card {
+    margin-top: 10px;
+    /* Garantir que a margem superior das músicas esteja proporcional */
+}
