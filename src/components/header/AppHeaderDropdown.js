@@ -1,4 +1,6 @@
 import React from 'react'
+import { Navigate } from 'react-router-dom'
+import { useState } from 'react'
 import {
   CAvatar,
   CBadge,
@@ -23,16 +25,27 @@ import {
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
-import avatar8 from './../../assets/images/avatars/rui-admin.jpg'
-
 const AppHeaderDropdown = () => {
+
+  const [login, setLogin] = useState(false)
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
+  const userFoto = JSON.parse(localStorage.getItem("fotoUserLogado"));
+
+  const handleLogout = () => {
+    localStorage.removeItem("loggedUser")
+    localStorage.removeItem("fotoUserLogado")
+    setLogin(true)
+  }
+  if (login) {
+    return <Navigate to="/login" />
+  }
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
-        <CAvatar src={avatar8} size="md" />
+        <CAvatar src={userFoto} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Minha Conta</CDropdownHeader>
+        <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">{user?.username}</CDropdownHeader>
         <CDropdownItem href="#">
           <CIcon icon={cilBell} className="me-2" />
           Notificações
@@ -60,7 +73,7 @@ const AppHeaderDropdown = () => {
         </CDropdownItem>
 
         <CDropdownDivider />
-        <CDropdownItem href="#">
+        <CDropdownItem href="#" onClick={handleLogout}>
           <CIcon icon={cilAccountLogout} className="me-2" />
           Terminar Sessão
         </CDropdownItem>

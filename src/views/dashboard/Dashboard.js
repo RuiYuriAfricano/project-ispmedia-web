@@ -1,5 +1,6 @@
 import React from 'react';
-import { CCard, CCardBody, CCardHeader, CCol, CRow } from '@coreui/react';
+import { Navigate } from 'react-router-dom'
+import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CRow } from '@coreui/react';
 import "./style/dashboard.css"
 
 // Importando os vídeos do diretório medias
@@ -25,6 +26,7 @@ import music3 from './musicas/Kizz-Daniel-Buga-ft.-Tekno.mp3';
 import music4 from './musicas/Rihanna_-_Lift_Me_Up_CeeNaija.com_.mp3';
 import music5 from './musicas/ya_levis_amour_audio_mp3_3344.mp3';
 import music6 from './musicas/Ghost __ TrendyBeatz.com.mp3';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const VideoList = () => {
   const videos = [
@@ -65,9 +67,8 @@ const VideoList = () => {
       url: video6,
     },
   ];
-
   return (
-    <CCol md={6}>
+    < CCol md={6} >
       <CCard className="mb-4">
         <CCardHeader>Vídeos Recentes</CCardHeader>
         <CCardBody>
@@ -88,7 +89,7 @@ const VideoList = () => {
           ))}
         </CCardBody>
       </CCard>
-    </CCol>
+    </CCol >
   );
 };
 
@@ -166,6 +167,10 @@ const MusicList = () => {
 };
 
 const Dashboard = () => {
+
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>
+  }
   return (
     <CRow>
       <VideoList />

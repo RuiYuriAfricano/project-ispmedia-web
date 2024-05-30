@@ -1,4 +1,6 @@
 import { legacy_createStore as createStore } from 'redux'
+import { configureStore } from "@reduxjs/toolkit";
+import { appSlice } from "./redux/app/slice";
 
 const initialState = {
   sidebarShow: true,
@@ -14,5 +16,10 @@ const changeState = (state = initialState, { type, ...rest }) => {
   }
 }
 
-const store = createStore(changeState)
+let store = createStore(changeState)
+store = configureStore({
+  reducer: {
+    app: appSlice.reducer,
+  },
+});
 export default store

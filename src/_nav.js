@@ -15,6 +15,7 @@ import {
   cilHome,
   cilList,
   cilMediaPlay,
+  cilMusicNote,
   cilNotes,
   cilPencil,
   cilPuzzle,
@@ -59,9 +60,15 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Grupos',
+    name: 'Grupos De Amigos',
     to: '/charts',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Grupos Musicais',
+    to: '/grupoMusical',
+    icon: <CIcon icon={cilMusicNote} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
