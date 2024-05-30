@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// components/ConfigGrupoMusical.js
+import React, { useState, useEffect } from 'react';
 import {
   CButton,
   CCard,
@@ -18,14 +19,41 @@ import {
 import CIcon from '@coreui/icons-react';
 import { cilMusicNote, cilHistory, cilCalendar } from '@coreui/icons';
 import { service } from './../../services';
+import { useParams } from 'react-router-dom';
 
 const ConfigGrupoMusical = () => {
+  const { idEditGrupo } = useParams();
+
   const [nomeGrupoMusical, setNomeGrupoMusical] = useState("");
   const [historia, setHistoria] = useState("");
   const [dataDeCriacao, setDataDeCriacao] = useState("");
   const [loading, setLoading] = useState(false);
   const [msgDoAlert, setMsgDoAlert] = useState("");
   const [corDoAlert, setCorDoAlert] = useState("");
+
+  useEffect(() => {
+    if (idEditGrupo) {
+      // Fetch the existing grupo musical data
+      const fetchGrupoMusical = async () => {
+        try {
+          const response = await service.grupoMusical.pesquisaporid(idEditGrupo);
+          if (response?.status === 200) {
+            const grupo = response.data;
+            setNomeGrupoMusical(grupo.nomeGrupoMusical);
+            setHistoria(grupo.historia);
+            setDataDeCriacao(grupo.dataDeCriacao.split('T')[0]);
+          } else {
+            setMsgDoAlert("Erro ao carregar dados do grupo musical");
+            setCorDoAlert("danger");
+          }
+        } catch (error) {
+          setMsgDoAlert("Erro ao conectar com o servidor!");
+          setCorDoAlert("danger");
+        }
+      };
+      fetchGrupoMusical();
+    }
+  }, [idEditGrupo]);
 
   const handleAddGrupoMusical = async () => {
     setLoading(true);
@@ -35,17 +63,33 @@ const ConfigGrupoMusical = () => {
       historia,
       dataDeCriacao,
     };
+    const editGrupo = {
+      codGrupoMusical: idEditGrupo,
+      nomeGrupoMusical,
+      historia,
+      dataDeCriacao,
+    };
 
     try {
-      const response = await service.grupoMusical.add(novoGrupo);
-      if (response?.status === 201) {
-        setMsgDoAlert("Grupo Musical Criado Com Sucesso!");
-        setCorDoAlert("success");
-        setNomeGrupoMusical("");
-        setHistoria("");
-        setDataDeCriacao("");
+      let response;
+      if (idEditGrupo) {
+        // Edit existing grupo musical
+        response = await service.grupoMusical.update(editGrupo);
       } else {
-        setMsgDoAlert("Falha na Criação do Grupo Musical, Tente Novamente!");
+        // Create new grupo musical
+        response = await service.grupoMusical.add(novoGrupo);
+      }
+
+      if (response?.status === 201 || response?.status === 200) {
+        setMsgDoAlert(`Grupo Musical ${idEditGrupo ? "Atualizado" : "Criado"} Com Sucesso!`);
+        setCorDoAlert("success");
+        if (!idEditGrupo) {
+          setNomeGrupoMusical("");
+          setHistoria("");
+          setDataDeCriacao("");
+        }
+      } else {
+        setMsgDoAlert(`Falha na ${idEditGrupo ? "Atualização" : "Criação"} do Grupo Musical, Tente Novamente!`);
         setCorDoAlert("danger");
       }
     } catch (error) {
@@ -63,7 +107,7 @@ const ConfigGrupoMusical = () => {
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
           <CCardBody className="p-4">
             <CForm>
-              <h1>Criar Novo Grupo Musical</h1>
+              <h1>{idEditGrupo !== undefined ? `Editar Grupo Musical` : "Criar Novo Grupo Musical"}</h1>
               <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
 
               <CInputGroup className="mb-3">
@@ -110,7 +154,7 @@ const ConfigGrupoMusical = () => {
 
               <div className="d-grid">
                 <CButton color="success" onClick={handleAddGrupoMusical}>
-                  {loading ? <CSpinner size="sm" /> : 'Criar Grupo Musical'}
+                  {loading ? <CSpinner size="sm" /> : idEditGrupo ? 'Atualizar Grupo Musical' : 'Criar Grupo Musical'}
                 </CButton>
               </div>
             </CForm>

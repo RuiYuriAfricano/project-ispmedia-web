@@ -23,6 +23,7 @@ import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
 
 const GrupoMusical = () => {
+
   const [grupos, setGrupos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -93,7 +94,8 @@ const GrupoMusical = () => {
                       <CDropdown>
                         <CDropdownToggle color="secondary">Escolha a Operação</CDropdownToggle>
                         <CDropdownMenu>
-                          <CDropdownItem href="#">Editar</CDropdownItem>
+
+                          <CDropdownItem><Link to={`/configGrupoMusical/${grupo.codGrupoMusical}`}>Editar</Link></CDropdownItem>
                           <CDropdownItem onClick={() => handleDelete(grupo.codGrupoMusical)}>Excluir</CDropdownItem>
                         </CDropdownMenu>
                       </CDropdown>

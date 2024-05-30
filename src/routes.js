@@ -12,6 +12,7 @@ const routes = [
   { path: '/login', name: 'Login', element: Login },
   { path: '/grupoMusical', name: 'GrupoMusical', element: GrupoMusical },
   { path: '/configGrupoMusical', name: 'ConfigGrupoMusical', element: ConfigGrupoMusical },
+  { path: '/configGrupoMusical/:idEditGrupo', name: 'ConfigGrupoMusical', element: ConfigGrupoMusical }
 ]
 
 export default routes
