@@ -63,7 +63,7 @@ const GrupoMusical = () => {
         <CCard className="mb-4">
           <CCardHeader className="d-flex justify-content-between align-items-center">
             <strong>Listagem dos Grupos Musicais</strong>
-            <Link to="/novoGrupoMusical">
+            <Link to="/configGrupoMusical">
               <CButton color="primary" role="button">
                 Novo Grupo
               </CButton>

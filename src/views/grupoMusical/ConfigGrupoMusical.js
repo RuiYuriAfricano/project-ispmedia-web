@@ -19,7 +19,7 @@ import CIcon from '@coreui/icons-react';
 import { cilMusicNote, cilHistory, cilCalendar } from '@coreui/icons';
 import { service } from './../../services';
 
-const NovoGrupoMusical = () => {
+const ConfigGrupoMusical = () => {
   const [nomeGrupoMusical, setNomeGrupoMusical] = useState("");
   const [historia, setHistoria] = useState("");
   const [dataDeCriacao, setDataDeCriacao] = useState("");
@@ -121,4 +121,4 @@ const NovoGrupoMusical = () => {
   );
 };
 
-export default NovoGrupoMusical;
+export default ConfigGrupoMusical;
