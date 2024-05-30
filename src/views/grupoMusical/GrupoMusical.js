@@ -44,16 +44,23 @@ const GrupoMusical = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    try {
-      // Realiza a exclusão do grupo musical com o ID especificado
-      await service.grupoMusical.excluir(id);
-      // Atualiza a lista de grupos após a exclusão
-      setGrupos(grupos.filter(grupo => grupo.codGrupoMusical !== id));
-    } catch (err) {
-      // Se houver um erro, exibe-o
-      console.error('Erro ao excluir o grupo musical:', err);
+    // Exibe um prompt de confirmação
+    const confirmDelete = window.confirm("Tem certeza que deseja excluir este grupo musical?");
+
+    // Se o usuário confirmar, prosseguimos com a exclusão
+    if (confirmDelete) {
+      try {
+        // Realiza a exclusão do grupo musical com o ID especificado
+        await service.grupoMusical.excluir(id);
+        // Atualiza a lista de grupos após a exclusão
+        setGrupos(grupos.filter(grupo => grupo.codGrupoMusical !== id));
+      } catch (err) {
+        // Se houver um erro, exibe-o
+        console.error('Erro ao excluir o grupo musical:', err);
+      }
     }
   };
+
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
