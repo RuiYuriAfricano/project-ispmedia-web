@@ -18,11 +18,13 @@ import {
   cilMusicNote,
   cilNotes,
   cilPencil,
+  cilPeople,
   cilPuzzle,
   cilSearch,
   cilShare,
   cilSpeedometer,
   cilStar,
+  cilUserFollow,
   cilUserPlus,
   cilWifiSignal0,
   cilWifiSignal1,
@@ -45,7 +47,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Gerir Conteúdo',
-    to: '/theme/colors',
+    to: '/gerirConteudo',
     icon: <CIcon icon={cilList} customClassName="nav-icon" />,
   },
   {
@@ -96,16 +98,24 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Rádio',
-    to: '/charts',
-    icon: <CIcon icon={cilWifiSignal1} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
     name: 'Lista de Partilhas',
     to: '/charts',
     icon: <CIcon icon={cilList} customClassName="nav-icon" />,
   },
+  {
+    component: CNavItem,
+    name: 'Artistas',
+    to: '/artistas',
+    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+  },
+
+  {
+    component: CNavItem,
+    name: 'Rádio',
+    to: '/charts',
+    icon: <CIcon icon={cilWifiSignal1} customClassName="nav-icon" />,
+  },
+
 ]
 
 export default _nav
