@@ -10,3 +10,10 @@ export const setIsLogged = (state, action) => {
 export const setLoggedUser = (state, action) => {
   state.user = action.payload;
 };
+
+export const setSidebarShow = (state, action) => {
+  state.sidebarShow = action.payload;
+};
+export const setTheme = (state, action) => {
+  state.theme = action.payload;
+};

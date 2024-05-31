@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   CContainer,
@@ -12,9 +11,9 @@ import {
   CHeaderToggler,
   CNavLink,
   CNavItem,
-  useColorModes,
   CForm,
   CFormInput,
+  useColorModes,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {
@@ -28,28 +27,34 @@ import {
 
 import { AppBreadcrumb } from './index';
 import { AppHeaderDropdown } from './header/index';
+import { setSidebarShow } from '../redux/app/slice';
 
 const AppHeader = () => {
   const headerRef = useRef();
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme');
 
   const dispatch = useDispatch();
-  const sidebarShow = useSelector((state) => state.sidebarShow);
+  const sidebarShow = useSelector((state) => state.app.sidebarShow);
 
   useEffect(() => {
-    document.addEventListener('scroll', () => {
+    const handleScroll = () => {
       headerRef.current &&
         headerRef.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0);
-    });
+    };
+    document.addEventListener('scroll', handleScroll);
+    return () => {
+      document.removeEventListener('scroll', handleScroll);
+    };
   }, []);
+
+  const toggleSidebar = () => {
+    dispatch(setSidebarShow(!sidebarShow));
+  };
 
   return (
     <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
       <CContainer className="border-bottom px-4" fluid>
-        <CHeaderToggler
-          onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
-          style={{ marginInlineStart: '-14px' }}
-        >
+        <CHeaderToggler onClick={toggleSidebar} style={{ marginInlineStart: '-14px' }}>
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>
 
