@@ -44,23 +44,16 @@ const GrupoMusical = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    // Exibe um prompt de confirmação
     const confirmDelete = window.confirm("Tem certeza que deseja excluir este grupo musical?");
-
-    // Se o usuário confirmar, prosseguimos com a exclusão
     if (confirmDelete) {
       try {
-        // Realiza a exclusão do grupo musical com o ID especificado
         await service.grupoMusical.excluir(id);
-        // Atualiza a lista de grupos após a exclusão
         setGrupos(grupos.filter(grupo => grupo.codGrupoMusical !== id));
       } catch (err) {
-        // Se houver um erro, exibe-o
         console.error('Erro ao excluir o grupo musical:', err);
       }
     }
   };
-
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -86,6 +79,7 @@ const GrupoMusical = () => {
                   <CTableHeaderCell scope="col">História</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Data de Criação</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Registo na Aplicação</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Utilizador</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Operações</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
@@ -97,11 +91,11 @@ const GrupoMusical = () => {
                     <CTableDataCell>{grupo.historia}</CTableDataCell>
                     <CTableDataCell>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</CTableDataCell>
                     <CTableDataCell>{new Date(grupo.dataDeRegisto).toLocaleDateString()}</CTableDataCell>
+                    <CTableDataCell>{grupo.registadopor?.username}</CTableDataCell> {/* Exibe o nome do utilizador */}
                     <CTableDataCell>
                       <CDropdown>
                         <CDropdownToggle color="secondary">Escolha a Operação</CDropdownToggle>
                         <CDropdownMenu>
-
                           <CDropdownItem><Link to={`/configGrupoMusical/${grupo.codGrupoMusical}`}>Editar</Link></CDropdownItem>
                           <CDropdownItem onClick={() => handleDelete(grupo.codGrupoMusical)}>Excluir</CDropdownItem>
                         </CDropdownMenu>

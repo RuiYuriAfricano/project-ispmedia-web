@@ -30,6 +30,8 @@ const ConfigGrupoMusical = () => {
   const [loading, setLoading] = useState(false);
   const [msgDoAlert, setMsgDoAlert] = useState("");
   const [corDoAlert, setCorDoAlert] = useState("");
+  const [codUtilizador, setCodUtilizador] = useState(-1);
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
 
   useEffect(() => {
     if (idEditGrupo) {
@@ -42,6 +44,7 @@ const ConfigGrupoMusical = () => {
             setNomeGrupoMusical(grupo.nomeGrupoMusical);
             setHistoria(grupo.historia);
             setDataDeCriacao(grupo.dataDeCriacao.split('T')[0]);
+            setCodUtilizador(grupo.fkUtilizador);
           } else {
             setMsgDoAlert("Erro ao carregar dados do grupo musical");
             setCorDoAlert("danger");
@@ -62,12 +65,14 @@ const ConfigGrupoMusical = () => {
       nomeGrupoMusical,
       historia,
       dataDeCriacao,
+      fkUtilizador: user?.codUtilizador,
     };
     const editGrupo = {
       codGrupoMusical: idEditGrupo,
       nomeGrupoMusical,
       historia,
       dataDeCriacao,
+      fkUtilizador: codUtilizador,
     };
 
     try {
