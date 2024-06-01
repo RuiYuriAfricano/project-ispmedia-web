@@ -112,7 +112,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Rádio',
-    to: '/charts',
+    to: '/estacoesDeRadio',
     icon: <CIcon icon={cilWifiSignal1} customClassName="nav-icon" />,
   },
 

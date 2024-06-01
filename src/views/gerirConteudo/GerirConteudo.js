@@ -22,7 +22,7 @@ import videoImage from './images/image3.png';
 
 const GerirConteudo = () => {
   const menuItems = [
-    { name: 'Gestão de Álbuns', icon: cilLibrary, link: '/albuns', image: albumImage },
+    { name: 'Gestão de Álbuns', icon: cilLibrary, link: '/album', image: albumImage },
     { name: 'Gestão de Músicas', icon: cilMusicNote, link: '/musicas', image: musicImage },
     { name: 'Gestão de Vídeos', icon: cilVideo, link: '/videos', image: videoImage },
   ];
@@ -55,10 +55,12 @@ const GerirConteudo = () => {
             </CCardHeader>
             <CCardBody style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <img src={item.image} alt={item.name} style={{ marginBottom: '1rem', maxWidth: '100%', height: '180px' }} />
-              <CButton color="primary" className="mt-3" to={item.link} component={Link} style={buttonStyle}>
-                <CIcon icon={item.icon} size="5xl" style={iconStyle} /> {/* Ajusta o tamanho dos ícones */}
-                <div>{item.name}</div>
-              </CButton>
+              <Link to={item.link}>
+                <CButton color="primary" className="mt-3" to={item.link} component={Link} style={buttonStyle}>
+                  <CIcon icon={item.icon} size="5xl" style={iconStyle} /> {/* Ajusta o tamanho dos ícones */}
+                  <div>{item.name}</div>
+                </CButton>
+              </Link>
             </CCardBody>
           </CCard>
         </CCol>

@@ -8,6 +8,9 @@ const ConfigGrupoMusical = React.lazy(() => import('./views/grupoMusical/ConfigG
 const Artista = React.lazy(() => import('./views/artista/Artista'))
 const ConfigArtista = React.lazy(() => import('./views/artista/ConfigArtista'))
 const GerirConteudo = React.lazy(() => import('./views/gerirConteudo/GerirConteudo'))
+const EstacoesDeRadio = React.lazy(() => import('./views/estacoesDeRadio/EstacoesDeRadio'))
+const Album = React.lazy(() => import('./views/album/Album'))
+const ConfigAlbum = React.lazy(() => import('./views/album/ConfigAlbum'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -20,6 +23,10 @@ const routes = [
   { path: '/configArtista', name: 'ConfigArtista', element: ConfigArtista },
   { path: '/configArtista/:idEditArtista', name: 'ConfigArtista', element: ConfigArtista },
   { path: '/gerirConteudo', name: 'GerirConteudo', element: GerirConteudo },
+  { path: '/estacoesDeRadio', name: 'EstacoesDeRadio', element: EstacoesDeRadio },
+  { path: '/album', name: 'Album', element: Album },
+  { path: '/configAlbum/', name: 'ConfigAlbum', element: ConfigAlbum },
+  { path: '/configAlbum/:idEditAlbum', name: 'ConfigAlbum', element: ConfigAlbum },
 ]
 
 export default routes
