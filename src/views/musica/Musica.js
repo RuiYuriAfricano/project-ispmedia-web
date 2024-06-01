@@ -6,11 +6,7 @@ import {
   CCardHeader,
   CCol,
   CRow,
-  CButton,
-  CDropdown,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle
+  CButton
 } from '@coreui/react';
 import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -18,10 +14,26 @@ import ReactPlayer from 'react-player';
 import { service } from './../../services';
 
 const Musicas = () => {
-
   const [musicas, setMusicas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [serverStatus, setServerStatus] = useState(true); // Estado do servidor: true = online, false = offline
+
+  useEffect(() => {
+    const checkServerStatus = async () => {
+      try {
+        const response = await fetch('http://localhost:3333/status');
+        if (response.status !== 404) {
+          setServerStatus(false); // Se o status não for 200, o servidor está offline
+        }
+      } catch (error) {
+        setServerStatus(false); // Em caso de erro, o servidor está offline
+      }
+    };
+    const interval = setInterval(checkServerStatus, 5000); // Verifica o status do servidor a cada 5 segundos
+
+    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+  }, []);
 
   useEffect(() => {
     const fetchMusicas = async () => {
@@ -54,6 +66,19 @@ const Musicas = () => {
     // Implement your share functionality here
     alert(`Sharing music with ID: ${id}`);
   };
+
+  const handlePlayerError = () => {
+    setPlaying(false); // Define o estado de reprodução como falso
+  };
+
+  const handlePlay = () => {
+    if (!serverStatus) {
+      alert('O servidor está offline. A reprodução não pode continuar.'); // Exibe uma mensagem se o servidor estiver offline
+      return;
+    }
+    setPlaying(true); // Define o estado de reprodução como verdadeiro
+  };
+
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -103,7 +128,14 @@ const Musicas = () => {
               </CCardHeader>
               <CCardBody style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <img src={`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`} alt={musica.tituloMusica} style={{ marginBottom: '1rem', maxWidth: '100%', height: '120px' }} />
-                <ReactPlayer url={`http://localhost:3333/musica/downloadMusica/${musica.codMusica}`} playing={false} controls={true} width="100%" height="50px" />
+                <ReactPlayer
+                  url={`http://localhost:3333/musica/downloadMusica/${musica.codMusica}`}
+                  playing={serverStatus}
+                  controls={true}
+                  width="100%"
+                  height="50px"
+                  onError={handlePlayerError}
+                />
                 <div style={buttonGroupStyle} className='mt-3'>
                   <CButton color="primary" style={buttonStyle}>
                     <CIcon icon={cilPencil} size="lg" style={iconStyle} />
