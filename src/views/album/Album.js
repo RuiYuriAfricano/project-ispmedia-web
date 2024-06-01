@@ -80,12 +80,12 @@ const Album = () => {
               <CTableHead>
                 <CTableRow>
                   <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Capa</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Título</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Descrição</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Editora</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Data de Lançamento</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Artista/Grupo Musical</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Capa</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Utilizador</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Operações</CTableHeaderCell>
                 </CTableRow>
@@ -94,13 +94,13 @@ const Album = () => {
                 {albuns.map((album, index) => (
                   <CTableRow key={album.codAlbum}>
                     <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
+                    <CTableDataCell><img src={"http://localhost:3333/album/downloadCapa/" + album.codAlbum + ""} alt="Capa do Álbum" style={{ width: '100px', height: '90px' }} /></CTableDataCell>
                     <CTableDataCell>{album.tituloAlbum}</CTableDataCell>
                     <CTableDataCell>{album.descricao}</CTableDataCell>
                     <CTableDataCell>{album.editora}</CTableDataCell>
                     <CTableDataCell>{formatarData(album.dataLancamento)}</CTableDataCell>
 
                     <CTableDataCell>{album.artista ? `Artista: ${album.artista.nomeArtista}` : `Grupo Musical: ${album.grupoMusical.nomeGrupoMusical}`}</CTableDataCell>
-                    <CTableDataCell><img src={"http://localhost:3333/album/downloadCapa/" + album.codAlbum + ""} alt="Capa do Álbum" style={{ width: '110px', height: '100px' }} /></CTableDataCell>
                     <CTableDataCell>{album.registadopor.username}</CTableDataCell>
                     <CTableDataCell>
                       <CDropdown>

@@ -23,7 +23,7 @@ import videoImage from './images/image3.png';
 const GerirConteudo = () => {
   const menuItems = [
     { name: 'Gestão de Álbuns', icon: cilLibrary, link: '/album', image: albumImage },
-    { name: 'Gestão de Músicas', icon: cilMusicNote, link: '/musicas', image: musicImage },
+    { name: 'Gestão de Músicas', icon: cilMusicNote, link: '/musica', image: musicImage },
     { name: 'Gestão de Vídeos', icon: cilVideo, link: '/videos', image: videoImage },
   ];
 
