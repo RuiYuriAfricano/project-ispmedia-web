@@ -33,7 +33,6 @@ const AppHeaderDropdown = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser")
-    localStorage.removeItem("fotoUserLogado")
     setLogin(true)
   }
   if (login) {
@@ -42,7 +41,7 @@ const AppHeaderDropdown = () => {
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
-        <CAvatar src={userFoto} size="md" />
+        <CAvatar src={"http://localhost:3333/utilizador/download/" + user?.username + ""} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">{user?.username}</CDropdownHeader>

@@ -148,7 +148,7 @@ const ConfigAlbum = () => {
   };
 
   return (
-    <CRow className="justify-content-center">
+    <CRow className="justify-content-center mb-4">
       <CCol md={9} lg={7} xl={6}>
         <CCard className="mx-4">
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}

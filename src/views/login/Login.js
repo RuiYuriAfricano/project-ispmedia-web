@@ -59,10 +59,7 @@ const Login = () => {
 
         dispatch(appSlice.actions.setIsLogged(true));
         const isLogged = loggedUser?.isLogged;
-        const response2 = await service.auth.download(username);
-        if (!isNullOrUndef(response2)) {
-          localStorage.setItem("fotoUserLogado", JSON.stringify(response2));
-        }
+
         navigate("/dashboard");
       } else {
         setMsgDoAlert("Falha ao fazer login, tente novamente!");
