@@ -35,7 +35,9 @@ const ConfigAlbum = () => {
   const [loading, setLoading] = useState(false);
   const [msgDoAlert, setMsgDoAlert] = useState("");
   const [corDoAlert, setCorDoAlert] = useState("");
-  const [capaAlbum, setCapaAlbum] = useState("");
+  const [capaAlbum, setCapaAlbum] = useState(null);
+  const [alterarCapa, setAlterarCapa] = useState(false); // Novo estado para controlar a alteração da capa do álbum
+  const [pertenceArtista, setPertenceArtista] = useState(true); // Novo estado para determinar se o álbum pertence a um artista ou a um grupo musical
   const user = JSON.parse(localStorage.getItem("loggedUser"));
 
   useEffect(() => {
@@ -71,11 +73,11 @@ const ConfigAlbum = () => {
             setTituloAlbum(album.tituloAlbum);
             setDescricao(album.descricao);
             setEditora(album.editora);
-            setDataLancamento(album.dataLancamento.split('T')[0]); // Corrigir a data para carregar corretamente
+            setDataLancamento(album.dataLancamento.split('T')[0]);
             setFkArtista(album.fkArtista);
             setFkGrupoMusical(album.fkGrupoMusical);
             setFkUtilizador(album.fkUtilizador);
-            setCapaAlbum(album.capaAlbum);
+            setCapaAlbum(null); // Reseta o estado da capa do álbum ao carregar os dados do álbum
           } else {
             setMsgDoAlert("Erro ao carregar dados do álbum");
             setCorDoAlert("danger");
@@ -92,35 +94,33 @@ const ConfigAlbum = () => {
   const handleAddAlbum = async () => {
     setLoading(true);
 
-    const novoAlbum = {
-      tituloAlbum,
-      descricao,
-      editora,
-      dataLancamento,
-      capaAlbum,
-      fkArtista: fkArtista || null,
-      fkGrupoMusical: fkGrupoMusical || null,
-      fkUtilizador: user?.codUtilizador,
-    };
+    const formData = new FormData();
+    formData.append('tituloAlbum', tituloAlbum);
+    formData.append('descricao', descricao);
+    formData.append('editora', editora);
+    formData.append('dataLancamento', dataLancamento);
+    formData.append('fkArtista', pertenceArtista ? (fkArtista || null) : null);
+    formData.append('fkGrupoMusical', !pertenceArtista ? (fkGrupoMusical || null) : null);
+    formData.append('fkUtilizador', user?.codUtilizador);
 
-    const editAlbum = {
-      codAlbum: idEditAlbum,
-      tituloAlbum,
-      descricao,
-      editora,
-      dataLancamento,
-      capaAlbum,
-      fkArtista: fkArtista || null,
-      fkGrupoMusical: fkGrupoMusical || null,
-      fkUtilizador,
-    };
+    if (alterarCapa || !idEditAlbum) {
+
+      const fileExtension = capaAlbum.name.split('.').pop();
+      const modifiedFilename = `${new Date().toISOString().replace(/[-:.]/g, '')}-${tituloAlbum}.${fileExtension}`;
+      const modifiedFile = new File([capaAlbum], modifiedFilename, {
+        type: capaAlbum.type,
+      });
+      formData.append('files', modifiedFile);
+      formData.append('capaAlbum', modifiedFilename);
+    }
 
     try {
       let response;
       if (idEditAlbum) {
-        response = await service.album.update(editAlbum);
+        formData.append('codAlbum', idEditAlbum);
+        response = await service.album.update(formData);
       } else {
-        response = await service.album.add(novoAlbum);
+        response = await service.album.add(formData);
       }
 
       if (response?.status === 201 || response?.status === 200) {
@@ -131,7 +131,7 @@ const ConfigAlbum = () => {
           setDescricao("");
           setEditora("");
           setDataLancamento("");
-          setCapaAlbum("");
+          setCapaAlbum(null);
           setFkArtista("");
           setFkGrupoMusical("");
         }
@@ -171,6 +171,7 @@ const ConfigAlbum = () => {
               </CInputGroup>
 
               <CInputGroup className="mb-3">
+
                 <CInputGroupText>
                   <CIcon icon={cilDescription} />
                 </CInputGroupText>
@@ -185,7 +186,7 @@ const ConfigAlbum = () => {
 
               <CInputGroup className="mb-3">
                 <CInputGroupText>
-                  <CIcon icon={cilUser} />
+                  <CIcon icon={cilMusicNote} />
                 </CInputGroupText>
                 <CFormInput
                   placeholder="Editora"
@@ -195,91 +196,103 @@ const ConfigAlbum = () => {
                   required
                 />
               </CInputGroup>
-              <CTooltip content="Selecione a data de lançamento do album.">
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilCalendar} />
-                  </CInputGroupText>
-                  <CFormInput
-                    type="date"
-                    placeholder="Data de Lançamento"
-                    autoComplete="data-lancamento"
-                    value={dataLancamento}
-                    onChange={(e) => setDataLancamento(e.target.value)}
-                    required
-                  />
-                </CInputGroup>
-              </CTooltip>
 
               <CInputGroup className="mb-3">
                 <CInputGroupText>
-                  <CIcon icon={cilImage} />
+                  <CIcon icon={cilCalendar} />
                 </CInputGroupText>
                 <CFormInput
-                  placeholder="Capa do Álbum"
-                  autoComplete="capa-album"
-                  value={capaAlbum}
-                  onChange={(e) => setCapaAlbum(e.target.value)}
+                  type="date"
+                  value={dataLancamento}
+                  onChange={(e) => setDataLancamento(e.target.value)}
                   required
                 />
               </CInputGroup>
 
-              <CFormCheck
-                id="pertenceAArtista"
-                label="Pertence a um artista?"
-                checked={!!fkArtista}
-                onChange={(e) => setFkArtista(e.target.checked ? artistas[0]?.codArtista : null)}
-                className="mb-3"
-              />
-
-              {fkArtista && (
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilUser} />
-                  </CInputGroupText>
-                  <CFormSelect
-                    value={fkArtista}
-                    onChange={(e) => setFkArtista(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecione um artista</option>
-                    {artistas.map((artista) => (
-                      <option key={artista.codArtista} value={artista.codArtista}>
-                        {artista.nomeArtista}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CInputGroup>
-              )}
-
-              {!fkArtista && (
+              {idEditAlbum && (
                 <CFormCheck
-                  id="pertenceAGrupo"
-                  label="Pertence a um grupo musical?"
-                  checked={!!fkGrupoMusical}
-                  onChange={(e) => setFkGrupoMusical(e.target.checked ? gruposMusicais[0]?.codGrupoMusical : null)}
+                  id="alterarCapa"
+                  label="Alterar capa do álbum?"
+                  checked={alterarCapa}
+                  onChange={(e) => setAlterarCapa(e.target.checked)}
                   className="mb-3"
                 />
               )}
 
-              {fkGrupoMusical && (
+              {(!idEditAlbum || (idEditAlbum && alterarCapa)) && (
                 <CInputGroup className="mb-3">
                   <CInputGroupText>
-                    <CIcon icon={cilGroup} />
+                    <CIcon icon={cilImage} />
                   </CInputGroupText>
-                  <CFormSelect
-                    value={fkGrupoMusical}
-                    onChange={(e) => setFkGrupoMusical(e.target.value)}
+                  <CFormInput
+                    type="file"
+                    onChange={(e) => setCapaAlbum(e.target.files[0])}
                     required
-                  >
-                    <option value="">Selecione um grupo musical</option>
-                    {gruposMusicais.map((grupo) => (
-                      <option key={grupo.codGrupoMusical} value={grupo.codGrupoMusical}>
-                        {grupo.nomeGrupoMusical}
-                      </option>
-                    ))}
-                  </CFormSelect>
+                  />
                 </CInputGroup>
+              )}
+
+              <div className="mb-3">
+                <CFormCheck
+                  type="radio"
+                  id="pertenceArtista"
+                  name="pertenceTipo"
+                  label="Pertence a um Artista"
+                  checked={pertenceArtista}
+                  onChange={() => setPertenceArtista(true)}
+                />
+                <CFormCheck
+                  type="radio"
+                  id="pertenceGrupo"
+                  name="pertenceTipo"
+                  label="Pertence a um Grupo Musical"
+                  checked={!pertenceArtista}
+                  onChange={() => setPertenceArtista(false)}
+                />
+              </div>
+
+              {pertenceArtista && (
+                <CTooltip content="Selecione um artista">
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilUser} />
+                    </CInputGroupText>
+                    <CFormSelect
+                      value={fkArtista}
+                      onChange={(e) => setFkArtista(e.target.value)}
+                      required
+                    >
+                      <option value="">Selecione um artista</option>
+                      {artistas.map((artista) => (
+                        <option key={artista.codArtista} value={artista.codArtista}>
+                          {artista.nomeArtista}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CInputGroup>
+                </CTooltip>
+              )}
+
+              {!pertenceArtista && (
+                <CTooltip content="Selecione um grupo musical">
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilGroup} />
+                    </CInputGroupText>
+                    <CFormSelect
+                      value={fkGrupoMusical}
+                      onChange={(e) => setFkGrupoMusical(e.target.value)}
+                      required
+                    >
+                      <option value="">Selecione um grupo musical</option>
+                      {gruposMusicais.map((grupo) => (
+                        <option key={grupo.codGrupoMusical} value={grupo.codGrupoMusical}>
+                          {grupo.nomeGrupoMusical}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CInputGroup>
+                </CTooltip>
               )}
 
               <div className="d-grid">
@@ -296,3 +309,4 @@ const ConfigAlbum = () => {
 };
 
 export default ConfigAlbum;
+

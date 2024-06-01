@@ -98,8 +98,9 @@ const Album = () => {
                     <CTableDataCell>{album.descricao}</CTableDataCell>
                     <CTableDataCell>{album.editora}</CTableDataCell>
                     <CTableDataCell>{formatarData(album.dataLancamento)}</CTableDataCell>
+
                     <CTableDataCell>{album.artista ? `Artista: ${album.artista.nomeArtista}` : `Grupo Musical: ${album.grupoMusical.nomeGrupoMusical}`}</CTableDataCell>
-                    <CTableDataCell><img src={album.capaAlbum} alt="Capa do Álbum" style={{ width: '50px' }} /></CTableDataCell>
+                    <CTableDataCell><img src={"http://localhost:3333/album/downloadCapa/" + album.codAlbum + "?destination=C:/ISPMediaCapasAlbum"} alt="Capa do Álbum" style={{ width: '50px' }} /></CTableDataCell>
                     <CTableDataCell>{album.registadopor.username}</CTableDataCell>
                     <CTableDataCell>
                       <CDropdown>
