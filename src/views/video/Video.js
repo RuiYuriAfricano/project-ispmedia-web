@@ -6,32 +6,25 @@ import {
   CCardHeader,
   CCol,
   CRow,
-  CButton,
-  CModal,
-  CModalHeader,
-  CModalTitle,
-  CModalBody,
-  CModalFooter
+  CButton
 } from '@coreui/react';
 import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import ReactPlayer from 'react-player';
 import { service } from './../../services';
 
-const Musica = () => {
+const Musicas = () => {
   const [musicas, setMusicas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [serverStatus, setServerStatus] = useState(false); // Estado do servidor: true = online, false = offline
-  const [showModal, setShowModal] = useState(false); // Estado para controlar o modal
-  const [musicaDetalhes, setMusicaDetalhes] = useState({}); // Estado para armazenar os detalhes da música
 
   useEffect(() => {
     const checkServerStatus = async () => {
       try {
         const response = await fetch('http://localhost:3333/status');
-        if (response.status === 200) {
-          setServerStatus(true); // Se o status for 200, o servidor está online
+        if (response.status !== 404) {
+          setServerStatus(false); // Se o status não for 200, o servidor está offline
         }
       } catch (error) {
         setServerStatus(false); // Em caso de erro, o servidor está offline
@@ -75,7 +68,7 @@ const Musica = () => {
   };
 
   const handlePlayerError = () => {
-    // Define o estado de reprodução como falso
+    setPlaying(false); // Define o estado de reprodução como falso
   };
 
   const handlePlay = () => {
@@ -83,13 +76,9 @@ const Musica = () => {
       alert('O servidor está offline. A reprodução não pode continuar.'); // Exibe uma mensagem se o servidor estiver offline
       return;
     }
-    // Define o estado de reprodução como verdadeiro
+    setPlaying(true); // Define o estado de reprodução como verdadeiro
   };
 
-  const handleShowDetails = (musica) => {
-    setMusicaDetalhes(musica);
-    setShowModal(true);
-  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -132,8 +121,7 @@ const Musica = () => {
       </CRow>
       <CRow className="justify-content-center mt-3">
         {musicas.map((musica, index) => (
-
-          < CCol sm="12" md="4" key={musica.codMusica} >
+          <CCol sm="12" md="4" key={musica.codMusica}>
             <CCard style={cardStyle}>
               <CCardHeader>
                 <h5>{musica.tituloMusica}</h5>
@@ -161,37 +149,18 @@ const Musica = () => {
                     <CIcon icon={cilShare} size="lg" style={iconStyle} />
                     Partilhar
                   </CButton>
-                  <CButton color="info" style={buttonStyle} onClick={() => handleShowDetails(musica)}>
+                  <CButton color="info" style={buttonStyle}>
                     <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
-                    Ver
+                    <Link to={`/detalhesMusica/${musica.codMusica}`} style={{ color: 'white' }}>Ver</Link>
                   </CButton>
                 </div>
               </CCardBody>
             </CCard>
           </CCol>
         ))}
-      </CRow >
-
-      <CModal visible={showModal} onClose={() => setShowModal(false)}>
-        <CModalHeader onClose={() => setShowModal(false)}>
-          <CModalTitle>Detalhes da Música</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <p><strong>Título:</strong> {musicaDetalhes.tituloMusica}</p>
-          <p><strong>Letra:</strong> {musicaDetalhes.letra}</p>
-          <p><strong>Gênero Musical:</strong> {musicaDetalhes.generoMusical}</p>
-          <p><strong>Compositor:</strong> {musicaDetalhes.compositor}</p>
-          <p><strong>Data de Lançamento:</strong> {new Date(musicaDetalhes.dataLancamento).toLocaleDateString()}</p>
-          <p><strong>Álbum:</strong> {musicaDetalhes.album?.tituloAlbum}</p>
-          <p><strong>Artista:</strong> {musicaDetalhes.artista?.nomeArtista}</p>
-          <p><strong>Grupo Musical:</strong> {musicaDetalhes.grupoMusical?.nomeGrupoMusical}</p>
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setShowModal(false)}>Fechar</CButton>
-        </CModalFooter>
-      </CModal>
+      </CRow>
     </>
   );
 };
 
-export default Musica;
+export default Musicas;

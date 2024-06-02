@@ -6,27 +6,23 @@ import {
   CCardHeader,
   CCol,
   CRow,
-  CTable,
-  CTableBody,
-  CTableHeaderCell,
-  CTableHead,
-  CTableRow,
-  CTableDataCell,
-  CDropdown,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
-  CButton
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter
 } from '@coreui/react';
-import { cilPlus } from '@coreui/icons';
+import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
 
 const Album = () => {
-
   const [albuns, setAlbuns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [albumDetalhes, setAlbumDetalhes] = useState({});
 
   useEffect(() => {
     const fetchAlbuns = async () => {
@@ -55,70 +51,104 @@ const Album = () => {
     }
   };
 
-  const formatarData = (data) => {
-    const dataObj = new Date(data);
-    return dataObj.toLocaleDateString();
+  const handleShare = (id) => {
+    alert(`Sharing album with ID: ${id}`);
+  };
+
+  const handleShowDetails = (album) => {
+    setAlbumDetalhes(album);
+    setShowModal(true);
   };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  return (
-    <CRow>
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader className="d-flex justify-content-between align-items-center">
-            <strong>Listagem dos Álbuns</strong>
-            <Link to="/configAlbum">
-              <CButton color="primary" role="button">
-                Novo Álbum
-              </CButton>
-            </Link>
-          </CCardHeader>
-          <CCardBody>
-            <CTable>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Capa</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Título</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Descrição</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Editora</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Data de Lançamento</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Artista/Grupo Musical</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Utilizador</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Operações</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {albuns.map((album, index) => (
-                  <CTableRow key={album.codAlbum}>
-                    <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
-                    <CTableDataCell><img src={"http://localhost:3333/album/downloadCapa/" + album.codAlbum + ""} alt="Capa do Álbum" style={{ width: '100px', height: '90px' }} /></CTableDataCell>
-                    <CTableDataCell>{album.tituloAlbum}</CTableDataCell>
-                    <CTableDataCell>{album.descricao}</CTableDataCell>
-                    <CTableDataCell>{album.editora}</CTableDataCell>
-                    <CTableDataCell>{formatarData(album.dataLancamento)}</CTableDataCell>
+  const cardStyle = {
+    marginBottom: '2rem',
+    textAlign: 'center',
+  };
 
-                    <CTableDataCell>{album.artista ? `Artista: ${album.artista.nomeArtista}` : `Grupo Musical: ${album.grupoMusical.nomeGrupoMusical}`}</CTableDataCell>
-                    <CTableDataCell>{album.registadopor.username}</CTableDataCell>
-                    <CTableDataCell>
-                      <CDropdown>
-                        <CDropdownToggle color="secondary">Escolha a Operação</CDropdownToggle>
-                        <CDropdownMenu>
-                          <CDropdownItem><Link to={`/configAlbum/${album.codAlbum}`}>Editar</Link></CDropdownItem>
-                          <CDropdownItem onClick={() => handleDelete(album.codAlbum)}>Excluir</CDropdownItem>
-                        </CDropdownMenu>
-                      </CDropdown>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))}
-              </CTableBody>
-            </CTable>
-          </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow>
+  const buttonGroupStyle = {
+    display: 'flex',
+    justifyContent: 'space-around',
+    width: '100%',
+  };
+
+  const buttonStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '60px',
+    width: '75px',
+  };
+
+  const iconStyle = {
+    marginBottom: '0.5rem',
+  };
+
+  return (
+    <>
+      <CRow className="justify-content-center mt-2">
+        <CCol sm="12" className="mb-3 d-flex justify-content-end">
+          <Link to="/configAlbum">
+            <CButton color="primary">
+              <CIcon icon={cilPlus} className="me-2" />
+              Inserir Novo Álbum
+            </CButton>
+          </Link>
+        </CCol>
+      </CRow>
+      <CRow className="justify-content-center mt-3">
+        {albuns.map((album) => (
+          <CCol sm="12" md="4" key={album.codAlbum}>
+            <CCard style={cardStyle}>
+              <CCardHeader>
+                <h5>{album.tituloAlbum}</h5>
+              </CCardHeader>
+              <CCardBody style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <img src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} style={{ marginBottom: '1rem', maxWidth: '100%', height: '120px' }} />
+                <div style={buttonGroupStyle} className='mt-3'>
+                  <CButton color="primary" style={buttonStyle}>
+                    <CIcon icon={cilPencil} size="lg" style={iconStyle} />
+                    <Link to={`/configAlbum/${album.codAlbum}`} style={{ color: 'white' }}>Editar</Link>
+                  </CButton>
+                  <CButton color="danger" style={buttonStyle} onClick={() => handleDelete(album.codAlbum)}>
+                    <CIcon icon={cilTrash} size="lg" style={iconStyle} />
+                    Excluir
+                  </CButton>
+                  <CButton color="success" style={buttonStyle} onClick={() => handleShare(album.codAlbum)}>
+                    <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                    Partilhar
+                  </CButton>
+                  <CButton color="info" style={buttonStyle} onClick={() => handleShowDetails(album)}>
+                    <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
+                    Ver
+                  </CButton>
+                </div>
+              </CCardBody>
+            </CCard>
+          </CCol>
+        ))}
+      </CRow>
+
+      <CModal visible={showModal} onClose={() => setShowModal(false)}>
+        <CModalHeader onClose={() => setShowModal(false)}>
+          <CModalTitle>Detalhes do Álbum</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p><strong>Título:</strong> {albumDetalhes.tituloAlbum}</p>
+          <p><strong>Descrição:</strong> {albumDetalhes.descricao}</p>
+          <p><strong>Editora:</strong> {albumDetalhes.editora}</p>
+          <p><strong>Data de Lançamento:</strong> {new Date(albumDetalhes.dataLancamento).toLocaleDateString()}</p>
+          <p><strong>Artista/Grupo Musical:</strong> {albumDetalhes.artista ? albumDetalhes.artista.nomeArtista : albumDetalhes.grupoMusical?.nomeGrupoMusical}</p>
+          <p><strong>Utilizador:</strong> {albumDetalhes.registadopor?.username}</p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowModal(false)}>Fechar</CButton>
+        </CModalFooter>
+      </CModal>
+    </>
   );
 };
 

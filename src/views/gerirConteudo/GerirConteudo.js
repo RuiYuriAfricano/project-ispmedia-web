@@ -24,7 +24,7 @@ const GerirConteudo = () => {
   const menuItems = [
     { name: 'Gestão de Álbuns', icon: cilLibrary, link: '/album', image: albumImage },
     { name: 'Gestão de Músicas', icon: cilMusicNote, link: '/musica', image: musicImage },
-    { name: 'Gestão de Vídeos', icon: cilVideo, link: '/videos', image: videoImage },
+    { name: 'Gestão de Vídeos', icon: cilVideo, link: '/video', image: videoImage },
   ];
 
   const cardStyle = {

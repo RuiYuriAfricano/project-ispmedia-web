@@ -27,7 +27,7 @@ import {
   cilPencil,
 } from '@coreui/icons';
 import { service } from './../../services';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const ConfigMusica = () => {
   const { idEditMusica } = useParams();
@@ -155,13 +155,6 @@ const ConfigMusica = () => {
       let response;
       if (idEditMusica) {
         formData.append('codMusica', idEditMusica);
-
-        if (pertenceArtista) {
-          formData.set("fkgrupoMusical", null);
-        } else {
-          formData.set("fkArtista", null);
-        }
-
         response = await service.musica.update(formData);
       } else {
         response = await service.musica.add(formData);
@@ -385,7 +378,7 @@ const ConfigMusica = () => {
                   </CButton>
                 </CCol>
                 <CCol xs={6} className="text-right">
-                  <Link to="/musica" > <CButton color="secondary">Voltar</CButton> </Link>
+                  <CButton color="secondary">Voltar</CButton>
                 </CCol>
               </CRow>
             </CForm>
