@@ -59,6 +59,15 @@ const ConfigGrupoMusical = () => {
   }, [idEditGrupo]);
 
   const handleAddGrupoMusical = async () => {
+    // Verificar se todos os campos obrigatórios estão preenchidos
+    const emptyFields = isAllFieldsFilled();
+
+    if (emptyFields.length > 0) {
+      const emptyFieldsMessage = emptyFields.join(', ');
+      setMsgDoAlert(`Por favor, preencha os campos: ${emptyFieldsMessage}.`);
+      setCorDoAlert('danger');
+      return;
+    }
     setLoading(true);
 
     const novoGrupo = {
@@ -105,6 +114,21 @@ const ConfigGrupoMusical = () => {
     }
   };
 
+  const isAllFieldsFilled = () => {
+    const emptyFields = [];
+
+    if (nomeGrupoMusical.trim() === '') {
+      emptyFields.push('Nome do grupo musical');
+    }
+    if (historia.trim() === '') {
+      emptyFields.push('História');
+    }
+    if (dataDeCriacao.trim() === '') {
+      emptyFields.push('Data de Criação');
+    }
+
+    return emptyFields;
+  };
   return (
     <CRow className="justify-content-center">
       <CCol md={9} lg={7} xl={6}>

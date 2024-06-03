@@ -16,7 +16,7 @@ import {
   CTooltip,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMusicNote, cilUser, cilGroup, cilImage, cilDescription, cilCalendar } from '@coreui/icons';
+import { cilMusicNote, cilUser, cilGroup, cilImage, cilDescription, cilCalendar, cilPen, cilPencil } from '@coreui/icons';
 import { service } from './../../services';
 import { useParams } from 'react-router-dom';
 
@@ -78,6 +78,12 @@ const ConfigAlbum = () => {
             setFkGrupoMusical(album.fkGrupoMusical);
             setFkUtilizador(album.fkUtilizador);
             setCapaAlbum(null); // Reseta o estado da capa do álbum ao carregar os dados do álbum
+            if (album.fkArtista === null) {
+              setPertenceArtista(false);
+            }
+            else if (album.grupoMusical === null) {
+              setPertenceArtista(true);
+            }
           } else {
             setMsgDoAlert("Erro ao carregar dados do álbum");
             setCorDoAlert("danger");
@@ -92,6 +98,15 @@ const ConfigAlbum = () => {
   }, [idEditAlbum]);
 
   const handleAddAlbum = async () => {
+    // Verificar se todos os campos obrigatórios estão preenchidos
+    const emptyFields = isAllFieldsFilled();
+
+    if (emptyFields.length > 0) {
+      const emptyFieldsMessage = emptyFields.join(', ');
+      setMsgDoAlert(`Por favor, preencha os campos: ${emptyFieldsMessage}.`);
+      setCorDoAlert('danger');
+      return;
+    }
     setLoading(true);
 
     const formData = new FormData();
@@ -147,6 +162,31 @@ const ConfigAlbum = () => {
     }
   };
 
+  const isAllFieldsFilled = () => {
+    const emptyFields = [];
+
+    if (tituloAlbum.trim() === '') {
+      emptyFields.push('Título do Album');
+    }
+    if (descricao.trim() === '') {
+      emptyFields.push('Descrição');
+    }
+
+    if (!fkArtista && !fkGrupoMusical) {
+      emptyFields.push('Artista ou Grupo Musical');
+    }
+    if (editora.trim() === '') {
+      emptyFields.push('Editora');
+    }
+    if (dataLancamento.trim() === '') {
+      emptyFields.push('Data de Lançamento');
+    }
+    if (!idEditAlbum && !capaAlbum) {
+      emptyFields.push('Capa da Album');
+    }
+
+    return emptyFields;
+  };
   return (
     <CRow className="justify-content-center mb-4">
       <CCol md={9} lg={7} xl={6}>
@@ -186,7 +226,7 @@ const ConfigAlbum = () => {
 
               <CInputGroup className="mb-3">
                 <CInputGroupText>
-                  <CIcon icon={cilMusicNote} />
+                  <CIcon icon={cilPencil} />
                 </CInputGroupText>
                 <CFormInput
                   placeholder="Editora"

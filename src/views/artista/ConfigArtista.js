@@ -73,6 +73,17 @@ const ConfigArtista = () => {
   }, [idEditArtista]);
 
   const handleAddArtista = async () => {
+
+    // Verificar se todos os campos obrigatórios estão preenchidos
+    const emptyFields = isAllFieldsFilled();
+
+    if (emptyFields.length > 0) {
+      const emptyFieldsMessage = emptyFields.join(', ');
+      setMsgDoAlert(`Por favor, preencha os campos: ${emptyFieldsMessage}.`);
+      setCorDoAlert('danger');
+      return;
+    }
+
     setLoading(true);
 
     const novoArtista = {
@@ -120,6 +131,22 @@ const ConfigArtista = () => {
     }
   };
 
+  const isAllFieldsFilled = () => {
+    const emptyFields = [];
+
+    if (nomeArtista.trim() === '') {
+      emptyFields.push('Nome do Artista');
+    }
+    if (generoMusical.trim() === '') {
+      emptyFields.push('Genêro Musical');
+    }
+    if (pertenceAGrupo && !fkGrupoMusical) {
+      emptyFields.push('Grupo Musical');
+    }
+
+    return emptyFields;
+  };
+
   return (
     <CRow className="justify-content-center">
       <CCol md={9} lg={7} xl={6}>
@@ -147,13 +174,38 @@ const ConfigArtista = () => {
                 <CInputGroupText>
                   <CIcon icon={cilMusicNote} />
                 </CInputGroupText>
-                <CFormInput
-                  placeholder="Gênero Musical"
-                  autoComplete="genero-musical"
+
+                <CFormSelect
                   value={generoMusical}
                   onChange={(e) => setGeneroMusical(e.target.value)}
-                  required
-                />
+                >
+                  <option value="">Selecione o Grupo Musical</option>
+                  <option value="Rock">Rock</option>
+                  <option value="Pop">Pop</option>
+                  <option value="Funk">Funk</option>
+                  <option value="Rap">Rap</option>
+                  <option value="Hip Hop">Hip Hop</option>
+                  <option value="Reggae">Reggae</option>
+                  <option value="Jazz">Jazz</option>
+                  <option value="Blues">Blues</option>
+                  <option value="Soul">Soul</option>
+                  <option value="Country">Country</option>
+                  <option value="Gospel">Gospel</option>
+                  <option value="Folk">Folk</option>
+                  <option value="Indie">Indie</option>
+                  <option value="Metal">Metal</option>
+                  <option value="Punk">Punk</option>
+                  <option value="Sertanejo">Sertanejo</option>
+                  <option value="Bossa Nova">Bossa Nova</option>
+                  <option value="Fado">Fado</option>
+                  <option value="Kizomba">Kizomba</option>
+                  <option value="Semba">Semba</option>
+                  <option value="Kuduro">Kuduro</option>
+                  <option value="Tarraxinha">Tarraxinha</option>
+                  <option value="Afro-house">Afro-house</option>
+                  <option value="Marrabenta">Marrabenta</option>
+                  <option value="Zouk">Zouk</option>
+                </CFormSelect>
               </CInputGroup>
 
               <CFormCheck

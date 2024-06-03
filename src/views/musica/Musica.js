@@ -30,8 +30,8 @@ const Musica = () => {
     const checkServerStatus = async () => {
       try {
         const response = await fetch('http://localhost:3333/status');
-        if (response.status === 200) {
-          setServerStatus(true); // Se o status for 200, o servidor está online
+        if (response.status !== 404) {
+          setServerStatus(false); // Se o status for 200, o servidor está online
         }
       } catch (error) {
         setServerStatus(false); // Em caso de erro, o servidor está offline

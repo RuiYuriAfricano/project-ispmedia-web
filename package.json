@@ -28,6 +28,7 @@
     "@coreui/utils": "^2.0.2",
     "@popperjs/core": "^2.11.8",
     "@reduxjs/toolkit": "^2.2.5",
+    "assemblyai": "^4.4.5",
     "axios": "^1.7.2",
     "chart.js": "^4.4.2",
     "classnames": "^2.5.1",

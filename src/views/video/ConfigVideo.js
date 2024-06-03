@@ -17,28 +17,26 @@ import {
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {
-  cilMusicNote,
+  cilVideo,
   cilUser,
   cilGroup,
-  cilImage,
   cilDescription,
   cilCalendar,
   cilFile,
   cilPencil,
 } from '@coreui/icons';
 import { service } from './../../services';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
-const ConfigMusica = () => {
-  const { idEditMusica } = useParams();
+const ConfigVideo = () => {
+  const { idEditVideo } = useParams();
 
-  const [tituloMusica, setTituloMusica] = useState('');
-  const [ficheiroMusical, setFicheiroMusical] = useState('');
-  const [letra, setLetra] = useState('');
-  const [generoMusical, setGeneroMusical] = useState('');
-  const [compositor, setCompositor] = useState('');
-  const [capaMusica, setCapaMusica] = useState(null);
-  const [fkAlbum, setFkAlbum] = useState('');
+  const [tituloVideo, setTituloVideo] = useState('');
+  const [ficheiroVideo, setFicheiroVideo] = useState('');
+  const [ficheiroDoVideo, setFicheiroDoVideo] = useState('');
+  const [generoDoVideo, setGeneroDoVideo] = useState('');
+  const [produtor, setProdutor] = useState('');
+  const [legenda, setLegenda] = useState('');
   const [fkGrupoMusical, setFkGrupoMusical] = useState('');
   const [fkArtista, setFkArtista] = useState('');
   const [dataLancamento, setDataLancamento] = useState('');
@@ -50,7 +48,6 @@ const ConfigMusica = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('loggedUser')) || {});
   const [artistas, setArtistas] = useState([]);
   const [gruposMusicais, setGruposMusicais] = useState([]);
-  const [albuns, setAlbuns] = useState([]);
 
   useEffect(() => {
     const fetchArtistas = async () => {
@@ -73,36 +70,35 @@ const ConfigMusica = () => {
       }
     };
 
-    const fetchAlbuns = async () => {
-      try {
-        const response = await service.album.listar();
-        setAlbuns(response.data);
-      } catch (error) {
-        setMsgDoAlert('Erro ao carregar álbuns');
-        setCorDoAlert('danger');
-      }
-    };
-
     fetchArtistas();
     fetchGruposMusicais();
-    fetchAlbuns();
 
-    if (idEditMusica) {
-      const fetchMusica = async () => {
+    if (idEditVideo) {
+      const fetchVideo = async () => {
         try {
-          const response = await service.musica.pesquisaporid(idEditMusica);
+          const response = await service.video.pesquisaporid(idEditVideo);
           if (response?.status === 200) {
-            const musica = response.data;
-            setTituloMusica(musica.tituloMusica);
-            setLetra(musica.letra);
-            setGeneroMusical(musica.generoMusical);
-            setCompositor(musica.compositor);
-            setDataLancamento(musica.dataLancamento.split('T')[0]);
-            setFkAlbum(musica.fkAlbum);
-            setFkGrupoMusical(musica.fkGrupoMusical);
-            setFkArtista(musica.fkArtista);
+            const video = response.data;
+            setTituloVideo(video.tituloVideo);
+            setGeneroDoVideo(video.generoDoVIdeo);
+            setProdutor(video.produtor);
+            setLegenda(video.legenda);
+            setDataLancamento(video.dataLancamento.split('T')[0]);
+            setFkGrupoMusical(video.fkGrupoMusical);
+            setFkArtista(video.fkArtista);
+            setFicheiroDoVideo(video.ficheiroDoVideo);
+
+            if (video.fkArtista === null) {
+              setPertenceGrupoMusical(true);
+              setPertenceArtista(false);
+            }
+            else if (video.grupoMusical === null) {
+              setPertenceGrupoMusical(false);
+              setPertenceArtista(true);
+            }
+
           } else {
-            setMsgDoAlert('Erro ao carregar dados da música');
+            setMsgDoAlert('Erro ao carregar dados do vídeo');
             setCorDoAlert('danger');
           }
         } catch (error) {
@@ -110,20 +106,29 @@ const ConfigMusica = () => {
           setCorDoAlert('danger');
         }
       };
-      fetchMusica();
+      fetchVideo();
     }
-  }, [idEditMusica]);
+  }, [idEditVideo]);
 
-  const handleAddMusica = async () => {
+  const handleAddVideo = async () => {
+
+    // Verificar se todos os campos obrigatórios estão preenchidos
+    const emptyFields = isAllFieldsFilled();
+
+    if (emptyFields.length > 0) {
+      const emptyFieldsMessage = emptyFields.join(', ');
+      setMsgDoAlert(`Por favor, preencha os campos: ${emptyFieldsMessage}.`);
+      setCorDoAlert('danger');
+      return;
+    }
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('tituloMusica', tituloMusica);
-    formData.append('letra', letra);
-    formData.append('generoMusical', generoMusical);
-    formData.append('compositor', compositor);
+    formData.append('tituloVideo', tituloVideo);
+    formData.append('generoDoVideo', generoDoVideo);
+    formData.append('produtor', produtor);
+    formData.append('legenda', legenda);
     formData.append('dataLancamento', dataLancamento);
-    formData.append('fkAlbum', fkAlbum || null);
     formData.append('fkArtista', fkArtista || null);
     formData.append('fkGrupoMusical', fkGrupoMusical || null);
     formData.append('fkUtilizador', user?.codUtilizador);
@@ -134,49 +139,49 @@ const ConfigMusica = () => {
       });
     };
 
-    let newCapaMusicaName = '';
-    let newFicheiroMusicalName = '';
+    let newFicheiroVideoName = '';
 
-    if (capaMusica) {
-      newCapaMusicaName = `${idEditMusica || 'new'}-${tituloMusica}-capa${capaMusica.name.slice(capaMusica.name.lastIndexOf('.'))}`;
-      const renamedCapaMusica = renameFile(capaMusica, newCapaMusicaName);
-      formData.append('files', renamedCapaMusica);
-      formData.append('capaMusica', newCapaMusicaName);
-    }
-
-    if (ficheiroMusical) {
-      newFicheiroMusicalName = `${idEditMusica || 'new'}-${tituloMusica}${ficheiroMusical.name.slice(ficheiroMusical.name.lastIndexOf('.'))}`;
-      const renamedFicheiroMusical = renameFile(ficheiroMusical, newFicheiroMusicalName);
-      formData.append('files', renamedFicheiroMusical);
-      formData.append('ficheiroMusical', newFicheiroMusicalName);
+    if (ficheiroVideo) {
+      newFicheiroVideoName = `${idEditVideo || 'new'}-${tituloVideo}${ficheiroVideo.name.slice(ficheiroVideo.name.lastIndexOf('.'))}`;
+      const renamedFicheiroVideo = renameFile(ficheiroVideo, newFicheiroVideoName);
+      formData.append('files', renamedFicheiroVideo);
+      formData.append('ficheiroDoVideo', newFicheiroVideoName);
     }
 
     try {
       let response;
-      if (idEditMusica) {
-        formData.append('codMusica', idEditMusica);
-        response = await service.musica.update(formData);
+      if (idEditVideo) {
+        formData.append('codVideo', idEditVideo);
+
+        if (pertenceArtista) {
+          formData.set("fkgrupoMusical", null);
+        } else {
+          formData.set("fkArtista", null);
+        }
+
+        if (!ficheiroVideo) {
+          formData.append('ficheiroDoVideo', ficheiroDoVideo);
+        }
+        response = await service.video.update(formData);
       } else {
-        response = await service.musica.add(formData);
+        response = await service.video.add(formData);
       }
 
       if (response?.status === 201 || response?.status === 200) {
-        setMsgDoAlert(`Música ${idEditMusica ? 'Atualizada' : 'Criada'} Com Sucesso!`);
+        setMsgDoAlert(`Vídeo ${idEditVideo ? 'Atualizado' : 'Criado'} Com Sucesso!`);
         setCorDoAlert('success');
-        if (!idEditMusica) {
-          setTituloMusica('');
-          setLetra('');
-          setGeneroMusical('');
-          setCompositor('');
+        if (!idEditVideo) {
+          setTituloVideo('');
+          setGeneroDoVideo('');
+          setProdutor('');
+          setLegenda('');
           setDataLancamento('');
-          setFkAlbum('');
           setFkGrupoMusical('');
           setFkArtista('');
-          setCapaMusica(null);
-          setFicheiroMusical(null);
+          setFicheiroVideo(null);
         }
       } else {
-        setMsgDoAlert(`Falha na ${idEditMusica ? 'Atualização' : 'Criação'} da Música, Tente Novamente!`);
+        setMsgDoAlert(`Falha na ${idEditVideo ? 'Atualização' : 'Criação'} do Vídeo, Tente Novamente!`);
         setCorDoAlert('danger');
       }
     } catch (error) {
@@ -187,6 +192,33 @@ const ConfigMusica = () => {
     }
   };
 
+
+  const isAllFieldsFilled = () => {
+    const emptyFields = [];
+
+    if (tituloVideo.trim() === '') {
+      emptyFields.push('Título do Vídeo');
+    }
+    if (generoDoVideo.trim() === '') {
+      emptyFields.push('Gênero do Vídeo');
+    }
+    if (produtor.trim() === '') {
+      emptyFields.push('Produtor');
+    }
+    if (!fkArtista && !fkGrupoMusical) {
+      emptyFields.push('Artista ou Grupo Musical');
+    }
+    if (dataLancamento.trim() === '') {
+      emptyFields.push('Data de Lançamento');
+    }
+    if (!idEditVideo && !ficheiroVideo) {
+      emptyFields.push('Arquivo de Vídeo');
+    }
+
+    return emptyFields;
+  };
+
+
   return (
     <CRow className="justify-content-center mb-4">
       <CCol md={9} lg={7} xl={6}>
@@ -194,18 +226,61 @@ const ConfigMusica = () => {
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
           <CCardBody className="p-4">
             <CForm>
-              <h1>{idEditMusica !== undefined ? 'Editar Música' : 'Registar Música'}</h1>
+              <h1>{idEditVideo !== undefined ? 'Editar Vídeo' : 'Registar Vídeo'}</h1>
               <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
 
               <CInputGroup className="mb-3">
                 <CInputGroupText>
-                  <CIcon icon={cilMusicNote} />
+                  <CIcon icon={cilVideo} />
                 </CInputGroupText>
                 <CFormInput
-                  placeholder="Título da Música"
-                  autoComplete="titulo-musica"
-                  value={tituloMusica}
-                  onChange={(e) => setTituloMusica(e.target.value)}
+                  placeholder="Título do Vídeo"
+                  autoComplete="titulo-video"
+                  value={tituloVideo}
+                  onChange={(e) => setTituloVideo(e.target.value)}
+                  required
+                />
+              </CInputGroup>
+
+              <CInputGroup className="mb-3">
+                <CInputGroupText>
+                  <CIcon icon={cilDescription} />
+                </CInputGroupText>
+
+                <CFormSelect
+                  value={generoDoVideo}
+                  onChange={(e) => setGeneroDoVideo(e.target.value)}
+                >
+                  <option value="">Selecione o Gênero do Vídeo</option>
+                  <option value="Ação">Ação</option>
+                  <option value="Comédia">Comédia</option>
+                  <option value="Drama">Drama</option>
+                  <option value="Suspense">Suspense</option>
+                  <option value="Romance">Romance</option>
+                  <option value="Documentário">Documentário</option>
+                  <option value="Educação">Educação</option>
+                  <option value="Religioso">Religioso</option>
+                  <option value="Tutorial">Tutorial</option>
+                  <option value="Palestra">Palestra</option>
+                  <option value="Entrevista">Entrevista</option>
+                  <option value="Esportes">Esportes</option>
+                  <option value="Notícias">Notícias</option>
+                  <option value="Reality Show">Reality Show</option>
+                  <option value="Video blog">Video blog</option>
+                  <option value="Video Musicais">Video Musicais</option>
+                  <option value="Análise de Produto/Review">Análise de Produto/Review</option>
+                </CFormSelect>
+              </CInputGroup>
+
+              <CInputGroup className="mb-3">
+                <CInputGroupText>
+                  <CIcon icon={cilPencil} />
+                </CInputGroupText>
+                <CFormInput
+                  placeholder="Produtor"
+                  autoComplete="produtor"
+                  value={produtor}
+                  onChange={(e) => setProdutor(e.target.value)}
                   required
                 />
               </CInputGroup>
@@ -216,37 +291,11 @@ const ConfigMusica = () => {
                 </CInputGroupText>
                 <textarea
                   className="form-control"
-                  placeholder="Letra"
-                  autoComplete="letra"
-                  value={letra}
-                  onChange={(e) => setLetra(e.target.value)}
+                  placeholder="Legenda"
+                  autoComplete="legenda"
+                  value={legenda === "" ? legenda : JSON.parse(legenda)}
+                  onChange={(e) => setLegenda(JSON.stringify(e.target.value))}
                   rows={4}
-                  required
-                />
-              </CInputGroup>
-
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilDescription} />
-                </CInputGroupText>
-                <CFormInput
-                  placeholder="Gênero Musical"
-                  autoComplete="genero-musical"
-                  value={generoMusical}
-                  onChange={(e) => setGeneroMusical(e.target.value)}
-                  required
-                />
-              </CInputGroup>
-
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilPencil} />
-                </CInputGroupText>
-                <CFormInput
-                  placeholder="Compositor"
-                  autoComplete="compositor"
-                  value={compositor}
-                  onChange={(e) => setCompositor(e.target.value)}
                   required
                 />
               </CInputGroup>
@@ -267,23 +316,12 @@ const ConfigMusica = () => {
 
               <CInputGroup className="mb-3">
                 <CInputGroupText>
-                  <CIcon icon={cilImage} />
-                </CInputGroupText>
-                <CFormInput
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setCapaMusica(e.target.files[0])}
-                />
-              </CInputGroup>
-
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
                   <CIcon icon={cilFile} />
                 </CInputGroupText>
                 <CFormInput
                   type="file"
-                  accept="audio/*"
-                  onChange={(e) => setFicheiroMusical(e.target.files[0])}
+                  accept="video/*"
+                  onChange={(e) => setFicheiroVideo(e.target.files[0])}
                 />
               </CInputGroup>
 
@@ -291,8 +329,8 @@ const ConfigMusica = () => {
                 <CCol>
                   <CFormCheck
                     type="checkbox"
-                    name="musica-pertenece"
-                    id="musica-artista"
+                    name="video-pertenece"
+                    id="video-artista"
                     label="Pertence a um Artista"
                     checked={pertenceArtista}
                     onChange={() => {
@@ -304,8 +342,8 @@ const ConfigMusica = () => {
                 <CCol>
                   <CFormCheck
                     type="checkbox"
-                    name="musica-pertenece"
-                    id="musica-grupo"
+                    name="video-pertenece"
+                    id="video-grupo"
                     label="Pertence a um Grupo Musical"
                     checked={pertenceGrupoMusical}
                     onChange={() => {
@@ -354,31 +392,14 @@ const ConfigMusica = () => {
                 </CInputGroup>
               )}
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilImage} />
-                </CInputGroupText>
-                <CFormSelect
-                  value={fkAlbum}
-                  onChange={(e) => setFkAlbum(e.target.value)}
-                >
-                  <option value="">Selecione o Álbum (Opcional)</option>
-                  {albuns.map((album) => (
-                    <option key={album.codAlbum} value={album.codAlbum}>
-                      {album.tituloAlbum}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CInputGroup>
-
               <CRow className='w-100'>
                 <CCol xs={6}>
-                  <CButton color="success" onClick={handleAddMusica} disabled={loading}>
+                  <CButton color="success" onClick={handleAddVideo} disabled={loading}>
                     {loading ? <CSpinner size="sm" /> : 'Guardar'}
                   </CButton>
                 </CCol>
                 <CCol xs={6} className="text-right">
-                  <CButton color="secondary">Voltar</CButton>
+                  <Link to="/video" > <CButton color="secondary">Voltar</CButton> </Link>
                 </CCol>
               </CRow>
             </CForm>
@@ -389,4 +410,4 @@ const ConfigMusica = () => {
   );
 };
 
-export default ConfigMusica;
+export default ConfigVideo;
