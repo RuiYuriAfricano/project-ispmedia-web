@@ -1,17 +1,19 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  CButton,
   CCard,
   CCardBody,
   CCardHeader,
   CCol,
   CRow,
-  CButton,
   CModal,
   CModalHeader,
   CModalTitle,
   CModalBody,
-  CModalFooter
+  CModalFooter,
+  CForm,
+  CFormSelect
 } from '@coreui/react';
 import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus, cilMediaPlay } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -28,17 +30,17 @@ const Video = () => {
   const [videoDetalhes, setVideoDetalhes] = useState({});
   const [modalVideoUrl, setModalVideoUrl] = useState('');
   const [currentCaption, setCurrentCaption] = useState('');
-  const [showCaption, setShowCaption] = useState(false); // State to show/hide caption
-
-  const playerRef = useRef(null);
-  const recognitionRef = useRef(null);
+  const [showCaption, setShowCaption] = useState(false);
+  const [participacoes, setParticipacoes] = useState([]);
+  const [selectedArtista, setSelectedArtista] = useState('');
+  const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
 
   useEffect(() => {
     const checkServerStatus = async () => {
       try {
         const response = await fetch('http://localhost:3333/status');
         if (response.status !== 404) {
-          setServerStatus(false);
+          setServerStatus(true);
         }
       } catch (error) {
         setServerStatus(false);
@@ -64,6 +66,21 @@ const Video = () => {
     fetchVideos();
   }, []);
 
+  useEffect(() => {
+    const fetchArtistas = async () => {
+      try {
+        const response = await service.artista.listar();
+        setArtistasDisponiveis(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    };
+
+    fetchArtistas();
+  }, []);
+
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Tem certeza que deseja excluir este vídeo?");
     if (confirmDelete) {
@@ -80,72 +97,111 @@ const Video = () => {
     alert(`Sharing video with ID: ${id}`);
   };
 
-  const handlePlayerError = () => { };
+  const handlePlayerError = () => {
+    // Handle player error
+  };
+
+  const handlePlay = () => {
+    if (!serverStatus) {
+      alert('O servidor está offline. A reprodução não pode continuar.');
+      return;
+    }
+    // Start playing
+  };
+
+  const fetchParticipacoes = async (videoId) => {
+    try {
+      const response = await service.participacaoVideo.listar();
+      if (Array.isArray(response.data)) {
+        const participacoesFiltradas = response.data.filter(p => p.fkVideo === videoId);
+        setParticipacoes(participacoesFiltradas);
+      } else {
+        console.error('response.data não é um array:', response.data);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar as participações:', error);
+    }
+  };
 
   const handleShowDetails = async (video) => {
     setVideoDetalhes(video);
     setShowModal(true);
+    fetchParticipacoes(video.codVideo);
   };
 
-  const handlePlayInModal = async (videoUrl, video) => {
-    setModalVideoUrl(videoUrl);
-    setShowVideoModal(true);
-    startRecognition();
-  };
-
-  const toggleCaption = () => {
-    setShowCaption(!showCaption);
-  };
-
-  const handleProgress = ({ playedSeconds }) => {
-    // No changes here for now
-  };
-
-  const startRecognition = () => {
-    if (!('webkitSpeechRecognition' in window)) {
-      alert('Browser does not support speech recognition');
+  const handleAddParticipacao = async () => {
+    if (!selectedArtista) {
+      alert('Selecione um artista para adicionar participação.');
       return;
     }
 
-    const recognition = new window.webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'pt-BR'; // Adjust language as needed
-
-    recognition.onresult = (event) => {
-      let interimTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          setCurrentCaption(event.results[i][0].transcript);
-        } else {
-          interimTranscript += event.results[i][0].transcript;
-        }
-      }
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error detected: ' + event.error);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-  };
-
-  const stopRecognition = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
+    try {
+      await service.participacaoVideo.add({
+        fkArtista: selectedArtista,
+        fkVideo: videoDetalhes.codVideo
+      });
+      fetchParticipacoes(videoDetalhes.codVideo);
+      setSelectedArtista('');
+    } catch (error) {
+      console.error('Erro ao adicionar participação:', error);
     }
   };
 
-  useEffect(() => {
-    return () => {
-      stopRecognition();
-    };
-  }, []);
+  const handleDeleteParticipacao = async (id) => {
+    const confirmDelete = window.confirm("Tem certeza que deseja excluir esta participação?");
+    if (confirmDelete) {
+      try {
+        await service.participacaoVideo.excluir(id);
+        fetchParticipacoes(videoDetalhes.codVideo);
+      } catch (err) {
+        console.error('Erro ao excluir a participação:', err);
+      }
+    }
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
+
+  const cardStyle = {
+    marginBottom: '2rem',
+    textAlign: 'center',
+  };
+
+  const buttonGroupStyle = {
+    display: 'flex',
+    justifyContent: 'space-around',
+    width: '100%',
+  };
+
+  const buttonStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '60px',
+    width: '75px',
+  };
+
+  const iconStyle = {
+    marginBottom: '0.5rem',
+  };
+
+  const participacoesStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  };
+
+  const participacaoItemStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '8px 0',
+  };
+
+  const participacaoButtonStyle = {
+    marginLeft: '10px',
+  };
 
   return (
     <>
@@ -162,7 +218,7 @@ const Video = () => {
       <CRow className="justify-content-center mt-3">
         {videos.map((video, index) => (
           <CCol sm="12" md="4" key={video.codVideo}>
-            <CCard style={{ marginBottom: '2rem', textAlign: 'center' }}>
+            <CCard style={cardStyle}>
               <CCardHeader>
                 <h5>{video.tituloVideo}</h5>
               </CCardHeader>
@@ -175,26 +231,22 @@ const Video = () => {
                   height="220px"
                   onError={handlePlayerError}
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%' }} className='mt-3'>
-                  <CButton color="primary" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60px', width: '65px' }}>
-                    <CIcon icon={cilPencil} size="lg" style={{ marginBottom: '0.5rem' }} />
+                <div style={buttonGroupStyle} className='mt-3'>
+                  <CButton color="primary" style={buttonStyle}>
+                    <CIcon icon={cilPencil} size="lg" style={iconStyle} />
                     <Link to={`/configVideo/${video.codVideo}`} style={{ color: 'white' }}>Editar</Link>
                   </CButton>
-                  <CButton color="danger" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60px', width: '65px' }} onClick={() => handleDelete(video.codVideo)}>
-                    <CIcon icon={cilTrash} size="lg" style={{ marginBottom: '0.5rem' }} />
+                  <CButton color="danger" style={buttonStyle} onClick={() => handleDelete(video.codVideo)}>
+                    <CIcon icon={cilTrash} size="lg" style={iconStyle} />
                     Excluir
                   </CButton>
-                  <CButton color="success" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60px', width: '65px' }} onClick={() => handleShare(video.codVideo)}>
-                    <CIcon icon={cilShare} size="lg" style={{ marginBottom: '0.5rem' }} />
+                  <CButton color="success" style={buttonStyle} onClick={() => handleShare(video.codVideo)}>
+                    <CIcon icon={cilShare} size="lg" style={iconStyle} />
                     Partilhar
                   </CButton>
-                  <CButton color="info" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60px', width: '65px' }} onClick={() => handleShowDetails(video)}>
-                    <CIcon icon={cilMagnifyingGlass} size="lg" style={{ marginBottom: '0.5rem' }} />
+                  <CButton color="info" style={buttonStyle} onClick={() => handleShowDetails(video)}>
+                    <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
                     Ver
-                  </CButton>
-                  <CButton color="info" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60px', width: '65px' }} onClick={() => handlePlayInModal(`http://localhost:3333/video/downloadVideo/${video.codVideo}`, video)}>
-                    <CIcon icon={cilMediaPlay} size="lg" style={{ marginBottom: '0.5rem' }} />
-                    Play
                   </CButton>
                 </div>
               </CCardBody>
@@ -202,18 +254,47 @@ const Video = () => {
           </CCol>
         ))}
       </CRow>
-
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
         <CModalHeader onClose={() => setShowModal(false)}>
           <CModalTitle>Detalhes do Vídeo</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <p><strong>Título:</strong> {videoDetalhes.tituloVideo}</p>
-          <p><strong>Gênero do Vídeo:</strong> {videoDetalhes.generoDoVIdeo}</p>
+          <p><strong>Gênero do Vídeo:</strong> {videoDetalhes.generoDoVideo}</p>
           <p><strong>Produtor:</strong> {videoDetalhes.produtor}</p>
           <p><strong>Data de Lançamento:</strong> {new Date(videoDetalhes.dataLancamento).toLocaleDateString()}</p>
+          <p><strong>Álbum:</strong> {videoDetalhes.album?.tituloAlbum}</p>
           <p><strong>Artista:</strong> {videoDetalhes.artista?.nomeArtista}</p>
           <p><strong>Grupo Musical:</strong> {videoDetalhes.grupoMusical?.nomeGrupoMusical}</p>
+
+          <hr />
+          <h5>Participações</h5>
+          <CForm>
+            <CFormSelect value={selectedArtista} onChange={(e) => setSelectedArtista(e.target.value)}>
+              <option value="">Selecione um artista...</option>
+              {artistasDisponiveis
+                .filter((artista) => !participacoes.some((participacao) => participacao.artista?.codArtista === artista.codArtista))
+                .map((artista) => (
+                  <option key={artista.codArtista} value={artista.codArtista}>
+                    {artista.nomeArtista}
+                  </option>
+                ))}
+            </CFormSelect>
+          </CForm>
+
+          <div className="mt-3">
+            <CButton color="primary" onClick={handleAddParticipacao}>Adicionar Participação</CButton>
+          </div>
+
+          <div style={participacoesStyle} className="mt-3">
+            {participacoes
+              .map((participacao) => (
+                <div key={participacao.codParticipacaoVideo} style={participacaoItemStyle}>
+                  <span>{participacao.artista?.nomeArtista}</span>
+                  <CButton color="danger" size="sm" style={participacaoButtonStyle} onClick={() => handleDeleteParticipacao(participacao.codParticipacaoVideo)}>Excluir</CButton>
+                </div>
+              ))}
+          </div>
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowModal(false)}>Fechar</CButton>
@@ -225,14 +306,12 @@ const Video = () => {
         </CModalHeader>
         <CModalBody style={{ padding: 0, position: 'relative' }}>
           <ReactPlayer
-            ref={playerRef}
             url={modalVideoUrl}
             playing={serverStatus}
             controls={true}
             width="100%"
             height="500px"
             onError={handlePlayerError}
-            onProgress={handleProgress}
           />
           {showCaption && (
             <div style={{
@@ -250,7 +329,7 @@ const Video = () => {
           )}
         </CModalBody>
         <CModalFooter>
-          <CButton color="info" onClick={toggleCaption}>Exibir Legenda</CButton>
+          <CButton color="info" onClick={() => setShowCaption(!showCaption)}>Exibir Legenda</CButton>
           <CButton color="secondary" onClick={() => setShowVideoModal(false)}>Fechar</CButton>
         </CModalFooter>
       </CModal>

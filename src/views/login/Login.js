@@ -37,9 +37,43 @@ const Login = () => {
   const loggedUser = useSelector((state) => state.app);
   const navigate = useNavigate();
 
+  const validateUsername = (username) => {
+    const regex = /^[a-zA-Z0-9_]{4,}$/;
+    return regex.test(username);
+  };
+
+  const validatePassword = (senha) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(senha);
+  };
+
   const handleLogin = async () => {
+    // Reset alert messages
+    setMsgDoAlert("");
+    setCorDoAlert("");
+
+    if (!username) {
+      setMsgDoAlert("Por favor, preencha o campo Username!");
+      setCorDoAlert("danger");
+      return;
+    } else if (!validateUsername(username)) {
+      setMsgDoAlert("Username deve conter apenas caracteres alfanuméricos e underscores e 4 caracteres no minimo!");
+      setCorDoAlert("danger");
+      return;
+    }
+
+    if (!senha) {
+      setMsgDoAlert("Por favor, preencha o campo Senha!");
+      setCorDoAlert("danger");
+      return;
+    } else if (!validatePassword(senha)) {
+      setMsgDoAlert("Senha deve ter no mínimo 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial!");
+      setCorDoAlert("danger");
+      return;
+    }
+
     setLoading(true); // Start loading
-    setTimeout(async () => { // Simulate a delay
+    setTimeout(async () => {
       const response = await service.auth.login({
         username: username,
         senha: senha,
@@ -66,7 +100,7 @@ const Login = () => {
         setCorDoAlert("danger");
       }
       setLoading(false); // End loading
-    }, 6000); // 2 second delay
+    }, 2000); // 2 second delay
   };
 
   return (

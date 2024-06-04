@@ -36,7 +36,80 @@ const Register = () => {
   const [msgDoAlert, setMsgDoAlert] = useState("");
   const [loading, setLoading] = useState(false); // Loading state
 
+  const validateUsername = (username) => {
+    const regex = /^[a-zA-Z0-9_]{4,}$/;
+    return regex.test(username);
+  };
+
+  const validatePassword = (senha) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(senha);
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validatePhone = (telefone) => {
+    const regex = /^[0-9]{3}-[0-9]{3}-[0-9]{3}$/;
+    return regex.test(telefone);
+  };
+
   const handleRegister = async () => {
+    // Reset alert messages
+    setMsgDoAlert("");
+    setCorDoAlert("");
+    if (!username) {
+      setMsgDoAlert("Por favor, preencha o campo Username!");
+      setCorDoAlert("danger");
+      return;
+    } else if (!validateUsername(username)) {
+      setMsgDoAlert("Username deve conter apenas caracteres alfanuméricos e underscores e 4 caracteres no minimo!");
+      setCorDoAlert("danger");
+      return;
+    }
+    if (!email) {
+      setMsgDoAlert("Por favor, preencha o campo Email!");
+      setCorDoAlert("danger");
+      return;
+    } else if (!validateEmail(email)) {
+      setMsgDoAlert("Por favor, insira um email válido!");
+      setCorDoAlert("danger");
+      return;
+    }
+
+    if (!senha) {
+      setMsgDoAlert("Por favor, preencha o campo Senha!");
+      setCorDoAlert("danger");
+      return;
+    } else if (!validatePassword(senha)) {
+      setMsgDoAlert("Senha deve ter no mínimo 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial!");
+      setCorDoAlert("danger");
+      return;
+    }
+
+    if (senha !== repetirSenha) {
+      setMsgDoAlert("As senhas não coincidem!");
+      setCorDoAlert("danger");
+      return;
+    }
+
+    if (!telefone) {
+      setMsgDoAlert("Por favor, preencha o campo Telefone!");
+      setCorDoAlert("danger");
+      return;
+    } else if (!validatePhone(telefone)) {
+      setMsgDoAlert("Telefone deve estar no formato XXX-XXX-XXX!");
+      setCorDoAlert("danger");
+      return;
+    }
+    if (!tipoDeUtilizador) {
+      setMsgDoAlert("Por favor, selecione o tipo de utilizador!");
+      setCorDoAlert("danger");
+      return;
+    }
+
     setLoading(true); // Start loading
 
     setTimeout(async () => {

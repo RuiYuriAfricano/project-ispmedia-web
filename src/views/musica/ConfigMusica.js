@@ -177,7 +177,7 @@ const ConfigMusica = () => {
         formData.append('codMusica', idEditMusica);
 
         if (pertenceArtista) {
-          formData.set("fkgrupoMusical", null);
+          formData.set("fkGrupoMusical", null);
         } else {
           formData.set("fkArtista", null);
         }

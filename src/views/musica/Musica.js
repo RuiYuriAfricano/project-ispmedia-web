@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  CButton,
   CCard,
   CCardBody,
   CCardHeader,
   CCol,
   CRow,
-  CButton,
   CModal,
   CModalHeader,
   CModalTitle,
   CModalBody,
-  CModalFooter
+  CModalFooter,
+  CForm,
+  CFormSelect
 } from '@coreui/react';
 import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -22,24 +24,27 @@ const Musica = () => {
   const [musicas, setMusicas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [serverStatus, setServerStatus] = useState(false); // Estado do servidor: true = online, false = offline
-  const [showModal, setShowModal] = useState(false); // Estado para controlar o modal
-  const [musicaDetalhes, setMusicaDetalhes] = useState({}); // Estado para armazenar os detalhes da música
+  const [serverStatus, setServerStatus] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [musicaDetalhes, setMusicaDetalhes] = useState({});
+  const [participacoes, setParticipacoes] = useState([]);
+  const [selectedArtista, setSelectedArtista] = useState('');
+  const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
 
   useEffect(() => {
     const checkServerStatus = async () => {
       try {
         const response = await fetch('http://localhost:3333/status');
         if (response.status !== 404) {
-          setServerStatus(false); // Se o status for 200, o servidor está online
+          setServerStatus(true);
         }
       } catch (error) {
-        setServerStatus(false); // Em caso de erro, o servidor está offline
+        setServerStatus(false);
       }
     };
-    const interval = setInterval(checkServerStatus, 5000); // Verifica o status do servidor a cada 5 segundos
+    const interval = setInterval(checkServerStatus, 5000);
 
-    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -57,6 +62,21 @@ const Musica = () => {
     fetchMusicas();
   }, []);
 
+  useEffect(() => {
+    const fetchArtistas = async () => {
+      try {
+        const response = await service.artista.listar();
+        setArtistasDisponiveis(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    };
+
+    fetchArtistas();
+  }, []);
+
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Tem certeza que deseja excluir esta música?");
     if (confirmDelete) {
@@ -70,25 +90,65 @@ const Musica = () => {
   };
 
   const handleShare = (id) => {
-    // Implement your share functionality here
     alert(`Sharing music with ID: ${id}`);
   };
 
   const handlePlayerError = () => {
-    // Define o estado de reprodução como falso
+    // Handle player error
   };
 
   const handlePlay = () => {
     if (!serverStatus) {
-      alert('O servidor está offline. A reprodução não pode continuar.'); // Exibe uma mensagem se o servidor estiver offline
+      alert('O servidor está offline. A reprodução não pode continuar.');
       return;
     }
-    // Define o estado de reprodução como verdadeiro
+    // Start playing
   };
 
-  const handleShowDetails = (musica) => {
+  const fetchParticipacoes = async (musicaId) => {
+    try {
+      const response = await service.participacaoMusica.listar();
+      const participacoesFiltradas = response.data.filter(p => p.fkMusica === musicaId);
+      setParticipacoes(participacoesFiltradas);
+    } catch (error) {
+      console.error('Erro ao carregar as participações:', error);
+    }
+  };
+
+  const handleShowDetails = async (musica) => {
     setMusicaDetalhes(musica);
     setShowModal(true);
+    fetchParticipacoes(musica.codMusica);
+  };
+
+  const handleAddParticipacao = async () => {
+    if (!selectedArtista) {
+      alert('Selecione um artista para adicionar participação.');
+      return;
+    }
+
+    try {
+      await service.participacaoMusica.add({
+        fkArtista: selectedArtista,
+        fkMusica: musicaDetalhes.codMusica
+      });
+      fetchParticipacoes(musicaDetalhes.codMusica);
+      setSelectedArtista('');
+    } catch (error) {
+      console.error('Erro ao adicionar participação:', error);
+    }
+  };
+
+  const handleDeleteParticipacao = async (id) => {
+    const confirmDelete = window.confirm("Tem certeza que deseja excluir esta participação?");
+    if (confirmDelete) {
+      try {
+        await service.participacaoMusica.excluir(id);
+        fetchParticipacoes(musicaDetalhes.codMusica);
+      } catch (err) {
+        console.error('Erro ao excluir a participação:', err);
+      }
+    }
   };
 
   if (loading) return <div>Loading...</div>;
@@ -118,6 +178,23 @@ const Musica = () => {
     marginBottom: '0.5rem',
   };
 
+  const participacoesStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  };
+
+  const participacaoItemStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '8px 0',
+  };
+
+  const participacaoButtonStyle = {
+    marginLeft: '10px',
+  };
+
   return (
     <>
       <CRow className="justify-content-center mt-2">
@@ -132,8 +209,7 @@ const Musica = () => {
       </CRow>
       <CRow className="justify-content-center mt-3">
         {musicas.map((musica, index) => (
-
-          < CCol sm="12" md="4" key={musica.codMusica} >
+          <CCol sm="12" md="4" key={musica.codMusica}>
             <CCard style={cardStyle}>
               <CCardHeader>
                 <h5>{musica.tituloMusica}</h5>
@@ -145,8 +221,7 @@ const Musica = () => {
                   playing={serverStatus}
                   controls={true}
                   width="100%"
-                  height="50px"
-                  onError={handlePlayerError}
+                  height="50px" onError={handlePlayerError}
                 />
                 <div style={buttonGroupStyle} className='mt-3'>
                   <CButton color="primary" style={buttonStyle}>
@@ -170,8 +245,7 @@ const Musica = () => {
             </CCard>
           </CCol>
         ))}
-      </CRow >
-
+      </CRow>
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
         <CModalHeader onClose={() => setShowModal(false)}>
           <CModalTitle>Detalhes da Música</CModalTitle>
@@ -185,6 +259,35 @@ const Musica = () => {
           <p><strong>Álbum:</strong> {musicaDetalhes.album?.tituloAlbum}</p>
           <p><strong>Artista:</strong> {musicaDetalhes.artista?.nomeArtista}</p>
           <p><strong>Grupo Musical:</strong> {musicaDetalhes.grupoMusical?.nomeGrupoMusical}</p>
+
+          <hr />
+          <h5>Participações</h5>
+          <CForm>
+            <CFormSelect value={selectedArtista} onChange={(e) => setSelectedArtista(e.target.value)}>
+              <option value="">Selecione um artista...</option>
+              {artistasDisponiveis
+                .filter((artista) => !participacoes.some((participacao) => participacao.artista?.codArtista === artista.codArtista))
+                .map((artista) => (
+                  <option key={artista.codArtista} value={artista.codArtista}>
+                    {artista.nomeArtista}
+                  </option>
+                ))}
+            </CFormSelect>
+          </CForm>
+
+          <div className="mt-3">
+            <CButton color="primary" onClick={handleAddParticipacao}>Adicionar Participação</CButton>
+          </div>
+
+          <div style={participacoesStyle} className="mt-3">
+            {participacoes
+              .map((participacao) => (
+                <div key={participacao.codParticipacaoMusica} style={participacaoItemStyle}>
+                  <span>{participacao.artista?.nomeArtista}</span>
+                  <CButton color="danger" size="sm" style={participacaoButtonStyle} onClick={() => handleDeleteParticipacao(participacao.codParticipacaoMusica)}>Excluir</CButton>
+                </div>
+              ))}
+          </div>
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowModal(false)}>Fechar</CButton>
