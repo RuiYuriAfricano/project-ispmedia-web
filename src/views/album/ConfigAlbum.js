@@ -20,8 +20,7 @@ import { cilMusicNote, cilUser, cilGroup, cilImage, cilDescription, cilCalendar,
 import { service } from './../../services';
 import { useParams } from 'react-router-dom';
 
-const ConfigAlbum = () => {
-  const { idEditAlbum } = useParams();
+const ConfigAlbum = ({ idEditAlbum, onClose }) => {
 
   const [tituloAlbum, setTituloAlbum] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -150,6 +149,9 @@ const ConfigAlbum = () => {
           setFkArtista("");
           setFkGrupoMusical("");
         }
+        setTimeout(() => {
+          onClose(true);
+        }, 2000);
       } else {
         setMsgDoAlert(`Falha na ${idEditAlbum ? "Atualização" : "Criação"} do Álbum, Tente Novamente!`);
         setCorDoAlert("danger");
@@ -189,12 +191,12 @@ const ConfigAlbum = () => {
   };
   return (
     <CRow className="justify-content-center mb-4">
-      <CCol md={9} lg={7} xl={6}>
+      <CCol>
         <CCard className="mx-4">
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
           <CCardBody className="p-4">
             <CForm>
-              <h1>{idEditAlbum !== undefined ? `Editar Álbum` : "Criar Novo Álbum"}</h1>
+              <h1>Album</h1>
               <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
 
               <CInputGroup className="mb-3">

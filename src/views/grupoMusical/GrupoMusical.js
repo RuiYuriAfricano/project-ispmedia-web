@@ -16,22 +16,29 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
-  CButton
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
+  CSpinner
 } from '@coreui/react';
 import { cilPlus } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
+import ConfigGrupoMusical from './ConfigGrupoMusical';
 
 const GrupoMusical = () => {
-
   const [grupos, setGrupos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editGrupoId, setEditGrupoId] = useState(null);
 
   useEffect(() => {
     const fetchGrupos = async () => {
       try {
-        const response = await service.grupoMusical.listar()
+        const response = await service.grupoMusical.listar();
         setGrupos(response.data);
         setLoading(false);
       } catch (err) {
@@ -55,6 +62,28 @@ const GrupoMusical = () => {
     }
   };
 
+  const handleEdit = (id) => {
+    setEditGrupoId(id);
+    setModalVisible(true);
+  };
+
+  const handleModalClose = async (success) => {
+    setModalVisible(false);
+    setEditGrupoId(null);
+    if (success) {
+      // Refresh the group list after successful creation/updation
+      setLoading(true);
+      try {
+        const response = await service.grupoMusical.listar();
+        setGrupos(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -64,11 +93,9 @@ const GrupoMusical = () => {
         <CCard className="mb-4">
           <CCardHeader className="d-flex justify-content-between align-items-center">
             <strong>Listagem dos Grupos Musicais</strong>
-            <Link to="/configGrupoMusical">
-              <CButton color="primary" role="button">
-                Novo Grupo
-              </CButton>
-            </Link>
+            <CButton color="primary" onClick={() => setModalVisible(true)}>
+              Novo Grupo
+            </CButton>
           </CCardHeader>
           <CCardBody>
             <CTable>
@@ -91,12 +118,12 @@ const GrupoMusical = () => {
                     <CTableDataCell>{grupo.historia}</CTableDataCell>
                     <CTableDataCell>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</CTableDataCell>
                     <CTableDataCell>{new Date(grupo.dataDeRegisto).toLocaleDateString()}</CTableDataCell>
-                    <CTableDataCell>{grupo.registadopor?.username}</CTableDataCell> {/* Exibe o nome do utilizador */}
+                    <CTableDataCell>{grupo.registadopor?.username}</CTableDataCell>
                     <CTableDataCell>
                       <CDropdown>
                         <CDropdownToggle color="secondary">Escolha a Operação</CDropdownToggle>
                         <CDropdownMenu>
-                          <CDropdownItem><Link to={`/configGrupoMusical/${grupo.codGrupoMusical}`}>Editar</Link></CDropdownItem>
+                          <CDropdownItem onClick={() => handleEdit(grupo.codGrupoMusical)}>Editar</CDropdownItem>
                           <CDropdownItem onClick={() => handleDelete(grupo.codGrupoMusical)}>Excluir</CDropdownItem>
                         </CDropdownMenu>
                       </CDropdown>
@@ -108,6 +135,15 @@ const GrupoMusical = () => {
           </CCardBody>
         </CCard>
       </CCol>
+
+      <CModal visible={modalVisible} onClose={() => handleModalClose(false)}>
+        <CModalHeader closeButton>
+          {editGrupoId ? 'Editar Grupo Musical' : 'Criar Novo Grupo Musical'}
+        </CModalHeader>
+        <CModalBody>
+          <ConfigGrupoMusical idEditGrupo={editGrupoId} onClose={handleModalClose} />
+        </CModalBody>
+      </CModal>
     </CRow>
   );
 };

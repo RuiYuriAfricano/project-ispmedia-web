@@ -20,6 +20,7 @@ import CIcon from '@coreui/icons-react';
 import ReactPlayer from 'react-player';
 import { service } from './../../services';
 import { color } from 'chart.js/helpers';
+import ConfigMusica from './ConfigMusica';
 
 const Musica = () => {
   const [musicas, setMusicas] = useState([]);
@@ -30,6 +31,8 @@ const Musica = () => {
   const [participacoes, setParticipacoes] = useState([]);
   const [selectedArtista, setSelectedArtista] = useState('');
   const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
+  const [modalConfigVisible, setModalConfigVisible] = useState(false);
+  const [editMusicaId, setEditMusicaId] = useState(null);
 
   useEffect(() => {
     const fetchMusicas = async () => {
@@ -123,6 +126,28 @@ const Musica = () => {
     }
   };
 
+  const handleEdit = (id) => {
+    setEditMusicaId(id);
+    setModalConfigVisible(true);
+  };
+
+  const handleModalConfigClose = async (success) => {
+    setModalConfigVisible(false);
+    setEditMusicaId(null);
+    if (success) {
+      // Refresh the group list after successful creation/updation
+      setLoading(true);
+      try {
+        const response = await service.musica.listar();
+        setMusicas(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -188,12 +213,12 @@ const Musica = () => {
     <>
       <CRow className="justify-content-center mt-2">
         <CCol sm="12" className="mb-3 d-flex justify-content-end">
-          <Link to="/configMusica">
-            <CButton color="primary">
-              <CIcon icon={cilPlus} className="me-2" />
-              Inserir Nova Música
-            </CButton>
-          </Link>
+
+          <CButton color="primary" onClick={() => setModalConfigVisible(true)}>
+            <CIcon icon={cilPlus} className="me-2" />
+            Inserir Nova Música
+          </CButton>
+
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
@@ -215,7 +240,7 @@ const Musica = () => {
                 </div>
                 <div style={buttonGroupStyle}>
                   <CButton color="secondary" style={buttonStyle}>
-                    <Link to={`/configMusica/${musica.codMusica}`} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                    <Link onClick={() => handleEdit(musica.codMusica)} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
                       <CIcon icon={cilPencil} size="lg" style={iconStyle} />
 
                     </Link>
@@ -294,6 +319,15 @@ const Musica = () => {
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowModal(false)}>Fechar</CButton>
         </CModalFooter>
+      </CModal>
+
+      <CModal visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
+        <CModalHeader closeButton>
+          {editMusicaId ? 'Editar Música' : 'Criar Nova Música'}
+        </CModalHeader>
+        <CModalBody>
+          <ConfigMusica idEditMusica={editMusicaId} onClose={handleModalConfigClose} />
+        </CModalBody>
       </CModal>
     </>
   );

@@ -28,8 +28,7 @@ import {
 import { service } from './../../services';
 import { useParams, Link } from 'react-router-dom';
 
-const ConfigVideo = () => {
-  const { idEditVideo } = useParams();
+const ConfigVideo = ({ idEditVideo, onClose }) => {
 
   const [tituloVideo, setTituloVideo] = useState('');
   const [ficheiroVideo, setFicheiroVideo] = useState('');
@@ -180,6 +179,9 @@ const ConfigVideo = () => {
           setFkArtista('');
           setFicheiroVideo(null);
         }
+        setTimeout(() => {
+          onClose(true);
+        }, 2000);
       } else {
         setMsgDoAlert(`Falha na ${idEditVideo ? 'Atualização' : 'Criação'} do Vídeo, Tente Novamente!`);
         setCorDoAlert('danger');
@@ -221,12 +223,12 @@ const ConfigVideo = () => {
 
   return (
     <CRow className="justify-content-center mb-4">
-      <CCol md={9} lg={7} xl={6}>
+      <CCol>
         <CCard className="mx-4">
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
           <CCardBody className="p-4">
             <CForm>
-              <h1>{idEditVideo !== undefined ? 'Editar Vídeo' : 'Registar Vídeo'}</h1>
+              <h1>Vídeo</h1>
               <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
 
               <CInputGroup className="mb-3">
@@ -398,9 +400,7 @@ const ConfigVideo = () => {
                     {loading ? <CSpinner size="sm" /> : 'Guardar'}
                   </CButton>
                 </CCol>
-                <CCol xs={6} className="text-right">
-                  <Link to="/video" > <CButton color="secondary">Voltar</CButton> </Link>
-                </CCol>
+
               </CRow>
             </CForm>
           </CCardBody>

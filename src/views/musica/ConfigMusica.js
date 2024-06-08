@@ -29,8 +29,7 @@ import {
 import { service } from './../../services';
 import { useParams, Link } from 'react-router-dom';
 
-const ConfigMusica = () => {
-  const { idEditMusica } = useParams();
+const ConfigMusica = ({ idEditMusica, onClose }) => {
 
   const [tituloMusica, setTituloMusica] = useState('');
   const [ficheiroMusical, setFicheiroMusical] = useState('');
@@ -202,6 +201,9 @@ const ConfigMusica = () => {
           setCapaMusica(null);
           setFicheiroMusical(null);
         }
+        setTimeout(() => {
+          onClose(true);
+        }, 2000);
       } else {
         setMsgDoAlert(`Falha na ${idEditMusica ? 'Atualização' : 'Criação'} da Música, Tente Novamente!`);
         setCorDoAlert('danger');
@@ -247,12 +249,12 @@ const ConfigMusica = () => {
 
   return (
     <CRow className="justify-content-center mb-4">
-      <CCol md={9} lg={7} xl={6}>
+      <CCol>
         <CCard className="mx-4">
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
           <CCardBody className="p-4">
             <CForm>
-              <h1>{idEditMusica !== undefined ? 'Editar Música' : 'Registar Música'}</h1>
+              <h1>Música</h1>
               <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
 
               <CInputGroup className="mb-3">
@@ -459,9 +461,6 @@ const ConfigMusica = () => {
                   <CButton color="success" onClick={handleAddMusica} disabled={loading}>
                     {loading ? <CSpinner size="sm" /> : 'Guardar'}
                   </CButton>
-                </CCol>
-                <CCol xs={6} className="text-right">
-                  <Link to="/musica" > <CButton color="secondary">Voltar</CButton> </Link>
                 </CCol>
               </CRow>
             </CForm>

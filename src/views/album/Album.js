@@ -16,12 +16,15 @@ import {
 import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
+import ConfigAlbum from './ConfigAlbum';
 
 const Album = () => {
   const [albuns, setAlbuns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [modalConfigVisible, setModalConfigVisible] = useState(false);
+  const [editAlbumId, setEditAlbumId] = useState(null);
   const [albumDetalhes, setAlbumDetalhes] = useState({});
 
   useEffect(() => {
@@ -58,6 +61,28 @@ const Album = () => {
   const handleShowDetails = (album) => {
     setAlbumDetalhes(album);
     setShowModal(true);
+  };
+
+  const handleEdit = (id) => {
+    setEditAlbumId(id);
+    setModalConfigVisible(true);
+  };
+
+  const handleModalConfigClose = async (success) => {
+    setModalConfigVisible(false);
+    setEditAlbumId(null);
+    if (success) {
+      // Refresh the group list after successful creation/updation
+      setLoading(true);
+      try {
+        const response = await service.album.listar();
+        setAlbuns(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    }
   };
 
   if (loading) return <div>Loading...</div>;
@@ -106,12 +131,12 @@ const Album = () => {
     <>
       <CRow className="justify-content-center mt-2">
         <CCol sm="12" className="mb-3 d-flex justify-content-end">
-          <Link to="/configAlbum">
-            <CButton color="primary">
-              <CIcon icon={cilPlus} className="me-2" />
-              Inserir Novo Álbum
-            </CButton>
-          </Link>
+
+          <CButton color="primary" onClick={() => setModalConfigVisible(true)}>
+            <CIcon icon={cilPlus} className="me-2" />
+            Inserir Novo Álbum
+          </CButton>
+
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
@@ -126,7 +151,7 @@ const Album = () => {
                 <div style={buttonGroupStyle}>
                   <CButton color="secondary" style={buttonStyle}>
 
-                    <Link to={`/configAlbum/${album.codAlbum}`} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}> <CIcon icon={cilPencil} size="lg" style={iconStyle} /></Link>
+                    <Link onClick={() => handleEdit(album.codAlbum)} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}> <CIcon icon={cilPencil} size="lg" style={iconStyle} /></Link>
                   </CButton>
                   <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(album.codAlbum)}>
 
@@ -167,6 +192,15 @@ const Album = () => {
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowModal(false)}>Fechar</CButton>
         </CModalFooter>
+      </CModal>
+
+      <CModal visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
+        <CModalHeader closeButton>
+          {editAlbumId ? 'Editar Album' : 'Criar Novo Album'}
+        </CModalHeader>
+        <CModalBody>
+          <ConfigAlbum idEditAlbum={editAlbumId} onClose={handleModalConfigClose} />
+        </CModalBody>
       </CModal>
     </>
   );

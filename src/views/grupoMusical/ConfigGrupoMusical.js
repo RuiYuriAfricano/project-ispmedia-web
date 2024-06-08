@@ -1,4 +1,3 @@
-// components/ConfigGrupoMusical.js
 import React, { useState, useEffect } from 'react';
 import {
   CButton,
@@ -21,9 +20,7 @@ import { cilMusicNote, cilHistory, cilCalendar } from '@coreui/icons';
 import { service } from './../../services';
 import { useParams } from 'react-router-dom';
 
-const ConfigGrupoMusical = () => {
-  const { idEditGrupo } = useParams();
-
+const ConfigGrupoMusical = ({ idEditGrupo, onClose }) => {
   const [nomeGrupoMusical, setNomeGrupoMusical] = useState("");
   const [historia, setHistoria] = useState("");
   const [dataDeCriacao, setDataDeCriacao] = useState("");
@@ -35,7 +32,6 @@ const ConfigGrupoMusical = () => {
 
   useEffect(() => {
     if (idEditGrupo) {
-      // Fetch the existing grupo musical data
       const fetchGrupoMusical = async () => {
         try {
           const response = await service.grupoMusical.pesquisaporid(idEditGrupo);
@@ -59,7 +55,6 @@ const ConfigGrupoMusical = () => {
   }, [idEditGrupo]);
 
   const handleAddGrupoMusical = async () => {
-    // Verificar se todos os campos obrigatórios estão preenchidos
     const emptyFields = isAllFieldsFilled();
 
     if (emptyFields.length > 0) {
@@ -87,10 +82,8 @@ const ConfigGrupoMusical = () => {
     try {
       let response;
       if (idEditGrupo) {
-        // Edit existing grupo musical
         response = await service.grupoMusical.update(editGrupo);
       } else {
-        // Create new grupo musical
         response = await service.grupoMusical.add(novoGrupo);
       }
 
@@ -102,6 +95,9 @@ const ConfigGrupoMusical = () => {
           setHistoria("");
           setDataDeCriacao("");
         }
+        setTimeout(() => {
+          onClose(true);
+        }, 2000);
       } else {
         setMsgDoAlert(`Falha na ${idEditGrupo ? "Atualização" : "Criação"} do Grupo Musical, Tente Novamente!`);
         setCorDoAlert("danger");
@@ -116,7 +112,6 @@ const ConfigGrupoMusical = () => {
 
   const isAllFieldsFilled = () => {
     const emptyFields = [];
-
     if (nomeGrupoMusical.trim() === '') {
       emptyFields.push('Nome do grupo musical');
     }
@@ -126,71 +121,57 @@ const ConfigGrupoMusical = () => {
     if (dataDeCriacao.trim() === '') {
       emptyFields.push('Data de Criação');
     }
-
     return emptyFields;
   };
+
   return (
-    <CRow className="justify-content-center">
-      <CCol md={9} lg={7} xl={6}>
-        <CCard className="mx-4">
+    <CCard className="mx-4">
+      <CCardBody className="p-4">
+        <CForm>
+          <h1>Grupo Musical</h1>
+          <p className="text-medium-emphasis">Preencha os detalhes do grupo musical</p>
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
-          <CCardBody className="p-4">
-            <CForm>
-              <h1>{idEditGrupo !== undefined ? `Editar Grupo Musical` : "Criar Novo Grupo Musical"}</h1>
-              <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
-
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilMusicNote} />
-                </CInputGroupText>
-                <CFormInput
-                  placeholder="Nome do Grupo Musical"
-                  autoComplete="nome-grupo-musical"
-                  value={nomeGrupoMusical}
-                  onChange={(e) => setNomeGrupoMusical(e.target.value)}
-                  required
-                />
-              </CInputGroup>
-
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilHistory} />
-                </CInputGroupText>
-                <CFormTextarea
-                  placeholder="História"
-                  autoComplete="historia"
-                  value={historia}
-                  onChange={(e) => setHistoria(e.target.value)}
-                  required
-                />
-              </CInputGroup>
-
-              <CTooltip content="Selecione a data em que o grupo musical foi criado">
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilCalendar} />
-                  </CInputGroupText>
-                  <CFormInput
-                    type="date"
-                    placeholder="Data de Criação"
-                    autoComplete="data-de-criacao"
-                    value={dataDeCriacao}
-                    onChange={(e) => setDataDeCriacao(e.target.value)}
-                    required
-                  />
-                </CInputGroup>
-              </CTooltip>
-
-              <div className="d-grid">
-                <CButton color="success" onClick={handleAddGrupoMusical}>
-                  {loading ? <CSpinner size="sm" /> : idEditGrupo ? 'Atualizar Grupo Musical' : 'Criar Grupo Musical'}
-                </CButton>
-              </div>
-            </CForm>
-          </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>
+              <CIcon icon={cilMusicNote} />
+            </CInputGroupText>
+            <CFormInput
+              placeholder="Nome do grupo musical"
+              value={nomeGrupoMusical}
+              onChange={(e) => setNomeGrupoMusical(e.target.value)}
+            />
+          </CInputGroup>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>
+              <CIcon icon={cilHistory} />
+            </CInputGroupText>
+            <CFormTextarea
+              placeholder="História do grupo"
+              value={historia}
+              onChange={(e) => setHistoria(e.target.value)}
+            />
+          </CInputGroup>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>
+              <CIcon icon={cilCalendar} />
+            </CInputGroupText>
+            <CFormInput
+              type="date"
+              placeholder="Data de Criação"
+              value={dataDeCriacao}
+              onChange={(e) => setDataDeCriacao(e.target.value)}
+            />
+          </CInputGroup>
+          <CRow>
+            <CCol xs={6}>
+              <CButton color="primary" className="px-4" onClick={handleAddGrupoMusical} disabled={loading}>
+                {loading ? <CSpinner size="sm" /> : 'Salvar'}
+              </CButton>
+            </CCol>
+          </CRow>
+        </CForm>
+      </CCardBody>
+    </CCard>
   );
 };
 

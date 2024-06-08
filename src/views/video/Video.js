@@ -19,6 +19,7 @@ import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus, cilMediaPla
 import CIcon from '@coreui/icons-react';
 import ReactPlayer from 'react-player';
 import { service } from './../../services';
+import ConfigVideo from './ConfigVideo';
 
 const Video = () => {
   const [videos, setVideos] = useState([]);
@@ -33,6 +34,8 @@ const Video = () => {
   const [participacoes, setParticipacoes] = useState([]);
   const [selectedArtista, setSelectedArtista] = useState('');
   const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
+  const [modalConfigVisible, setModalConfigVisible] = useState(false);
+  const [editVideoId, setEditVideoId] = useState(null);
 
 
   useEffect(() => {
@@ -139,6 +142,28 @@ const Video = () => {
     }
   };
 
+  const handleEdit = (id) => {
+    setEditVideoId(id);
+    setModalConfigVisible(true);
+  };
+
+  const handleModalConfigClose = async (success) => {
+    setModalConfigVisible(false);
+    setEditVideoId(null);
+    if (success) {
+      // Refresh the group list after successful creation/updation
+      setLoading(true);
+      try {
+        const response = await service.video.listar();
+        setVideos(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -190,12 +215,11 @@ const Video = () => {
     <>
       <CRow className="justify-content-center mt-2">
         <CCol sm="12" className="mb-3 d-flex justify-content-end">
-          <Link to="/configVideo">
-            <CButton color="primary">
-              <CIcon icon={cilPlus} className="me-2" />
-              Inserir Novo Vídeo
-            </CButton>
-          </Link>
+
+          <CButton color="primary" onClick={() => setModalConfigVisible(true)}>
+            <CIcon icon={cilPlus} className="me-2" />
+            Inserir Novo Vídeo
+          </CButton>
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
@@ -224,7 +248,7 @@ const Video = () => {
                 /></div>
                 <div style={buttonGroupStyle} className='mt-5'>
                   <CButton color="secondary" style={buttonStyle}>
-                    <Link to={`/configVideo/${video.codVideo}`} style={{ color: 'white' }}>
+                    <Link onClick={() => handleEdit(video.codVideo)} style={{ color: 'white' }}>
                       <CIcon icon={cilPencil} size="lg" style={iconStyle} />
                     </Link>
                   </CButton>
@@ -331,6 +355,15 @@ const Video = () => {
           <CButton color="info" onClick={() => setShowCaption(!showCaption)}>Exibir Legenda</CButton>
           <CButton color="secondary" onClick={() => setShowVideoModal(false)}>Fechar</CButton>
         </CModalFooter>
+      </CModal>
+
+      <CModal visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
+        <CModalHeader closeButton>
+          {editVideoId ? 'Editar Vídeo' : 'Criar Novo Vídeo'}
+        </CModalHeader>
+        <CModalBody>
+          <ConfigVideo idEditVideo={editVideoId} onClose={handleModalConfigClose} />
+        </CModalBody>
       </CModal>
     </>
   );
