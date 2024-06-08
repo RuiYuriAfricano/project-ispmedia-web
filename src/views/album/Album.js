@@ -70,21 +70,36 @@ const Album = () => {
 
   const buttonGroupStyle = {
     display: 'flex',
-    justifyContent: 'space-around',
-    width: '100%',
+    flexDirection: 'column',
+    gap: '26px',
+    alignItems: 'flex-start',
   };
 
   const buttonStyle = {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    height: '60px',
-    width: '75px',
+    justifyContent: 'flex-start',
+    height: '30px',
+    width: '50px',
+    textAlign: 'center'
   };
 
   const iconStyle = {
-    marginBottom: '0.5rem',
+    marginRight: '0.5rem',
+    color: '#000'
+  };
+
+  const cardBodyStyle = {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  };
+
+  const imageStyle = {
+    marginBottom: '1rem',
+    width: '270px',
+    height: '200px',
   };
 
   return (
@@ -106,24 +121,29 @@ const Album = () => {
               <CCardHeader>
                 <h5>{album.tituloAlbum}</h5>
               </CCardHeader>
-              <CCardBody style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <img src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} style={{ marginBottom: '1rem', maxWidth: '100%', height: '120px' }} />
-                <div style={buttonGroupStyle} className='mt-3'>
-                  <CButton color="primary" style={buttonStyle}>
-                    <CIcon icon={cilPencil} size="lg" style={iconStyle} />
-                    <Link to={`/configAlbum/${album.codAlbum}`} style={{ color: 'white' }}>Editar</Link>
+              <CCardBody style={cardBodyStyle}>
+                <img src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} style={imageStyle} />
+                <div style={buttonGroupStyle}>
+                  <CButton color="secondary" style={buttonStyle}>
+
+                    <Link to={`/configAlbum/${album.codAlbum}`} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}> <CIcon icon={cilPencil} size="lg" style={iconStyle} /></Link>
                   </CButton>
-                  <CButton color="danger" style={buttonStyle} onClick={() => handleDelete(album.codAlbum)}>
-                    <CIcon icon={cilTrash} size="lg" style={iconStyle} />
-                    Excluir
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(album.codAlbum)}>
+
+                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}><CIcon icon={cilTrash} size="lg" style={iconStyle} /></Link>
+
                   </CButton>
-                  <CButton color="success" style={buttonStyle} onClick={() => handleShare(album.codAlbum)}>
-                    <CIcon icon={cilShare} size="lg" style={iconStyle} />
-                    Partilhar
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(album.codAlbum)}>
+
+                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                      <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                    </Link>
                   </CButton>
-                  <CButton color="info" style={buttonStyle} onClick={() => handleShowDetails(album)}>
-                    <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
-                    Ver
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(album)}>
+
+                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                      <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
+                    </Link>
                   </CButton>
                 </div>
               </CCardBody>

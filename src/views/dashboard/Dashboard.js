@@ -1,7 +1,7 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom'
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CRow } from '@coreui/react';
-import "./style/dashboard.css"
+import { Navigate } from 'react-router-dom';
+import { CCard, CCardBody, CCardHeader, CCol, CRow, CCardImage, CCardFooter, CButton } from '@coreui/react';
+import "./style/dashboard.css";
 
 // Importando os vídeos do diretório medias
 import video1 from './videos/Sandra Mbuyi - Goodness (clip officiel).mp4';
@@ -18,6 +18,12 @@ import cover3 from './capas/Capa3.jpg';
 import cover4 from './capas/Capa4.jpg';
 import cover5 from './capas/Capa5.jpg';
 import cover6 from './capas/Capa6.jpg';
+import cover7 from './capas/Capa7.jpeg';
+import cover8 from './capas/Capa8.jpeg';
+import cover9 from './capas/Capa9.jpeg';
+import cover10 from './capas/Capa10.jpeg';
+import cover11 from './capas/Capa11.jpeg';
+import cover12 from './capas/Capa12.jpeg';
 
 // Importando as músicas do diretório musics
 import music1 from './musicas/Cough.mp3';
@@ -68,28 +74,36 @@ const VideoList = () => {
     },
   ];
   return (
-    < CCol md={6} >
+    <CCol md={6}>
       <CCard className="mb-4">
         <CCardHeader>Vídeos Recentes</CCardHeader>
         <CCardBody>
+
           {videos.map((video, index) => (
-            <div className="video-card mb-3" key={index}>
-              <div className="video-thumbnail">
-                <video controls width="500" height="300"> {/* Definindo altura e largura */}
-                  <source src={video.url} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-              <div className="video-details">
-                <h5>{video.title}</h5>
-                <p>Author: {video.author}</p>
-                <p>Year: {video.year}</p>
-              </div>
-            </div>
+            <CCard className="video-card mb-3" key={index}>
+
+              <CCardBody>
+                <div className="video-thumbnail">
+                  <video controls width="100%" height="300">
+                    {/* Definindo altura e largura */}
+                    <source src={video.url} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+
+              </CCardBody>
+              <CCardFooter>
+
+                <div className="video-details" style={{}}>
+                  <h5 color='secondary'>{video.title}</h5>
+                  <p>{video.author}, {video.year}</p>
+                </div>
+              </CCardFooter>
+            </CCard>
           ))}
         </CCardBody>
       </CCard>
-    </CCol >
+    </CCol>
   );
 };
 
@@ -97,42 +111,42 @@ const MusicList = () => {
   const musics = [
     {
       title: 'Cough',
-      author: 'Author 1',
+      author: 'Kizz Daniel',
       year: '2023',
       cover: cover1,
       url: music1, // Variável para a URL da música
     },
     {
-      title: 'Dam_sio_Brothers_Button_Rose_Ney_Chiqui_-_Viagemalcsv',
-      author: 'Author 2',
+      title: 'Viagem',
+      author: 'Damásio Brothers ft Button Rose',
       year: '2022',
       cover: cover2,
       url: music2, // Variável para a URL da música
     },
     {
-      title: 'Kizz-Daniel-Buga-ft.-Tekno',
-      author: 'Author 3',
+      title: 'Buga',
+      author: 'Kizz Daniel-ft.-Tekno',
       year: '2021',
       cover: cover3,
       url: music3, // Variável para a URL da música
     },
     {
-      title: 'Rihanna_-_Lift_Me_Up_CeeNaija.com_',
-      author: 'Author 4',
+      title: 'Lift_Me_Up_',
+      author: 'Rihanna_-_',
       year: '2020',
       cover: cover4,
       url: music4, // Variável para a URL da música
     },
     {
-      title: 'ya_levis_amour_audio_mp3_3344',
-      author: 'Author 5',
+      title: '_amour_',
+      author: 'ya_levis',
       year: '2019',
       cover: cover5,
       url: music5, // Variável para a URL da música
     },
     {
       title: 'Ghost',
-      author: 'Author 6',
+      author: 'Justin Bieber',
       year: '2018',
       cover: cover6,
       url: music6, // Variável para a URL da música
@@ -140,25 +154,105 @@ const MusicList = () => {
   ];
 
   return (
-    <CCol md={6}>
-      <CCard className="mb-4">
+    <CCol md={3} >
+      <CCard className="mb-4" >
         <CCardHeader>Músicas Recentes</CCardHeader>
-        <CCardBody>
+        <CCardBody className='pt-1'>
           {musics.map((music, index) => (
-            <div className="music-card mb-3" key={index}>
-              <div className="music-thumbnail">
-                <img src={music.cover} alt={music.title} width="230" height="150" /> {/* Definindo altura e largura */}
-                <audio controls>
-                  <source src={music.url} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-              <div className="music-details">
-                <h5>{music.title}</h5>
-                <p>Author: {music.author}</p>
-                <p>Year: {music.year}</p>
-              </div>
-            </div>
+            <CCard className="music-card mb-3" key={index}>
+              <CCardHeader>
+                <div className="music-details">
+                  <h5>{music.title}</h5>
+                  <p>{music.author}, {music.year}</p>
+                </div>
+              </CCardHeader>
+              <CCardBody>
+                <div className="music-thumbnail">
+                  <CCardImage src={music.cover} alt={music.title} width="230" height="150" />
+                  {/* Definindo altura e largura */}
+
+                </div>
+              </CCardBody>
+              <CCardFooter style={{ textAlign: 'center', paddingBottom: '18px' }}>
+                <div style={{ width: '100%', height: '45px', marginTop: '10px', overflow: 'hidden' }}>
+                  <audio controls style={{ width: '100%', height: '100%' }}>
+                    <source src={music.url} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              </CCardFooter>
+            </CCard>
+          ))}
+        </CCardBody>
+      </CCard>
+    </CCol>
+  );
+};
+
+const AlbumList = () => {
+  const albums = [
+    {
+      title: 'Album - Pro2',
+      author: 'Prodigio',
+      year: '2023',
+      cover: cover12,
+    },
+    {
+      title: 'Album - NGA',
+      author: 'NGA',
+      year: '2022',
+      cover: cover11,
+    },
+    {
+      title: 'Album - Yola',
+      author: 'Yola Semedo',
+      year: '2021',
+      cover: cover7,
+    },
+    {
+      title: 'Lift Me Up - Pro2',
+      author: 'Prodigio',
+      year: '2020',
+      cover: cover10,
+    },
+    {
+      title: 'Album - Matias',
+      author: 'Matias Damásio',
+      year: '2019',
+      cover: cover8,
+    },
+    {
+      title: 'Album - Chelsea',
+      author: 'Chelsea Dinorath',
+      year: '2018',
+      cover: cover9,
+    },
+  ];
+
+  return (
+    <CCol md={3}>
+      <CCard className="mb-4">
+        <CCardHeader>Álbuns Recentes</CCardHeader>
+        <CCardBody>
+          {albums.map((album, index) => (
+            <CCard className="album-card mb-3" key={index}>
+              <CCardHeader>
+                <div className="album-details pt-2">
+                  <h5>{album.title}</h5>
+                  <p>{album.author}, {album.year}</p>
+                </div>
+              </CCardHeader>
+              <CCardBody>
+                <div className="album-thumbnail">
+                  <CCardImage src={album.cover} alt={album.title} width="230" height="150" />
+                  {/* Definindo altura e largura */}
+                </div>
+
+              </CCardBody>
+              <CCardFooter style={{ textAlign: 'center', padding: '13px' }}>
+                <CButton color='secondary' style={{ padding: '8px', margin: '2.5px', color: '#000' }} > Mais Detalhes</CButton>
+              </CCardFooter>
+            </CCard>
           ))}
         </CCardBody>
       </CCard>
@@ -167,14 +261,14 @@ const MusicList = () => {
 };
 
 const Dashboard = () => {
-
   if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
-    return <Navigate to="/login"></Navigate>
+    return <Navigate to="/login"></Navigate>;
   }
   return (
     <CRow>
       <VideoList />
       <MusicList />
+      <AlbumList />
     </CRow>
   );
 };

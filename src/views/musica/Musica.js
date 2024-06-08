@@ -19,33 +19,17 @@ import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@cor
 import CIcon from '@coreui/icons-react';
 import ReactPlayer from 'react-player';
 import { service } from './../../services';
+import { color } from 'chart.js/helpers';
 
 const Musica = () => {
   const [musicas, setMusicas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [serverStatus, setServerStatus] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [musicaDetalhes, setMusicaDetalhes] = useState({});
   const [participacoes, setParticipacoes] = useState([]);
   const [selectedArtista, setSelectedArtista] = useState('');
   const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
-
-  useEffect(() => {
-    const checkServerStatus = async () => {
-      try {
-        const response = await fetch('http://localhost:3333/status');
-        if (response.status !== 404) {
-          setServerStatus(true);
-        }
-      } catch (error) {
-        setServerStatus(false);
-      }
-    };
-    const interval = setInterval(checkServerStatus, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const fetchMusicas = async () => {
@@ -91,18 +75,6 @@ const Musica = () => {
 
   const handleShare = (id) => {
     alert(`Sharing music with ID: ${id}`);
-  };
-
-  const handlePlayerError = () => {
-    // Handle player error
-  };
-
-  const handlePlay = () => {
-    if (!serverStatus) {
-      alert('O servidor está offline. A reprodução não pode continuar.');
-      return;
-    }
-    // Start playing
   };
 
   const fetchParticipacoes = async (musicaId) => {
@@ -161,21 +133,38 @@ const Musica = () => {
 
   const buttonGroupStyle = {
     display: 'flex',
-    justifyContent: 'space-around',
-    width: '100%',
+    flexDirection: 'column',
+    gap: '26px',
+    alignItems: 'flex-start',
   };
 
   const buttonStyle = {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    height: '60px',
-    width: '75px',
+    justifyContent: 'flex-start',
+    height: '30px',
+    width: '50px',
+    textAlign: 'center',
+
   };
 
   const iconStyle = {
-    marginBottom: '0.5rem',
+    marginRight: '0.5rem',
+    color: '#000'
+  };
+
+  const cardBodyStyle = {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+
+  };
+
+  const imageStyle = {
+    marginBottom: '1rem',
+    width: '270px',
+    height: '200px',
   };
 
   const participacoesStyle = {
@@ -208,37 +197,47 @@ const Musica = () => {
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
-        {musicas.map((musica, index) => (
+        {musicas.map((musica) => (
           <CCol sm="12" md="4" key={musica.codMusica}>
             <CCard style={cardStyle}>
               <CCardHeader>
                 <h5>{musica.tituloMusica}</h5>
               </CCardHeader>
-              <CCardBody style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <img src={`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`} alt={musica.tituloMusica} style={{ marginBottom: '1rem', maxWidth: '100%', height: '120px' }} />
-                <ReactPlayer
-                  url={`http://localhost:3333/musica/downloadMusica/${musica.codMusica}`}
-                  playing={serverStatus}
-                  controls={true}
-                  width="100%"
-                  height="50px" onError={handlePlayerError}
-                />
-                <div style={buttonGroupStyle} className='mt-3'>
-                  <CButton color="primary" style={buttonStyle}>
-                    <CIcon icon={cilPencil} size="lg" style={iconStyle} />
-                    <Link to={`/configMusica/${musica.codMusica}`} style={{ color: 'white' }}>Editar</Link>
+              <CCardBody style={cardBodyStyle}>
+                <div className='w-100'>
+                  <img src={`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`} alt={musica.tituloMusica} style={imageStyle} />
+                  <ReactPlayer
+                    url={`http://localhost:3333/musica/downloadMusica/${musica.codMusica}`}
+                    controls={true}
+                    width="100%"
+                    height="50px"
+                  />
+                </div>
+                <div style={buttonGroupStyle}>
+                  <CButton color="secondary" style={buttonStyle}>
+                    <Link to={`/configMusica/${musica.codMusica}`} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                      <CIcon icon={cilPencil} size="lg" style={iconStyle} />
+
+                    </Link>
                   </CButton>
-                  <CButton color="danger" style={buttonStyle} onClick={() => handleDelete(musica.codMusica)}>
-                    <CIcon icon={cilTrash} size="lg" style={iconStyle} />
-                    Excluir
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(musica.codMusica)}>
+
+                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                      <CIcon icon={cilTrash} size="lg" style={iconStyle} />
+                    </Link>
                   </CButton>
-                  <CButton color="success" style={buttonStyle} onClick={() => handleShare(musica.codMusica)}>
-                    <CIcon icon={cilShare} size="lg" style={iconStyle} />
-                    Partilhar
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(musica.codMusica)}>
+                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                      <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                    </Link>
+
                   </CButton>
-                  <CButton color="info" style={buttonStyle} onClick={() => handleShowDetails(musica)}>
-                    <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
-                    Ver
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(musica)}>
+
+                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                      <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
+                    </Link>
+
                   </CButton>
                 </div>
               </CCardBody>
@@ -246,6 +245,7 @@ const Musica = () => {
           </CCol>
         ))}
       </CRow>
+
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
         <CModalHeader onClose={() => setShowModal(false)}>
           <CModalTitle>Detalhes da Música</CModalTitle>
@@ -273,20 +273,22 @@ const Musica = () => {
                   </option>
                 ))}
             </CFormSelect>
+
           </CForm>
-
           <div className="mt-3">
-            <CButton color="primary" onClick={handleAddParticipacao}>Adicionar Participação</CButton>
+            <CButton color="primary" onClick={handleAddParticipacao} style={{ marginTop: '10px' }}>
+              Adicionar Participação
+            </CButton>
           </div>
-
           <div style={participacoesStyle} className="mt-3">
-            {participacoes
-              .map((participacao) => (
-                <div key={participacao.codParticipacaoMusica} style={participacaoItemStyle}>
-                  <span>{participacao.artista?.nomeArtista}</span>
-                  <CButton color="danger" size="sm" style={participacaoButtonStyle} onClick={() => handleDeleteParticipacao(participacao.codParticipacaoMusica)}>Excluir</CButton>
-                </div>
-              ))}
+            {participacoes.map((participacao) => (
+              <div key={participacao.codParticipacao} style={participacaoItemStyle}>
+                <span>{participacao.artista?.nomeArtista}</span>
+                <CButton color="danger" size="sm" style={{ marginLeft: '10px' }} onClick={() => handleDeleteParticipacao(participacao.codParticipacao)}>
+                  Excluir
+                </CButton>
+              </div>
+            ))}
           </div>
         </CModalBody>
         <CModalFooter>

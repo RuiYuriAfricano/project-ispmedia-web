@@ -24,7 +24,6 @@ const Video = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [serverStatus, setServerStatus] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [videoDetalhes, setVideoDetalhes] = useState({});
@@ -35,21 +34,6 @@ const Video = () => {
   const [selectedArtista, setSelectedArtista] = useState('');
   const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
 
-  useEffect(() => {
-    const checkServerStatus = async () => {
-      try {
-        const response = await fetch('http://localhost:3333/status');
-        if (response.status !== 404) {
-          setServerStatus(true);
-        }
-      } catch (error) {
-        setServerStatus(false);
-      }
-    };
-    const interval = setInterval(checkServerStatus, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -97,17 +81,7 @@ const Video = () => {
     alert(`Sharing video with ID: ${id}`);
   };
 
-  const handlePlayerError = () => {
-    // Handle player error
-  };
 
-  const handlePlay = () => {
-    if (!serverStatus) {
-      alert('O servidor está offline. A reprodução não pode continuar.');
-      return;
-    }
-    // Start playing
-  };
 
   const fetchParticipacoes = async (videoId) => {
     try {
@@ -127,6 +101,12 @@ const Video = () => {
     setVideoDetalhes(video);
     setShowModal(true);
     fetchParticipacoes(video.codVideo);
+  };
+
+  const handleShowVideoModal = async (video) => {
+    setVideoDetalhes(video);
+    setShowVideoModal(true);
+    setModalVideoUrl(`http://localhost:3333/video/downloadVideo/${video.codVideo}`)
   };
 
   const handleAddParticipacao = async () => {
@@ -169,21 +149,24 @@ const Video = () => {
 
   const buttonGroupStyle = {
     display: 'flex',
-    justifyContent: 'space-around',
-    width: '100%',
+    flexDirection: 'column',
+    gap: '10px',
+    alignItems: 'flex-end'
   };
 
   const buttonStyle = {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '60px',
-    width: '75px',
+    height: '40px',
+    width: '40px',
+    paddingTop: '16px',
+    marginLeft: '15px'
   };
 
   const iconStyle = {
     marginBottom: '0.5rem',
+    color: '#000'
   };
 
   const participacoesStyle = {
@@ -222,31 +205,48 @@ const Video = () => {
               <CCardHeader>
                 <h5>{video.tituloVideo}</h5>
               </CCardHeader>
-              <CCardBody style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <ReactPlayer
+              <CCardBody style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0px' }}>
+                <div className='video-thumbnail mt-0'><ReactPlayer
                   url={`http://localhost:3333/video/downloadVideo/${video.codVideo}`}
-                  playing={serverStatus}
+                  playing={false}
                   controls={true}
                   width="100%"
-                  height="220px"
-                  onError={handlePlayerError}
-                />
-                <div style={buttonGroupStyle} className='mt-3'>
-                  <CButton color="primary" style={buttonStyle}>
-                    <CIcon icon={cilPencil} size="lg" style={iconStyle} />
-                    <Link to={`/configVideo/${video.codVideo}`} style={{ color: 'white' }}>Editar</Link>
+                  height="280px"
+                  style={{ marginTop: '0px' }}
+                  config={{
+                    file: {
+                      attributes: {
+                        disablePictureInPicture: true,
+                        controlsList: 'nodownload'
+                      }
+                    }
+                  }}
+                /></div>
+                <div style={buttonGroupStyle} className='mt-5'>
+                  <CButton color="secondary" style={buttonStyle}>
+                    <Link to={`/configVideo/${video.codVideo}`} style={{ color: 'white' }}>
+                      <CIcon icon={cilPencil} size="lg" style={iconStyle} />
+                    </Link>
                   </CButton>
-                  <CButton color="danger" style={buttonStyle} onClick={() => handleDelete(video.codVideo)}>
-                    <CIcon icon={cilTrash} size="lg" style={iconStyle} />
-                    Excluir
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(video.codVideo)}>
+                    <Link style={{ color: 'white' }}>
+                      <CIcon icon={cilTrash} size="lg" style={iconStyle} />
+                    </Link>
                   </CButton>
-                  <CButton color="success" style={buttonStyle} onClick={() => handleShare(video.codVideo)}>
-                    <CIcon icon={cilShare} size="lg" style={iconStyle} />
-                    Partilhar
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(video.codVideo)}>
+                    <Link style={{ color: 'white' }}>
+                      <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                    </Link>
                   </CButton>
-                  <CButton color="info" style={buttonStyle} onClick={() => handleShowDetails(video)}>
-                    <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
-                    Ver
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(video)}>
+                    <Link style={{ color: 'white' }}>
+                      <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
+                    </Link>
+                  </CButton>
+                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShowVideoModal(video)}>
+                    <Link style={{ color: 'white' }}>
+                      <CIcon icon={cilMediaPlay} size="lg" style={iconStyle} />
+                    </Link>
                   </CButton>
                 </div>
               </CCardBody>
@@ -302,16 +302,15 @@ const Video = () => {
       </CModal>
       <CModal visible={showVideoModal} onClose={() => setShowVideoModal(false)} size="lg">
         <CModalHeader onClose={() => setShowVideoModal(false)}>
-          <CModalTitle>Legendas do Vídeo</CModalTitle>
+          <CModalTitle>{videoDetalhes.tituloVideo}</CModalTitle>
         </CModalHeader>
         <CModalBody style={{ padding: 0, position: 'relative' }}>
           <ReactPlayer
             url={modalVideoUrl}
-            playing={serverStatus}
+            playing={false}
             controls={true}
             width="100%"
             height="500px"
-            onError={handlePlayerError}
           />
           {showCaption && (
             <div style={{
