@@ -6,7 +6,10 @@ import { musica } from "./musica";
 import { video } from "./video";
 import { participacaoMusica } from "./participacaoMusica";
 import { participacaoVideo } from "./participacaoVideo";
+import { playlist } from "./playlist";
+import { musicasDaPlaylist } from "./musicasDaPlaylist";
 
 export const service = {
-  auth, grupoMusical, artista, album, musica, video, participacaoMusica, participacaoVideo
+  auth, grupoMusical, artista, album, musica, video, participacaoMusica, participacaoVideo,
+  playlist, musicasDaPlaylist
 };
