@@ -8,8 +8,9 @@ import { participacaoMusica } from "./participacaoMusica";
 import { participacaoVideo } from "./participacaoVideo";
 import { playlist } from "./playlist";
 import { musicasDaPlaylist } from "./musicasDaPlaylist";
+import { videosDaPlaylist } from "./videosDaPlaylist"
 
 export const service = {
   auth, grupoMusical, artista, album, musica, video, participacaoMusica, participacaoVideo,
-  playlist, musicasDaPlaylist
+  playlist, musicasDaPlaylist, videosDaPlaylist
 };

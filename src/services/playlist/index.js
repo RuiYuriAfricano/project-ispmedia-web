@@ -49,6 +49,26 @@ async function listar() {
     }
 }
 
+async function getVideosEMusicasDaPlaylist(idPlaylist) {
+    try {
+        const response = await axiosInstance.post(`playlist/${idPlaylist}/videos-e-musicas`);
+        return response;
+    } catch (error) {
+        return error?.response;
+    }
+}
+
+async function pesquisarMusicasEVideosPorTitulo(palavraChave) {
+    try {
+
+        const response = await axiosInstance.post('playlist/pesquisar/', {
+            "palavraChave": palavraChave,
+        });
+        return response;
+    } catch (error) {
+        return error?.response;
+    }
+}
 
 
-export const playlist = { add, update, excluir, listar, pesquisaporid };
+export const playlist = { add, update, excluir, listar, pesquisaporid, getVideosEMusicasDaPlaylist, pesquisarMusicasEVideosPorTitulo };

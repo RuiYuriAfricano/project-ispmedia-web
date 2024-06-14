@@ -337,11 +337,14 @@ const ConfigAlbum = ({ idEditAlbum, onClose }) => {
                 </CTooltip>
               )}
 
-              <div className="d-grid">
-                <CButton color="success" onClick={handleAddAlbum}>
-                  {loading ? <CSpinner size="sm" /> : idEditAlbum ? 'Atualizar Álbum' : 'Criar Álbum'}
-                </CButton>
-              </div>
+
+              <CRow>
+                <CCol xs={6}>
+                  <CButton color="primary" onClick={handleAddAlbum}>
+                    {loading ? <CSpinner size="sm" /> : 'Salvar'}
+                  </CButton>
+                </CCol>
+              </CRow>
             </CForm>
           </CCardBody>
         </CCard>

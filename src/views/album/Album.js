@@ -141,7 +141,7 @@ const Album = () => {
       </CRow>
       <CRow className="justify-content-center mt-3">
         {albuns.map((album) => (
-          <CCol sm="12" md="4" key={album.codAlbum}>
+          <CCol lg="6" sm="12" xl="4" md="6" key={album.codAlbum}>
             <CCard style={cardStyle}>
               <CCardHeader>
                 <h5>{album.tituloAlbum}</h5>

@@ -63,7 +63,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Grupos De Amigos',
-    to: '/charts',
+    to: '/grupoDeAmigos',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
   {
@@ -75,7 +75,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'PlayLists',
-    to: '/charts',
+    to: '/playlist',
     icon: <CIcon icon={cilFeaturedPlaylist} customClassName="nav-icon" />,
   },
   {
