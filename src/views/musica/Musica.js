@@ -223,7 +223,7 @@ const Musica = () => {
       </CRow>
       <CRow className="justify-content-center mt-3">
         {musicas.map((musica) => (
-          <CCol sm="12" md="4" key={musica.codMusica}>
+          <CCol lg="4" sm="12" xl="4" md="6" key={musica.codMusica}>
             <CCard style={cardStyle}>
               <CCardHeader>
                 <h5>{musica.tituloMusica}</h5>

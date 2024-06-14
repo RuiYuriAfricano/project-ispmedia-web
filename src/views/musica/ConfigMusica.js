@@ -458,7 +458,7 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
 
               <CRow className='w-100'>
                 <CCol xs={6}>
-                  <CButton color="success" onClick={handleAddMusica} disabled={loading}>
+                  <CButton color="primary" onClick={handleAddMusica} disabled={loading}>
                     {loading ? <CSpinner size="sm" /> : 'Guardar'}
                   </CButton>
                 </CCol>
