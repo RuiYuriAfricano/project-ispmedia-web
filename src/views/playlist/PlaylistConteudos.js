@@ -24,7 +24,11 @@ import {
     CListGroup,
     CListGroupItem,
     CAlert,
-    CCardFooter
+    CCardFooter,
+    CDropdown,
+    CDropdownToggle,
+    CDropdownMenu,
+    CDropdownItem,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilMediaPlay, cilPlus } from '@coreui/icons';
@@ -162,6 +166,24 @@ const PlaylistConteudo = () => {
         return emptyFields;
     };
 
+    const handleRemoveFromPlaylist = async (conteudo) => {
+        const confirmDelete = window.confirm("Tem certeza que deseja excluir o conteudo desta PlayList?");
+        if (confirmDelete) {
+            try {
+                if (conteudo.tipo === 'video') {
+                    await service.videosDaPlaylist.excluir(conteudo.codigoConteudoDaPlayList);
+                }
+                else {
+                    await service.musicasDaPlaylist.excluir(conteudo.codigoConteudoDaPlayList);
+                }
+
+                setVideos(videos.filter(video => !(video.codigo === conteudo.codigo && video.tipo === conteudo.tipo)));
+            } catch (err) {
+                console.error('Erro ao excluir a playList:', err);
+            }
+        }
+    };
+
     return (
         <CRow>
             <CCol md={8}>
@@ -249,19 +271,9 @@ const PlaylistConteudo = () => {
                             </CTableHead>
                             <CTableBody>
                                 {videos.map((video) => (
-                                    <CTableRow active={selectedItem?.codigo === video.codigo && selectedItem?.tipo === video.tipo} key={video.codigo + "" + video.tipo} onClick={() => {
-                                        if (video.tipo === "video") {
-                                            setSelectedVideo(`http://localhost:3333/video/downloadVideo/${video.codigo}`);
-                                            setSelectedUrlCapa(null);
-                                        }
-                                        else {
-                                            setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${video.codigo}`);
-                                            setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${video.codigo}`);
-                                        }
-                                        setSelectedTitulo(video.titulo)
-                                        setSelectedTipo(video.tipo);
-                                        setSelectedItem(video); // Define o item selecionado
-                                    }}>
+                                    <CTableRow
+                                        active={selectedItem?.codigo === video.codigo && selectedItem?.tipo === video.tipo}
+                                        key={video.codigo + "" + video.tipo}>
                                         <CTableDataCell>
                                             <div className="thumbnail-wrapper">
                                                 <CImage
@@ -271,14 +283,44 @@ const PlaylistConteudo = () => {
                                                     style={{ width: "100%", borderRadius: "5px" }}
                                                 />
                                                 <div className="play-icon-wrapper">
-                                                    <CIcon icon={cilMediaPlay} className="play-icon" />
+                                                    <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
+                                                        if (video.tipo === "video") {
+                                                            setSelectedVideo(`http://localhost:3333/video/downloadVideo/${video.codigo}`);
+                                                            setSelectedUrlCapa(null);
+                                                        }
+                                                        else {
+                                                            setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${video.codigo}`);
+                                                            setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${video.codigo}`);
+                                                        }
+                                                        setSelectedTitulo(video.titulo)
+                                                        setSelectedTipo(video.tipo);
+                                                        setSelectedItem(video); // Define o item selecionado
+                                                    }} />
                                                 </div>
                                             </div>
                                         </CTableDataCell>
-                                        <CTableDataCell><h6>{video.titulo}</h6> {video.autor}</CTableDataCell>
+                                        <CTableDataCell>
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6>{video.titulo}</h6>
+                                                    {video.autor}
+                                                </div>
+                                                <CDropdown className="ml-2">
+                                                    <CDropdownToggle className="vertical-dots" caret={false}>
+                                                        &#x2022;<br />&#x2022;<br />&#x2022;
+                                                    </CDropdownToggle>
+                                                    <CDropdownMenu className="dropdown-menu-right">
+                                                        <CDropdownItem className="dropdown-item" onClick={() => alert('Ver detalhes')}>Ver detalhes</CDropdownItem>
+                                                        <CDropdownItem className="dropdown-item" onClick={() => handleRemoveFromPlaylist(video)}>Remover da playlist</CDropdownItem>
+                                                    </CDropdownMenu>
+                                                </CDropdown>
+                                            </div>
+                                        </CTableDataCell>
                                     </CTableRow>
                                 ))}
                             </CTableBody>
+
+
                         </CTable>
                     </CCardBody>
                 </CCard>

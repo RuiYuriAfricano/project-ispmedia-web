@@ -54,3 +54,24 @@
     background-color: rgba(0, 0, 0, 0.5) !important;
     /* semi-transparente */
 }
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.vertical-dots {
+    font-size: 0.5rem;
+    line-height: 0.5;
+    cursor: pointer;
+    border-radius: 100%;
+    width: 5px;
+}
+
+.dropdown-item {
+    cursor: pointer;
+}
+
+.dropdown-menu-right {
+    left: auto;
+    right: 0;
+}
