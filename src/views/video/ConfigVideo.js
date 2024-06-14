@@ -396,7 +396,7 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
 
               <CRow className='w-100'>
                 <CCol xs={6}>
-                  <CButton color="success" onClick={handleAddVideo} disabled={loading}>
+                  <CButton color="primary" onClick={handleAddVideo} disabled={loading}>
                     {loading ? <CSpinner size="sm" /> : 'Guardar'}
                   </CButton>
                 </CCol>

@@ -250,7 +250,7 @@ const AlbumList = () => {
 
               </CCardBody>
               <CCardFooter style={{ textAlign: 'center', padding: '13px' }}>
-                <CButton color='secondary' style={{ padding: '8px', margin: '2.5px', color: '#000' }} > Mais Detalhes</CButton>
+                <CButton style={{ padding: '8px', margin: '2.5px', color: '#fff', backgroundColor: '#333', borderRadius: '20px', width: '180px' }} > Mais Detalhes</CButton>
               </CCardFooter>
             </CCard>
           ))}

@@ -13,7 +13,8 @@ import {
   CModalBody,
   CModalFooter,
   CForm,
-  CFormSelect
+  CFormSelect,
+  CCardFooter
 } from '@coreui/react';
 import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus, cilMediaPlay } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -170,6 +171,7 @@ const Video = () => {
   const cardStyle = {
     marginBottom: '2rem',
     textAlign: 'center',
+    backgroundColor: '#000'
   };
 
   const buttonGroupStyle = {
@@ -224,11 +226,9 @@ const Video = () => {
       </CRow>
       <CRow className="justify-content-center mt-3">
         {videos.map((video, index) => (
-          <CCol sm="12" md="4" key={video.codVideo}>
+          <CCol lg="6" sm="12" xl="4" md="6" key={video.codVideo}>
             <CCard style={cardStyle}>
-              <CCardHeader>
-                <h5>{video.tituloVideo}</h5>
-              </CCardHeader>
+
               <CCardBody style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0px' }}>
                 <div className='video-thumbnail mt-0'><ReactPlayer
                   url={`http://localhost:3333/video/downloadVideo/${video.codVideo}`}
@@ -236,7 +236,7 @@ const Video = () => {
                   controls={true}
                   width="100%"
                   height="280px"
-                  style={{ marginTop: '0px' }}
+                  style={{ marginTop: '0px', padding: '0' }}
                   config={{
                     file: {
                       attributes: {
@@ -274,6 +274,9 @@ const Video = () => {
                   </CButton>
                 </div>
               </CCardBody>
+              <CCardFooter>
+                <h5 style={{ color: '#fff' }}>{video.tituloVideo}</h5>
+              </CCardFooter>
             </CCard>
           </CCol>
         ))}
