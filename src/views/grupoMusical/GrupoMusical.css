@@ -1,0 +1,36 @@
+.thumbnail-wrapper {
+    position: relative;
+    left: 20%;
+    width: 100px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+
+}
+
+.thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.thumbnail-wrapper:hover {
+    transform: scale(1.05);
+}
+
+.thumbnail-wrapper:hover .play-icon {
+    opacity: 1;
+}

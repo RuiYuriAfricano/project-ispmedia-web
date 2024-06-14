@@ -21,12 +21,14 @@ import {
   CModalHeader,
   CModalBody,
   CModalFooter,
-  CSpinner
+  CImage
 } from '@coreui/react';
-import { cilPlus } from '@coreui/icons';
+import { cilGroup, cilMediaPlay, cilPen, cilPlus, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
 import ConfigGrupoMusical from './ConfigGrupoMusical';
+import './GrupoMusical.css';
+import thumbnail from './img/default-thumbnail.jpeg';
 
 const GrupoMusical = () => {
   const [grupos, setGrupos] = useState([]);
@@ -89,7 +91,7 @@ const GrupoMusical = () => {
 
   return (
     <CRow>
-      <CCol xs={12}>
+      <CCol>
         <CCard className="mb-4">
           <CCardHeader className="d-flex justify-content-between align-items-center">
             <strong>Listagem dos Grupos Musicais</strong>
@@ -98,35 +100,44 @@ const GrupoMusical = () => {
             </CButton>
           </CCardHeader>
           <CCardBody>
-            <CTable>
+            <CTable className="text-center" hover responsive>
               <CTableHead>
                 <CTableRow>
-                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                  <CTableHeaderCell scope="col"><CIcon icon={cilGroup} /></CTableHeaderCell>
                   <CTableHeaderCell scope="col">Nome</CTableHeaderCell>
                   <CTableHeaderCell scope="col">História</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Data de Criação</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Registo na Aplicação</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Utilizador</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Registado Por</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Operações</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody>
                 {grupos.map((grupo, index) => (
                   <CTableRow key={grupo.codGrupoMusical}>
-                    <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
+                    <CTableHeaderCell scope="row">
+                      <div className="thumbnail-wrapper" >
+                        <Link>
+                          <CImage
+                            className="thumbnail"
+                            src={thumbnail} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                            alt={grupo.nomeGrupoMusical}
+                          />
+                          <CIcon icon={cilMediaPlay} className="play-icon" />
+                        </Link>
+                      </div>
+                    </CTableHeaderCell>
                     <CTableDataCell>{grupo.nomeGrupoMusical}</CTableDataCell>
                     <CTableDataCell>{grupo.historia}</CTableDataCell>
                     <CTableDataCell>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</CTableDataCell>
                     <CTableDataCell>{new Date(grupo.dataDeRegisto).toLocaleDateString()}</CTableDataCell>
                     <CTableDataCell>{grupo.registadopor?.username}</CTableDataCell>
                     <CTableDataCell>
-                      <CDropdown>
-                        <CDropdownToggle color="secondary">Escolha a Operação</CDropdownToggle>
-                        <CDropdownMenu>
-                          <CDropdownItem onClick={() => handleEdit(grupo.codGrupoMusical)}>Editar</CDropdownItem>
-                          <CDropdownItem onClick={() => handleDelete(grupo.codGrupoMusical)}>Excluir</CDropdownItem>
-                        </CDropdownMenu>
-                      </CDropdown>
+
+                      <Link onClick={() => handleEdit(grupo.codGrupoMusical)}><CIcon icon={cilPen} /></Link>
+                      <span>    </span>
+                      <Link onClick={() => handleDelete(grupo.codGrupoMusical)}><CIcon icon={cilTrash} /></Link>
+
                     </CTableDataCell>
                   </CTableRow>
                 ))}
