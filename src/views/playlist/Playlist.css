@@ -1,0 +1,78 @@
+.playlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0px;
+    justify-content: center;
+    /* Centraliza os cards */
+    max-width: 1000px;
+    /* Limita a largura máxima */
+    margin: 0 auto;
+    /* Centraliza o grid na página */
+}
+
+.playlist-card {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s;
+    max-width: 300px;
+    /* Limita a largura máxima de cada card */
+    margin: 0 auto;
+    margin-bottom: 20px;
+    /* Centraliza cada card dentro do grid */
+}
+
+.playlist-card:hover {
+    transform: scale(1.05);
+}
+
+.thumbnail-wrapper {
+    position: relative;
+}
+
+.thumbnail {
+    width: 100%;
+    display: block;
+}
+
+.play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 2rem;
+}
+
+.ligacao {
+    text-decoration: none;
+}
+
+.playlist-info {
+    padding: 10px;
+    color: white;
+}
+
+.playlist-info h5 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.playlist-info p {
+    margin: 4px 0;
+    font-size: 0.875rem;
+}
+
+.playlist-actions {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    border-top: 1px solid #444;
+}
+
+.playlist-actions a {
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+}
