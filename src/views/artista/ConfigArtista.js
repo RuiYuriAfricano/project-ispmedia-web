@@ -124,7 +124,7 @@ const ConfigArtista = ({ artista, onSave, closeModal }) => {
   return (
     <CForm>
       {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
-      <h1>{artista ? `Editar Artista` : "Criar Novo Artista"}</h1>
+      <h1>Artista</h1>
       <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
 
       <CInputGroup className="mb-3">
@@ -206,11 +206,13 @@ const ConfigArtista = ({ artista, onSave, closeModal }) => {
         </CInputGroup>
       )}
 
-      <div className="d-grid">
-        <CButton color="success" onClick={handleAddArtista}>
-          {loading ? <CSpinner size="sm" /> : artista ? 'Atualizar Artista' : 'Criar Artista'}
-        </CButton>
-      </div>
+      <CRow>
+        <CCol xs={6}>
+          <CButton color="primary" onClick={handleAddArtista}>
+            {loading ? <CSpinner size="sm" /> : 'Salvar'}
+          </CButton>
+        </CCol>
+      </CRow>
     </CForm>
   );
 };
