@@ -15,7 +15,7 @@ const Playlist = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editPlaylistId, setEditPlaylistId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Define the number of items per page
+  const itemsPerPage = 8; // Define the number of items per page
 
   useEffect(() => {
     const fetchPlaylists = async () => {
