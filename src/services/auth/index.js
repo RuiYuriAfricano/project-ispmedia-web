@@ -29,10 +29,18 @@ async function register(formData) {
   }
 }
 
+async function listar() {
+  try {
+    const response = await axiosInstance.post("utilizador/listar");
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+}
 
 
 
 
 
-
-export const auth = { login, register };
+export const auth = { login, register, listar };
