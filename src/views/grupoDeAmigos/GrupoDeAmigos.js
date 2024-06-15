@@ -6,27 +6,20 @@ import {
   CCardHeader,
   CCol,
   CRow,
-  CTable,
-  CTableBody,
-  CTableHeaderCell,
-  CTableHead,
-  CTableRow,
-  CTableDataCell,
-  CDropdown,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
   CButton,
   CModal,
   CModalHeader,
   CModalBody,
-  CModalFooter,
-  CSpinner
+  CImage,
+  CPagination,
+  CPaginationItem
 } from '@coreui/react';
-import { cilPlus } from '@coreui/icons';
+import { cilPlus, cilMediaPlay, cilTrash, cilPen } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
 import ConfigGrupoDeAmigos from './ConfigGrupoDeAmigos';
+import './GrupoDeAmigos.css';
+import thumbnail from './img/default-thumbnail.png';
 
 const GrupoDeAmigos = () => {
   const [grupos, setGrupos] = useState([]);
@@ -34,11 +27,13 @@ const GrupoDeAmigos = () => {
   const [error, setError] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [editGrupoId, setEditGrupoId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Define the number of items per page
 
   useEffect(() => {
     const fetchGrupos = async () => {
       try {
-        const response = await service.grupoMusical.listar();
+        const response = await service.grupoDeAmigos.listar();
         setGrupos(response.data);
         setLoading(false);
       } catch (err) {
@@ -51,13 +46,13 @@ const GrupoDeAmigos = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Tem certeza que deseja excluir este grupo musical?");
+    const confirmDelete = window.confirm("Tem certeza que deseja excluir este grupo de amigos?");
     if (confirmDelete) {
       try {
-        await service.grupoMusical.excluir(id);
-        setGrupos(grupos.filter(grupo => grupo.codGrupoMusical !== id));
+        await service.grupoDeAmigos.excluir(id);
+        setGrupos(grupos.filter(grupo => grupo.codGrupoDeAmigos !== id));
       } catch (err) {
-        console.error('Erro ao excluir o grupo musical:', err);
+        console.error('Erro ao excluir o grupo de amigos:', err);
       }
     }
   };
@@ -71,10 +66,9 @@ const GrupoDeAmigos = () => {
     setModalVisible(false);
     setEditGrupoId(null);
     if (success) {
-      // Refresh the group list after successful creation/updation
       setLoading(true);
       try {
-        const response = await service.grupoMusical.listar();
+        const response = await service.grupoDeAmigos.listar();
         setGrupos(response.data);
         setLoading(false);
       } catch (err) {
@@ -84,61 +78,72 @@ const GrupoDeAmigos = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const selectedGrupos = grupos.slice(startIndex, startIndex + itemsPerPage);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   return (
     <CRow>
-      <CCol xs={12}>
+      <CCol>
         <CCard className="mb-4">
           <CCardHeader className="d-flex justify-content-between align-items-center">
-            <strong>Listagem dos Grupos Musicais</strong>
+            <strong>Meus Grupos de Amigos</strong>
             <CButton color="primary" onClick={() => setModalVisible(true)}>
               Novo Grupo
             </CButton>
           </CCardHeader>
           <CCardBody>
-            <CTable>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Nome</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">História</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Data de Criação</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Registo na Aplicação</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Utilizador</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Operações</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {grupos.map((grupo, index) => (
-                  <CTableRow key={grupo.codGrupoMusical}>
-                    <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
-                    <CTableDataCell>{grupo.nomeGrupoMusical}</CTableDataCell>
-                    <CTableDataCell>{grupo.historia}</CTableDataCell>
-                    <CTableDataCell>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</CTableDataCell>
-                    <CTableDataCell>{new Date(grupo.dataDeRegisto).toLocaleDateString()}</CTableDataCell>
-                    <CTableDataCell>{grupo.registadopor?.username}</CTableDataCell>
-                    <CTableDataCell>
-                      <CDropdown>
-                        <CDropdownToggle color="secondary">Escolha a Operação</CDropdownToggle>
-                        <CDropdownMenu>
-                          <CDropdownItem onClick={() => handleEdit(grupo.codGrupoMusical)}>Editar</CDropdownItem>
-                          <CDropdownItem onClick={() => handleDelete(grupo.codGrupoMusical)}>Excluir</CDropdownItem>
-                        </CDropdownMenu>
-                      </CDropdown>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))}
-              </CTableBody>
-            </CTable>
+            <div className="group-grid">
+              {selectedGrupos.map((grupo) => (
+                <div className="group-card" key={grupo.codGrupoDeAmigos}>
+                  <Link to={`/grupoConteudo/${grupo.codGrupoDeAmigos}`} className='ligacao'>
+                    <div className="thumbnail-wrapper">
+                      <CImage className="thumbnail" src="https://images.unsplash.com/photo-1517048676732-d65bc937f952" alt={grupo.nomeDoGrupo} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
+                      <CIcon icon={cilMediaPlay} className="play-icon" />
+                    </div>
+                    <div className="group-info">
+                      <h5>{grupo.nomeDoGrupo}</h5>
+                      <p>{grupo.utilizador?.username}</p>
+                      <p>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</p>
+                    </div>
+                  </Link>
+                  <div className="group-actions">
+                    <Link onClick={() => handleEdit(grupo.codGrupoDeAmigos)}><CIcon icon={cilPen} /></Link>
+                    <Link onClick={() => handleDelete(grupo.codGrupoDeAmigos)}><CIcon icon={cilTrash} /></Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <CPagination align="center" className="mt-3">
+              <CPaginationItem disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+                Anterior
+              </CPaginationItem>
+              {[...Array(Math.ceil(grupos.length / itemsPerPage)).keys()].map(number => (
+                <CPaginationItem
+                  key={number + 1}
+                  active={currentPage === number + 1}
+                  onClick={() => handlePageChange(number + 1)}
+                >
+                  {number + 1}
+                </CPaginationItem>
+              ))}
+              <CPaginationItem disabled={currentPage === Math.ceil(grupos.length / itemsPerPage)} onClick={() => handlePageChange(currentPage + 1)}>
+                Próxima
+              </CPaginationItem>
+            </CPagination>
           </CCardBody>
         </CCard>
       </CCol>
 
       <CModal visible={modalVisible} onClose={() => handleModalClose(false)}>
         <CModalHeader closeButton>
-          {editGrupoId ? 'Editar Grupo Musical' : 'Criar Novo Grupo Musical'}
+          {editGrupoId ? 'Editar Grupo de Amigos' : 'Criar Novo Grupo de Amigos'}
         </CModalHeader>
         <CModalBody>
           <ConfigGrupoDeAmigos idEditGrupo={editGrupoId} onClose={handleModalClose} />
