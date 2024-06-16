@@ -13,6 +13,7 @@ const Video = React.lazy(() => import('./views/video/Video'))
 const Playlist = React.lazy(() => import('./views/playlist/Playlist'))
 const GrupoDeAmigos = React.lazy(() => import('./views/grupoDeAmigos/GrupoDeAmigos'))
 const PlaylistConteudo = React.lazy(() => import('./views/playlist/PlaylistConteudos'))
+const GrupoConteudo = React.lazy(() => import('./views/grupoDeAmigos/GrupoConteudos'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -27,7 +28,8 @@ const routes = [
   { path: '/video', name: 'Video', element: Video },
   { path: '/grupoDeAmigos', name: 'GrupoDeAmigos', element: GrupoDeAmigos },
   { path: '/playlist', name: 'Playlist', element: Playlist },
-  { path: '/playlistConteudo/:playlistId', name: 'PlaylistConteudo', element: PlaylistConteudo }
+  { path: '/playlistConteudo/:playlistId', name: 'PlaylistConteudo', element: PlaylistConteudo },
+  { path: '/grupoConteudo/:grupoId', name: 'GrupoConteudo', element: GrupoConteudo }
 ]
 
 export default routes
