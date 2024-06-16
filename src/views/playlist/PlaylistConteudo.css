@@ -41,6 +41,11 @@
     opacity: 0.8;
 }
 
+.scrollable-table {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
 .thumbnail-wrapper .play-icon {
     width: 50px;
     height: 50px;
@@ -49,6 +54,42 @@
     background-color: rgba(0, 0, 0, 0.5);
     border-radius: 50%;
 }
+
+/* comentario*/
+.star {
+    font-size: 1.5em;
+    margin: 0 5px;
+}
+
+.star.selected {
+    color: gold;
+}
+
+.comment {
+    margin-bottom: 1em;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-name {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/*fim comentário */
 
 .react-player div>video::cue {
     background-color: rgba(0, 0, 0, 0.5) !important;

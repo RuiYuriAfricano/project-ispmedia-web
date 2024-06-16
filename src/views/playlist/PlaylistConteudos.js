@@ -38,6 +38,7 @@ import thumbnail from './img/default-thumbnail.png';
 import './PlaylistConteudo.css';
 import { Player, ControlBar } from 'video-react';
 import 'video-react/dist/video-react.css'; // Importa os estilos padrões do player
+import StarRating from './StarRating';
 
 const PlaylistConteudo = () => {
     const { playlistId } = useParams();
@@ -56,7 +57,17 @@ const PlaylistConteudo = () => {
     const [corDoAlert, setCorDoAlert] = useState('');
     const [nomePlayList, setNomePlayList] = useState(null);
 
+    const user = JSON.parse(localStorage.getItem("loggedUser"));
+
     const [cart, setCart] = useState([]);
+
+    const [comments, setComments] = useState([]);
+    const [rating, setRating] = useState(0);
+    const [newComment, setNewComment] = useState('');
+    const [currentUser, setCurrentUser] = useState({
+        name: 'Rui Malemba', // Substitua pelo nome do usuário atual
+        photo: 'http://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
+    });
 
     useEffect(() => {
         const fetchVideos = async () => {
@@ -96,6 +107,18 @@ const PlaylistConteudo = () => {
         fetchNomePlaylist();
         fetchVideos();
     }, [playlistId]);
+
+    const handleAddComment = () => {
+        if (newComment.trim()) {
+            setComments([...comments, {
+                text: newComment,
+                rating,
+                user: currentUser
+            }]);
+            setNewComment('');
+            setRating(0);
+        }
+    };
 
     const handleSearch = async () => {
         // Verificar se todos os campos obrigatórios estão preenchidos
@@ -179,7 +202,7 @@ const PlaylistConteudo = () => {
 
                 setVideos(videos.filter(video => !(video.codigo === conteudo.codigo && video.tipo === conteudo.tipo)));
             } catch (err) {
-                console.error('Erro ao excluir a playList:', err);
+                console.error('Erro ao excluir conteudo da playList:', err);
             }
         }
     };
@@ -210,6 +233,7 @@ const PlaylistConteudo = () => {
                                     controls={true}
                                     width="100%"
                                     height="100%"
+                                    playing={true}
                                     config={{
                                         file: {
                                             attributes: {
@@ -227,7 +251,7 @@ const PlaylistConteudo = () => {
                                         controls={true}
                                         width="98%"
                                         height="98%"
-
+                                        playing={true}
                                         style={{ marginLeft: '6px' }}
                                         config={{
                                             file: {
@@ -245,7 +269,33 @@ const PlaylistConteudo = () => {
                                     )}
 
                     </CCardBody>
-                    <CCardFooter><h5>{selectedTitulo}</h5></CCardFooter>
+                    <CCardFooter>
+                        <h5>{selectedTitulo}</h5>
+                        <div>
+                            <h6>Comentários:</h6>
+                            {comments.map((comment, index) => (
+                                <div key={index} className="comment">
+                                    <div className="comment-header">
+                                        <CImage src={comment.user.photo} alt={comment.user.name} className="user-photo" />
+                                        <span className="user-name">{comment.user.name}</span>
+                                        <StarRating rating={comment.rating} setRating={() => { }} />
+                                    </div>
+                                    <p>{comment.text}</p>
+                                </div>
+                            ))}
+                            <CForm>
+                                <CInputGroup>
+                                    <CFormInput
+                                        value={newComment}
+                                        onChange={(e) => setNewComment(e.target.value)}
+                                        placeholder="Adicionar um comentário"
+                                    />
+                                </CInputGroup>
+                                <StarRating rating={rating} setRating={setRating} />
+                                <CButton color="primary" onClick={handleAddComment}>Comentar</CButton>
+                            </CForm>
+                        </div>
+                    </CCardFooter>
                 </CCard>
             </CCol>
             <CCol md={4}>
@@ -263,65 +313,67 @@ const PlaylistConteudo = () => {
                         </CRow>
                     </CCardHeader>
                     <CCardBody>
-                        <CTable hover responsive>
-                            <CTableHead>
-                                <CTableRow>
-                                    {/* Add your table headers here */}
-                                </CTableRow>
-                            </CTableHead>
-                            <CTableBody>
-                                {videos.map((video) => (
-                                    <CTableRow
-                                        active={selectedItem?.codigo === video.codigo && selectedItem?.tipo === video.tipo}
-                                        key={video.codigo + "" + video.tipo}>
-                                        <CTableDataCell>
-                                            <div className="thumbnail-wrapper">
-                                                <CImage
-                                                    className="thumbnail"
-                                                    src={video.tipo === 'video' ? thumbnail : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
-                                                    alt={video.nome}
-                                                    style={{ width: "100%", borderRadius: "5px" }}
-                                                />
-                                                <div className="play-icon-wrapper">
-                                                    <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
-                                                        if (video.tipo === "video") {
-                                                            setSelectedVideo(`http://localhost:3333/video/downloadVideo/${video.codigo}`);
-                                                            setSelectedUrlCapa(null);
-                                                        }
-                                                        else {
-                                                            setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${video.codigo}`);
-                                                            setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${video.codigo}`);
-                                                        }
-                                                        setSelectedTitulo(video.titulo)
-                                                        setSelectedTipo(video.tipo);
-                                                        setSelectedItem(video); // Define o item selecionado
-                                                    }} />
-                                                </div>
-                                            </div>
-                                        </CTableDataCell>
-                                        <CTableDataCell>
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <h6>{video.titulo}</h6>
-                                                    {video.autor}
-                                                </div>
-                                                <CDropdown className="ml-2">
-                                                    <CDropdownToggle className="vertical-dots" caret={false}>
-                                                        &#x2022;<br />&#x2022;<br />&#x2022;
-                                                    </CDropdownToggle>
-                                                    <CDropdownMenu className="dropdown-menu-right">
-                                                        <CDropdownItem className="dropdown-item" onClick={() => alert('Ver detalhes')}>Ver detalhes</CDropdownItem>
-                                                        <CDropdownItem className="dropdown-item" onClick={() => handleRemoveFromPlaylist(video)}>Remover da playlist</CDropdownItem>
-                                                    </CDropdownMenu>
-                                                </CDropdown>
-                                            </div>
-                                        </CTableDataCell>
+                        <div className="scrollable-table">
+                            <CTable hover responsive>
+                                <CTableHead>
+                                    <CTableRow>
+                                        {/* Add your table headers here */}
                                     </CTableRow>
-                                ))}
-                            </CTableBody>
+                                </CTableHead>
+                                <CTableBody>
+                                    {videos.map((video) => (
+                                        <CTableRow
+                                            active={selectedItem?.codigo === video.codigo && selectedItem?.tipo === video.tipo}
+                                            key={video.codigo + "" + video.tipo}>
+                                            <CTableDataCell>
+                                                <div className="thumbnail-wrapper">
+                                                    <CImage
+                                                        className="thumbnail"
+                                                        src={video.tipo === 'video' ? thumbnail : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                        alt={video.nome}
+                                                        style={{ width: "100%", borderRadius: "5px" }}
+                                                    />
+                                                    <div className="play-icon-wrapper">
+                                                        <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
+                                                            if (video.tipo === "video") {
+                                                                setSelectedVideo(`http://localhost:3333/video/downloadVideo/${video.codigo}`);
+                                                                setSelectedUrlCapa(null);
+                                                            }
+                                                            else {
+                                                                setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${video.codigo}`);
+                                                                setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${video.codigo}`);
+                                                            }
+                                                            setSelectedTitulo(video.titulo)
+                                                            setSelectedTipo(video.tipo);
+                                                            setSelectedItem(video); // Define o item selecionado
+                                                        }} />
+                                                    </div>
+                                                </div>
+                                            </CTableDataCell>
+                                            <CTableDataCell>
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6>{video.titulo}</h6>
+                                                        {video.autor}
+                                                    </div>
+                                                    <CDropdown className="ml-2">
+                                                        <CDropdownToggle className="vertical-dots" caret={false}>
+                                                            &#x2022;<br />&#x2022;<br />&#x2022;
+                                                        </CDropdownToggle>
+                                                        <CDropdownMenu className="dropdown-menu-right">
+                                                            <CDropdownItem className="dropdown-item" onClick={() => alert('Ver detalhes')}>Ver detalhes</CDropdownItem>
+                                                            <CDropdownItem className="dropdown-item" onClick={() => handleRemoveFromPlaylist(video)}>Remover da playlist</CDropdownItem>
+                                                        </CDropdownMenu>
+                                                    </CDropdown>
+                                                </div>
+                                            </CTableDataCell>
+                                        </CTableRow>
+                                    ))}
+                                </CTableBody>
 
 
-                        </CTable>
+                            </CTable>
+                        </div>
                     </CCardBody>
                 </CCard>
             </CCol>
@@ -331,13 +383,13 @@ const PlaylistConteudo = () => {
                 setModal(false);
             }} size="lg">
                 <CModalHeader closeButton>
-                    <h3>Adicionar Vídeo à Playlist</h3>
+                    <h3>Adicionar Mídia à Playlist</h3>
                 </CModalHeader>
                 <CModalBody>
                     {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
                     <CForm>
                         <CInputGroup>
-                            <CFormInput onChange={(e) => setPalavraChave(e.target.value)} id="search" name="search" placeholder="Digite o nome do vídeo..." />
+                            <CFormInput onChange={(e) => setPalavraChave(e.target.value)} id="search" name="search" placeholder="Digite o nome da midia..." />
                         </CInputGroup>
                         <br />
                         <CButton type="button" color="primary" onClick={() => handleSearch()}>Pesquisar</CButton>
@@ -358,7 +410,7 @@ const PlaylistConteudo = () => {
                             }
                         })}
                     </CListGroup>
-                    <h5 className="mt-4">Conteudos selecionados</h5>
+                    <h5 className="mt-4">Conteúdos selecionados</h5>
                     <CListGroup>
                         {cart.map((item) => {
                             const video = searchResults.find(v => v.codigo === item.codigo && v.tipo === item.tipo);
