@@ -52,5 +52,26 @@ async function listar() {
     }
 }
 
+async function getVideosMusicasEAlbunsDoGrupo(idGrupo) {
+    try {
+        const response = await axiosInstance.post(`grupo-de-amigos/${idGrupo}/videos-musicas-e-albuns`);
+        return response;
+    } catch (error) {
+        return error?.response;
+    }
+}
 
-export const grupoDeAmigos = { add, update, excluir, listar, pesquisaporid };
+async function pesquisarVideosMusicasEAlbunsDoGrupoPorTitulo(palavraChave) {
+    try {
+
+        const response = await axiosInstance.post('grupo-de-amigos/pesquisar/', {
+            "palavraChave": palavraChave,
+        });
+        return response;
+    } catch (error) {
+        return error?.response;
+    }
+}
+
+
+export const grupoDeAmigos = { add, update, excluir, getVideosMusicasEAlbunsDoGrupo, pesquisarVideosMusicasEAlbunsDoGrupoPorTitulo, listar, pesquisaporid };
