@@ -78,7 +78,7 @@ const PlaylistConteudo = () => {
                 if (response.data.data.length > 0) {
                     if (response.data.data[0].tipo === 'video') {
                         setSelectedVideo(`http://localhost:3333/video/downloadVideo/${response.data.data[0].codigo}`);
-                        setSelectedUrlCapa(null);
+                        setSelectedUrlCapa(`http://localhost:3333/video/${response.data.data[0].codigo}/thumbnail`);
                         setSelectedTitulo(response.data.data[0].titulo);
                         setSelectedItem(response.data.data[0])
                     } else if (response.data.data[0].tipo === 'musica') {
@@ -454,7 +454,7 @@ const PlaylistConteudo = () => {
                                                         <div className="thumbnail-wrapper">
                                                             <CImage
                                                                 className="thumbnail"
-                                                                src={video.tipo === 'video' ? thumbnail : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                                src={video.tipo === 'video' ? `http://localhost:3333/video/${video.codigo}/thumbnail` : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                 alt={video.nome}
                                                                 style={{ width: "100%", borderRadius: "5px" }}
                                                             />
@@ -462,7 +462,7 @@ const PlaylistConteudo = () => {
                                                                 <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
                                                                     if (video.tipo === "video") {
                                                                         setSelectedVideo(`http://localhost:3333/video/downloadVideo/${video.codigo}`);
-                                                                        setSelectedUrlCapa(null);
+                                                                        setSelectedUrlCapa(`http://localhost:3333/video/${video.codigo}/thumbnail`);
                                                                     }
                                                                     else {
                                                                         setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${video.codigo}`);
