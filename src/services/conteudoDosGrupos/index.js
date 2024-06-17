@@ -22,6 +22,16 @@ async function update(formData) {
     }
 }
 
+async function updateFk(formData) {
+    try {
+        const response = await axiosInstance.put("atualizar-conteudo-do-grupo", formData);
+
+        return response;
+    } catch (error) {
+        return error?.response;
+    }
+}
+
 async function excluir(codConteudo) {
     try {
         const response = await axiosInstance.delete(`conteudo-dos-grupos/${Number(codConteudo)}`);
@@ -51,4 +61,4 @@ async function listar() {
 
 
 
-export const conteudoDosGrupos = { add, update, excluir, listar, pesquisaporid };
+export const conteudoDosGrupos = { add, update, excluir, listar, pesquisaporid, updateFk };
