@@ -1,0 +1,92 @@
+/* StepIndicator.css */
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+    border: #323a49 solid 0.5px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.step-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: white;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.step-name {
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.step.active .step-icon {
+    background-color: #007bff;
+    color: white;
+}
+
+.step.completed .step-icon {
+    background-color: #28a745;
+    color: white;
+}
+
+.step:before {
+    content: '';
+    position: absolute;
+    top: 1.1rem;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: #ccc;
+    z-index: -1;
+    transition: background-color 0.3s ease;
+}
+
+.step.active:before,
+.step.completed:before {
+    background-color: #28a745;
+}
+
+.step:first-child:before {
+    left: 50%;
+    width: 50%;
+}
+
+.step:last-child:before {
+    left: -50%;
+    width: 50%;
+}
+
+.step:not(:first-child):after {
+    content: '';
+    position: absolute;
+    top: 1.1rem;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #ccc;
+    z-index: -1;
+    transition: background-color 0.3s ease;
+}
+
+.step.active:not(:first-child):after,
+.step.completed:not(:first-child):after {
+    background-color: #28a745;
+}
