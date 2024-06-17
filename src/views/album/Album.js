@@ -31,8 +31,11 @@ const Album = () => {
     const fetchAlbuns = async () => {
       try {
         const response = await service.album.listar();
-        setAlbuns(response.data);
-        setLoading(false);
+        if (response.status === 201) {
+          setAlbuns(response.data);
+          setLoading(false);
+        }
+
       } catch (err) {
         setError(err);
         setLoading(false);
@@ -187,6 +190,7 @@ const Album = () => {
           <p><strong>Editora:</strong> {albumDetalhes.editora}</p>
           <p><strong>Data de Lançamento:</strong> {new Date(albumDetalhes.dataLancamento).toLocaleDateString()}</p>
           <p><strong>Artista/Grupo Musical:</strong> {albumDetalhes.artista ? albumDetalhes.artista.nomeArtista : albumDetalhes.grupoMusical?.nomeGrupoMusical}</p>
+          <p><strong>Visibilidade:</strong> {albumDetalhes.visibilidade}</p>
           <p><strong>Utilizador:</strong> {albumDetalhes.registadopor?.username}</p>
         </CModalBody>
         <CModalFooter>
@@ -194,7 +198,7 @@ const Album = () => {
         </CModalFooter>
       </CModal>
 
-      <CModal visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
+      <CModal backdrop="static" visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
         <CModalHeader closeButton>
           {editAlbumId ? 'Editar Album' : 'Criar Novo Album'}
         </CModalHeader>
