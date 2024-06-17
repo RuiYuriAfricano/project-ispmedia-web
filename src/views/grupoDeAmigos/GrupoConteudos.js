@@ -88,9 +88,16 @@ const PlaylistConteudo = () => {
                         setSelectedItem(response.data.data[0])
                     }
                     else if (response.data.data[0].tipo === 'album') {
-                        setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
-                        setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
-                        setSelectedTitulo(response.data.data[0].musicasDoAlbum[0].tituloMusica);
+                        if (response.data.data[0].musicasDoAlbum.length === 0) {
+                            setSelectedVideo('');
+                            setSelectedUrlCapa(`http://localhost:3333/album/downloadCapa/${response.data.data[0].codigo}`);
+                            setSelectedTitulo(response.data.data[0].titulo);
+                        } else {
+                            setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
+                            setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
+                            setSelectedTitulo(response.data.data[0].musicasDoAlbum[0].tituloMusica);
+                        }
+
                         setSelectedItem(response.data.data[0].musicasDoAlbum[0])
                     }
                     setSelectedTipo(response.data.data[0].tipo);
@@ -400,7 +407,7 @@ const PlaylistConteudo = () => {
                                                         <div className="thumbnail-wrapper">
                                                             <CImage
                                                                 className="thumbnail"
-                                                                src={video.tipo === 'video' ? thumbnail : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                                src={video.tipo === 'video' ? thumbnail : `http://localhost:3333/album/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                 alt={video.nome}
                                                                 style={{ width: "100%", borderRadius: "5px" }}
                                                             />
