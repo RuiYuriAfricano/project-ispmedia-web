@@ -284,7 +284,7 @@ const Musica = () => {
           <p><strong>Álbum:</strong> {musicaDetalhes.album?.tituloAlbum}</p>
           <p><strong>Artista:</strong> {musicaDetalhes.artista?.nomeArtista}</p>
           <p><strong>Grupo Musical:</strong> {musicaDetalhes.grupoMusical?.nomeGrupoMusical}</p>
-
+          <p><strong>Visibilidade:</strong> {musicaDetalhes.visibilidade}</p>
           <hr />
           <h5>Participações</h5>
           <CForm>
@@ -321,7 +321,7 @@ const Musica = () => {
         </CModalFooter>
       </CModal>
 
-      <CModal visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
+      <CModal backdrop="static" visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
         <CModalHeader closeButton>
           {editMusicaId ? 'Editar Música' : 'Criar Nova Música'}
         </CModalHeader>

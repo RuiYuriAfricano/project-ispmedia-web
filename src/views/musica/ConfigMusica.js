@@ -28,6 +28,7 @@ import {
 } from '@coreui/icons';
 import { service } from './../../services';
 import { useParams, Link } from 'react-router-dom';
+import StepIndicator from '../StepIndicador/StepIndicator';
 
 const ConfigMusica = ({ idEditMusica, onClose }) => {
 
@@ -50,6 +51,16 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
   const [artistas, setArtistas] = useState([]);
   const [gruposMusicais, setGruposMusicais] = useState([]);
   const [albuns, setAlbuns] = useState([]);
+  const [isPrivatePlaylist, setIsPrivatePlaylist] = useState(true);
+  const [selectedPlaylist, setSelectedPlaylist] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [playlistsPrivadas, setPlaylistsPrivadas] = useState([]); // New state for private playlists
+  const [grupos, setGrupos] = useState([]); // New state for groups
+  const [step, setStep] = useState(1); // New state to track the current step
+  const vetor = [{ id: 1, txt: 'Carregar Ficheiro' },
+  { id: 2, txt: 'Detalhes' },
+  { id: 3, txt: 'Autoria e Visibilidade' },
+  { id: 4, txt: 'Finalizar' }];
 
   useEffect(() => {
     const fetchArtistas = async () => {
@@ -72,6 +83,28 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
       }
     };
 
+    const fetchPlaylistsPrivadas = async () => {
+      try {
+        const response = await service.playlist.listar(); // Assuming this is the correct service call
+        setPlaylistsPrivadas(response.data.filter(item => {
+          return item.tipoPlayList === "privada" && item.fkUtilizador === user.codUtilizador
+        }));
+      } catch (error) {
+        setMsgDoAlert("Erro ao carregar playlists privadas");
+        setCorDoAlert("danger");
+      }
+    };
+
+    const fetchGrupos = async () => {
+      try {
+        const response = await service.grupoDeAmigos.listar(); // Assuming this is the correct service call
+        setGrupos(response.data);
+      } catch (error) {
+        setMsgDoAlert("Erro ao carregar grupos");
+        setCorDoAlert("danger");
+      }
+    };
+
     const fetchAlbuns = async () => {
       try {
         const response = await service.album.listar();
@@ -85,6 +118,8 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
     fetchArtistas();
     fetchGruposMusicais();
     fetchAlbuns();
+    fetchGrupos();
+    fetchPlaylistsPrivadas();
 
     if (idEditMusica) {
       const fetchMusica = async () => {
@@ -124,16 +159,6 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
 
   const handleAddMusica = async () => {
 
-    // Verificar se todos os campos obrigatórios estão preenchidos
-    const emptyFields = isAllFieldsFilled();
-
-    if (emptyFields.length > 0) {
-      const emptyFieldsMessage = emptyFields.join(', ');
-      setMsgDoAlert(`Por favor, preencha os campos: ${emptyFieldsMessage}.`);
-      setCorDoAlert('danger');
-      return;
-    }
-
     setLoading(true);
 
     const formData = new FormData();
@@ -146,6 +171,9 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
     formData.append('fkArtista', fkArtista || null);
     formData.append('fkGrupoMusical', fkGrupoMusical || null);
     formData.append('fkUtilizador', user?.codUtilizador);
+    if (!idEditMusica) {
+      formData.append('visibilidade', isPrivatePlaylist ? 'PlayListPrivada' : selectedGroup !== "" ? "Publico" : "Privado");
+    }
 
     const renameFile = (file, newName) => {
       return new File([file], newName, {
@@ -172,6 +200,7 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
 
     try {
       let response;
+      let response2
       if (idEditMusica) {
         formData.append('codMusica', idEditMusica);
 
@@ -184,9 +213,25 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
         response = await service.musica.update(formData);
       } else {
         response = await service.musica.add(formData);
+
+        if (response?.status === 201) {
+          if (isPrivatePlaylist) {
+            response2 = await service.musicasDaPlaylist.add({
+              "fkPlayList": Number(selectedPlaylist),
+              "fkMusica": Number(response.data.codMusica),
+            });
+          }
+          else if (!isPrivatePlaylist && selectedGroup !== '') {
+            response2 = await service.conteudoDosGrupos.add({
+              "fkGrupoDeAmigos": Number(selectedGroup),
+              "fkMusica": Number(response.data.codMusica),
+            });
+          }
+        }
+
       }
 
-      if (response?.status === 201 || response?.status === 200) {
+      if (response?.status === 200 || (response?.status === 201 && (response2?.status === 201 || selectedGroup === ""))) {
         setMsgDoAlert(`Música ${idEditMusica ? 'Atualizada' : 'Criada'} Com Sucesso!`);
         setCorDoAlert('success');
         if (!idEditMusica) {
@@ -216,251 +261,366 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
     }
   };
 
-  const isAllFieldsFilled = () => {
+
+  const validateCurrentStepFields = () => {
     const emptyFields = [];
 
-    if (tituloMusica.trim() === '') {
-      emptyFields.push('Título do Música');
-    }
-    if (generoMusical.trim() === '') {
-      emptyFields.push('Gênero da Música');
-    }
-    if (letra.trim() === '') {
-      emptyFields.push('Letra');
-    }
-    if (!fkArtista && !fkGrupoMusical) {
-      emptyFields.push('Artista ou Grupo Musical');
-    }
-    if (compositor.trim() === '') {
-      emptyFields.push('Compositor');
-    }
-    if (dataLancamento.trim() === '') {
-      emptyFields.push('Data de Lançamento');
-    }
-    if (!idEditMusica && !ficheiroMusical) {
-      emptyFields.push('Arquivo de Música');
-    }
-    if (!idEditMusica && !capaMusica) {
-      emptyFields.push('Capa da Música');
+    if (step === 1) {
+      if (!capaMusica && !idEditMusica) {
+        emptyFields.push('Capa da Música');
+      }
+      if (!ficheiroMusical && !idEditMusica) {
+        emptyFields.push('Arquivo de Música');
+      }
+    } else if (step === 2) {
+      if (tituloMusica.trim() === '') {
+        emptyFields.push('Título da Música');
+      }
+      if (generoMusical.trim() === '') {
+        emptyFields.push('Gênero da Música');
+      }
+      if (letra.trim() === '') {
+        emptyFields.push('Letra');
+      }
+      if (compositor.trim() === '') {
+        emptyFields.push('Compositor');
+      }
+      if (dataLancamento.trim() === '') {
+        emptyFields.push('Data de Lançamento');
+      }
+    } else if (step === 3) {
+      if (!fkArtista && !fkGrupoMusical) {
+        emptyFields.push('Artista ou Grupo Musical');
+      }
+      if (isPrivatePlaylist && !idEditMusica && selectedPlaylist.trim() === '') {
+        emptyFields.push('Playlist Privada');
+      }
     }
 
     return emptyFields;
   };
 
+
+  const handleNext = () => {
+    const emptyFields = validateCurrentStepFields();
+
+    if (emptyFields.length > 0) {
+      const emptyFieldsMessage = emptyFields.join(', ');
+      setMsgDoAlert(`Por favor, preencha os campos: ${emptyFieldsMessage}.`);
+      setCorDoAlert('danger');
+      return;
+    }
+
+    setMsgDoAlert("");
+    setCorDoAlert('');
+
+    setStep(step + 1);
+  };
+
+
+  const handlePrevious = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
   return (
     <CRow className="justify-content-center mb-4">
       <CCol>
-        <CCard className="mx-4">
+        <CCard className="mx-4" style={{ border: 'none ' }}>
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
-          <CCardBody className="p-4">
+          <StepIndicator currentStep={step} vetor={vetor} totalSteps={3} />
+          <CCardBody className="p-4" style={{ border: '0.1px solid #323a49', borderRadius: '10px' }}>
             <CForm>
-              <h1>Música</h1>
-              <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
+              {step === 2 && (
+                <>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilMusicNote} />
+                    </CInputGroupText>
+                    <CFormInput
+                      placeholder="Título da Música"
+                      autoComplete="titulo-musica"
+                      value={tituloMusica}
+                      onChange={(e) => setTituloMusica(e.target.value)}
+                      required
+                    />
+                  </CInputGroup>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilMusicNote} />
-                </CInputGroupText>
-                <CFormInput
-                  placeholder="Título da Música"
-                  autoComplete="titulo-musica"
-                  value={tituloMusica}
-                  onChange={(e) => setTituloMusica(e.target.value)}
-                  required
-                />
-              </CInputGroup>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilDescription} />
+                    </CInputGroupText>
+                    <textarea
+                      className="form-control"
+                      placeholder="Letra"
+                      autoComplete="letra"
+                      value={letra}
+                      onChange={(e) => setLetra(e.target.value)}
+                      rows={4}
+                      required
+                    />
+                  </CInputGroup>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilDescription} />
-                </CInputGroupText>
-                <textarea
-                  className="form-control"
-                  placeholder="Letra"
-                  autoComplete="letra"
-                  value={letra}
-                  onChange={(e) => setLetra(e.target.value)}
-                  rows={4}
-                  required
-                />
-              </CInputGroup>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilDescription} />
+                    </CInputGroupText>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilDescription} />
-                </CInputGroupText>
+                    <CFormSelect
+                      value={generoMusical}
+                      onChange={(e) => setGeneroMusical(e.target.value)}
+                    >
+                      <option value="">Selecione o Genero Musical</option>
+                      <option value="Rock">Rock</option>
+                      <option value="Pop">Pop</option>
+                      <option value="Funk">Funk</option>
+                      <option value="Rap">Rap</option>
+                      <option value="Hip Hop">Hip Hop</option>
+                      <option value="Reggae">Reggae</option>
+                      <option value="Jazz">Jazz</option>
+                      <option value="Blues">Blues</option>
+                      <option value="Soul">Soul</option>
+                      <option value="Country">Country</option>
+                      <option value="Gospel">Gospel</option>
+                      <option value="Folk">Folk</option>
+                      <option value="Indie">Indie</option>
+                      <option value="Metal">Metal</option>
+                      <option value="Punk">Punk</option>
+                      <option value="Sertanejo">Sertanejo</option>
+                      <option value="Bossa Nova">Bossa Nova</option>
+                      <option value="Fado">Fado</option>
+                      <option value="Kizomba">Kizomba</option>
+                      <option value="Semba">Semba</option>
+                      <option value="Kuduro">Kuduro</option>
+                      <option value="Tarraxinha">Tarraxinha</option>
+                      <option value="Afro-house">Afro-house</option>
+                      <option value="Marrabenta">Marrabenta</option>
+                      <option value="Zouk">Zouk</option>
+                    </CFormSelect>
+                  </CInputGroup>
 
-                <CFormSelect
-                  value={generoMusical}
-                  onChange={(e) => setGeneroMusical(e.target.value)}
-                >
-                  <option value="">Selecione o Grupo Musical</option>
-                  <option value="Rock">Rock</option>
-                  <option value="Pop">Pop</option>
-                  <option value="Funk">Funk</option>
-                  <option value="Rap">Rap</option>
-                  <option value="Hip Hop">Hip Hop</option>
-                  <option value="Reggae">Reggae</option>
-                  <option value="Jazz">Jazz</option>
-                  <option value="Blues">Blues</option>
-                  <option value="Soul">Soul</option>
-                  <option value="Country">Country</option>
-                  <option value="Gospel">Gospel</option>
-                  <option value="Folk">Folk</option>
-                  <option value="Indie">Indie</option>
-                  <option value="Metal">Metal</option>
-                  <option value="Punk">Punk</option>
-                  <option value="Sertanejo">Sertanejo</option>
-                  <option value="Bossa Nova">Bossa Nova</option>
-                  <option value="Fado">Fado</option>
-                  <option value="Kizomba">Kizomba</option>
-                  <option value="Semba">Semba</option>
-                  <option value="Kuduro">Kuduro</option>
-                  <option value="Tarraxinha">Tarraxinha</option>
-                  <option value="Afro-house">Afro-house</option>
-                  <option value="Marrabenta">Marrabenta</option>
-                  <option value="Zouk">Zouk</option>
-                </CFormSelect>
-              </CInputGroup>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilPencil} />
+                    </CInputGroupText>
+                    <CFormInput
+                      placeholder="Compositor"
+                      autoComplete="compositor"
+                      value={compositor}
+                      onChange={(e) => setCompositor(e.target.value)}
+                      required
+                    />
+                  </CInputGroup>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilPencil} />
-                </CInputGroupText>
-                <CFormInput
-                  placeholder="Compositor"
-                  autoComplete="compositor"
-                  value={compositor}
-                  onChange={(e) => setCompositor(e.target.value)}
-                  required
-                />
-              </CInputGroup>
-
-              <CTooltip content="Selecione a data de lançamento">
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilCalendar} />
-                  </CInputGroupText>
-                  <CFormInput
-                    type="date"
-                    value={dataLancamento}
-                    onChange={(e) => setDataLancamento(e.target.value)}
-                    required
-                  />
-                </CInputGroup>
-              </CTooltip>
-
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilImage} />
-                </CInputGroupText>
-                <CFormInput
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setCapaMusica(e.target.files[0])}
-                />
-              </CInputGroup>
-
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilFile} />
-                </CInputGroupText>
-                <CFormInput
-                  type="file"
-                  accept="audio/*"
-                  onChange={(e) => setFicheiroMusical(e.target.files[0])}
-                />
-              </CInputGroup>
-
-              <CRow className="mb-3">
-                <CCol>
-                  <CFormCheck
-                    type="checkbox"
-                    name="musica-pertenece"
-                    id="musica-artista"
-                    label="Pertence a um Artista"
-                    checked={pertenceArtista}
-                    onChange={() => {
-                      setPertenceArtista(!pertenceArtista);
-                      setPertenceGrupoMusical(false); // Desmarcar grupo musical
-                    }}
-                  />
-                </CCol>
-                <CCol>
-                  <CFormCheck
-                    type="checkbox"
-                    name="musica-pertenece"
-                    id="musica-grupo"
-                    label="Pertence a um Grupo Musical"
-                    checked={pertenceGrupoMusical}
-                    onChange={() => {
-                      setPertenceGrupoMusical(!pertenceGrupoMusical);
-                      setPertenceArtista(false); // Desmarcar artista
-                    }}
-                  />
-                </CCol>
-              </CRow>
-
-              {pertenceArtista && (
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilUser} />
-                  </CInputGroupText>
-                  <CFormSelect
-                    value={fkArtista}
-                    onChange={(e) => setFkArtista(e.target.value)}
-                  >
-                    <option value="">Selecione o Artista</option>
-                    {artistas.map((artista) => (
-                      <option key={artista.codArtista} value={artista.codArtista}>
-                        {artista.nomeArtista}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CInputGroup>
+                  <CTooltip content="Selecione a data de lançamento">
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText>
+                        <CIcon icon={cilCalendar} />
+                      </CInputGroupText>
+                      <CFormInput
+                        type="date"
+                        value={dataLancamento}
+                        onChange={(e) => setDataLancamento(e.target.value)}
+                        required
+                      />
+                    </CInputGroup>
+                  </CTooltip>
+                </>
               )}
 
-              {pertenceGrupoMusical && (
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilGroup} />
-                  </CInputGroupText>
-                  <CFormSelect
-                    value={fkGrupoMusical}
-                    onChange={(e) => setFkGrupoMusical(e.target.value)}
-                  >
-                    <option value="">Selecione o Grupo Musical</option>
-                    {gruposMusicais.map((grupo) => (
-                      <option key={grupo.codGrupoMusical} value={grupo.codGrupoMusical}>
-                        {grupo.nomeGrupoMusical}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CInputGroup>
-              )}
+              {step === 1 && (
+                <>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilImage} />
+                    </CInputGroupText>
+                    <CFormInput
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setCapaMusica(e.target.files[0])}
+                    />
+                  </CInputGroup>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilImage} />
-                </CInputGroupText>
-                <CFormSelect
-                  value={fkAlbum}
-                  onChange={(e) => setFkAlbum(e.target.value)}
-                >
-                  <option value="">Selecione o Álbum (Opcional)</option>
-                  {albuns.map((album) => (
-                    <option key={album.codAlbum} value={album.codAlbum}>
-                      {album.tituloAlbum}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CInputGroup>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilFile} />
+                    </CInputGroupText>
+                    <CFormInput
+                      type="file"
+                      accept="audio/*"
+                      onChange={(e) => setFicheiroMusical(e.target.files[0])}
+                    />
+                  </CInputGroup>
+
+                </>
+              )}
+              {step === 3 && (
+                <>
+                  <CRow className="mb-3">
+                    <CCol>
+                      <CFormCheck
+                        type="checkbox"
+                        name="musica-pertenece"
+                        id="musica-artista"
+                        label="Pertence a um Artista"
+                        checked={pertenceArtista}
+                        onChange={() => {
+                          setPertenceArtista(!pertenceArtista);
+                          setPertenceGrupoMusical(false); // Desmarcar grupo musical
+                        }}
+                      />
+                    </CCol>
+                    <CCol>
+                      <CFormCheck
+                        type="checkbox"
+                        name="musica-pertenece"
+                        id="musica-grupo"
+                        label="Pertence a um Grupo Musical"
+                        checked={pertenceGrupoMusical}
+                        onChange={() => {
+                          setPertenceGrupoMusical(!pertenceGrupoMusical);
+                          setPertenceArtista(false); // Desmarcar artista
+                        }}
+                      />
+                    </CCol>
+                  </CRow>
+
+                  {pertenceArtista && (
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText>
+                        <CIcon icon={cilUser} />
+                      </CInputGroupText>
+                      <CFormSelect
+                        value={fkArtista}
+                        onChange={(e) => setFkArtista(e.target.value)}
+                      >
+                        <option value="">Selecione o Artista</option>
+                        {artistas.map((artista) => (
+                          <option key={artista.codArtista} value={artista.codArtista}>
+                            {artista.nomeArtista}
+                          </option>
+                        ))}
+                      </CFormSelect>
+                    </CInputGroup>
+                  )}
+
+                  {pertenceGrupoMusical && (
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText>
+                        <CIcon icon={cilGroup} />
+                      </CInputGroupText>
+                      <CFormSelect
+                        value={fkGrupoMusical}
+                        onChange={(e) => setFkGrupoMusical(e.target.value)}
+                      >
+                        <option value="">Selecione o Grupo Musical</option>
+                        {gruposMusicais.map((grupo) => (
+                          <option key={grupo.codGrupoMusical} value={grupo.codGrupoMusical}>
+                            {grupo.nomeGrupoMusical}
+                          </option>
+                        ))}
+                      </CFormSelect>
+                    </CInputGroup>
+                  )}
+
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilImage} />
+                    </CInputGroupText>
+                    <CFormSelect
+                      value={fkAlbum}
+                      onChange={(e) => setFkAlbum(e.target.value)}
+                    >
+                      <option value="">Selecione o Álbum (Opcional)</option>
+                      {albuns.map((album) => (
+                        <option key={album.codAlbum} value={album.codAlbum}>
+                          {album.tituloAlbum}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CInputGroup>
+
+                  {!idEditMusica && (
+                    <>
+                      <div className="mb-3">
+                        <CFormCheck
+                          type="radio"
+                          id="privatePlaylist"
+                          name="playlistOrGroup"
+                          label="Colocar em uma Playlist Privada"
+                          checked={isPrivatePlaylist}
+                          onChange={() => setIsPrivatePlaylist(true)}
+                        />
+                        <CFormCheck
+                          type="radio"
+                          id="group"
+                          name="playlistOrGroup"
+                          label="Colocar em um Grupo"
+                          checked={!isPrivatePlaylist}
+                          onChange={() => setIsPrivatePlaylist(false)}
+                        />
+                      </div>
+
+                      {isPrivatePlaylist && (
+                        <CTooltip content="Selecione uma playlist privada">
+                          <CInputGroup className="mb-3">
+                            <CInputGroupText>
+                              <CIcon icon={cilMusicNote} />
+                            </CInputGroupText>
+                            <CFormSelect
+                              value={selectedPlaylist}
+                              onChange={(e) => setSelectedPlaylist(e.target.value)}
+                              required
+                            >
+                              <option value="">Selecione uma playlist privada</option>
+                              {playlistsPrivadas.map((playlist) => (
+                                <option key={playlist.codPlayList} value={playlist.codPlayList}>
+                                  {playlist.nomePlayList}
+                                </option>
+                              ))}
+                            </CFormSelect>
+                          </CInputGroup>
+                        </CTooltip>
+                      )}
+
+                      {!isPrivatePlaylist && (
+                        <CTooltip content="Selecione um grupo">
+                          <CInputGroup className="mb-3">
+                            <CInputGroupText>
+                              <CIcon icon={cilGroup} />
+                            </CInputGroupText>
+                            <CFormSelect
+                              value={selectedGroup}
+                              onChange={(e) => setSelectedGroup(e.target.value)}
+                              required
+                            >
+                              <option value="">Público</option>
+                              {grupos.map((grupo) => (
+                                <option key={grupo.codGrupoDeAmigos} value={grupo.codGrupoDeAmigos}>
+                                  {grupo.nomeDoGrupo}
+                                </option>
+                              ))}
+                            </CFormSelect>
+                          </CInputGroup>
+                        </CTooltip>
+                      )}
+                    </>
+                  )}
+
+                </>
+              )}
 
               <CRow className='w-100'>
                 <CCol xs={6}>
-                  <CButton color="primary" onClick={handleAddMusica} disabled={loading}>
+                  {step > 1 && <CButton color="secondary" onClick={handlePrevious}>Anterior</CButton>}
+                </CCol>
+                <CCol xs={6} className="text-end">
+                  {step < 4 && <CButton color="primary" onClick={handleNext}>Próximo</CButton>}
+                  {step === 4 && <CButton color="primary" onClick={handleAddMusica} disabled={loading}>
                     {loading ? <CSpinner size="sm" /> : 'Guardar'}
                   </CButton>
+                  }
                 </CCol>
               </CRow>
             </CForm>
