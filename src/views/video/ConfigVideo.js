@@ -24,9 +24,11 @@ import {
   cilCalendar,
   cilFile,
   cilPencil,
+  cilMusicNote,
 } from '@coreui/icons';
 import { service } from './../../services';
 import { useParams, Link } from 'react-router-dom';
+import StepIndicator from '../StepIndicador/StepIndicator';
 
 const ConfigVideo = ({ idEditVideo, onClose }) => {
 
@@ -47,6 +49,17 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('loggedUser')) || {});
   const [artistas, setArtistas] = useState([]);
   const [gruposMusicais, setGruposMusicais] = useState([]);
+  const [isPrivatePlaylist, setIsPrivatePlaylist] = useState(true);
+  const [selectedPlaylist, setSelectedPlaylist] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [playlistsPrivadas, setPlaylistsPrivadas] = useState([]); // New state for private playlists
+  const [grupos, setGrupos] = useState([]); // New state for groups
+  const [step, setStep] = useState(1); // New state to track the current step
+  const vetor = [{ id: 1, txt: 'Carregar Ficheiro' },
+  { id: 2, txt: 'Detalhes' },
+  { id: 3, txt: 'Autoria e Visibilidade' },
+  { id: 4, txt: 'Finalizar' }];
+
 
   useEffect(() => {
     const fetchArtistas = async () => {
@@ -69,8 +82,33 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
       }
     };
 
+    const fetchPlaylistsPrivadas = async () => {
+      try {
+        const response = await service.playlist.listar(); // Assuming this is the correct service call
+        setPlaylistsPrivadas(response.data.filter(item => {
+          return item.tipoPlayList === "privada" && item.fkUtilizador === user.codUtilizador
+        }));
+      } catch (error) {
+        setMsgDoAlert("Erro ao carregar playlists privadas");
+        setCorDoAlert("danger");
+      }
+    };
+
+    const fetchGrupos = async () => {
+      try {
+        const response = await service.grupoDeAmigos.listar(); // Assuming this is the correct service call
+        setGrupos(response.data);
+      } catch (error) {
+        setMsgDoAlert("Erro ao carregar grupos");
+        setCorDoAlert("danger");
+      }
+    };
+
+
     fetchArtistas();
     fetchGruposMusicais();
+    fetchPlaylistsPrivadas();
+    fetchGrupos();
 
     if (idEditVideo) {
       const fetchVideo = async () => {
@@ -111,15 +149,6 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
 
   const handleAddVideo = async () => {
 
-    // Verificar se todos os campos obrigatórios estão preenchidos
-    const emptyFields = isAllFieldsFilled();
-
-    if (emptyFields.length > 0) {
-      const emptyFieldsMessage = emptyFields.join(', ');
-      setMsgDoAlert(`Por favor, preencha os campos: ${emptyFieldsMessage}.`);
-      setCorDoAlert('danger');
-      return;
-    }
     setLoading(true);
 
     const formData = new FormData();
@@ -131,7 +160,9 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
     formData.append('fkArtista', fkArtista || null);
     formData.append('fkGrupoMusical', fkGrupoMusical || null);
     formData.append('fkUtilizador', user?.codUtilizador);
-
+    if (!idEditVideo) {
+      formData.append('visiblidade', isPrivatePlaylist ? 'PlayListPrivada' : selectedGroup !== "" ? "Publico" : "Privado");
+    }
     const renameFile = (file, newName) => {
       return new File([file], newName, {
         type: file.type,
@@ -149,6 +180,7 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
 
     try {
       let response;
+      let response2;
       if (idEditVideo) {
         formData.append('codVideo', idEditVideo);
 
@@ -164,9 +196,24 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
         response = await service.video.update(formData);
       } else {
         response = await service.video.add(formData);
+
+        if (response?.status === 201) {
+          if (isPrivatePlaylist) {
+            response2 = await service.videosDaPlaylist.add({
+              "fkPlayList": Number(selectedPlaylist),
+              "fkVideo": Number(response.data.codVideo),
+            });
+          }
+          else if (!isPrivatePlaylist && selectedGroup !== '') {
+            response2 = await service.conteudoDosGrupos.add({
+              "fkGrupoDeAmigos": Number(selectedGroup),
+              "fkVideo": Number(response.data.codVideo),
+            });
+          }
+        }
       }
 
-      if (response?.status === 201 || response?.status === 200) {
+      if (response?.status === 200 || (response?.status === 201 && (response2?.status === 201 || selectedGroup === ""))) {
         setMsgDoAlert(`Vídeo ${idEditVideo ? 'Atualizado' : 'Criado'} Com Sucesso!`);
         setCorDoAlert('success');
         if (!idEditVideo) {
@@ -194,211 +241,327 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
     }
   };
 
-
-  const isAllFieldsFilled = () => {
+  const validateCurrentStepFields = () => {
     const emptyFields = [];
 
-    if (tituloVideo.trim() === '') {
-      emptyFields.push('Título do Vídeo');
-    }
-    if (generoDoVideo.trim() === '') {
-      emptyFields.push('Gênero do Vídeo');
-    }
-    if (produtor.trim() === '') {
-      emptyFields.push('Produtor');
-    }
-    if (!fkArtista && !fkGrupoMusical) {
-      emptyFields.push('Artista ou Grupo Musical');
-    }
-    if (dataLancamento.trim() === '') {
-      emptyFields.push('Data de Lançamento');
-    }
-    if (!idEditVideo && !ficheiroVideo) {
-      emptyFields.push('Arquivo de Vídeo');
+    if (step === 1) {
+
+      if (!ficheiroVideo && !idEditVideo) {
+        emptyFields.push('Arquivo de Vídeo');
+      }
+    } else if (step === 2) {
+      if (tituloVideo.trim() === '') {
+        emptyFields.push('Título do Vídeo');
+      }
+      if (generoDoVideo.trim() === '') {
+        emptyFields.push('Gênero do Vídeo');
+      }
+      if (produtor.trim() === '') {
+        emptyFields.push('Produtor');
+      }
+      if (legenda.trim() === '') {
+        emptyFields.push('Legenda');
+      }
+      if (dataLancamento.trim() === '') {
+        emptyFields.push('Data de Lançamento');
+      }
+    } else if (step === 3) {
+      if (!fkArtista && !fkGrupoMusical) {
+        emptyFields.push('Artista ou Grupo Musical');
+      }
+      if (isPrivatePlaylist && !idEditVideo && selectedPlaylist.trim() === '') {
+        emptyFields.push('Playlist Privada');
+      }
     }
 
     return emptyFields;
+  };
+
+  const handleNext = () => {
+    const emptyFields = validateCurrentStepFields();
+
+    if (emptyFields.length > 0) {
+      const emptyFieldsMessage = emptyFields.join(', ');
+      setMsgDoAlert(`Por favor, preencha os campos: ${emptyFieldsMessage}.`);
+      setCorDoAlert('danger');
+      return;
+    }
+
+    setMsgDoAlert('');
+    setCorDoAlert('');
+
+    setStep(step + 1);
+  };
+
+  const handlePrevious = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
   };
 
 
   return (
     <CRow className="justify-content-center mb-4">
       <CCol>
-        <CCard className="mx-4">
+        <CCard className="mx-4" style={{ border: 'none ' }}>
           {corDoAlert && <CAlert color={corDoAlert}>{msgDoAlert}</CAlert>}
-          <CCardBody className="p-4">
+          <StepIndicator currentStep={step} vetor={vetor} totalSteps={3} />
+          <CCardBody className="p-4" style={{ border: '0.1px solid #323a49', borderRadius: '10px' }}>
             <CForm>
-              <h1>Vídeo</h1>
-              <p className="text-body-secondary">Atenção aos campos obrigatórios *</p>
+              {step === 2 && (
+                <>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilVideo} />
+                    </CInputGroupText>
+                    <CFormInput
+                      placeholder="Título do Vídeo"
+                      autoComplete="titulo-video"
+                      value={tituloVideo}
+                      onChange={(e) => setTituloVideo(e.target.value)}
+                      required
+                    />
+                  </CInputGroup>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilVideo} />
-                </CInputGroupText>
-                <CFormInput
-                  placeholder="Título do Vídeo"
-                  autoComplete="titulo-video"
-                  value={tituloVideo}
-                  onChange={(e) => setTituloVideo(e.target.value)}
-                  required
-                />
-              </CInputGroup>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilDescription} />
+                    </CInputGroupText>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilDescription} />
-                </CInputGroupText>
+                    <CFormSelect
+                      value={generoDoVideo}
+                      onChange={(e) => setGeneroDoVideo(e.target.value)}
+                    >
+                      <option value="">Selecione o Gênero do Vídeo</option>
+                      <option value="Ação">Ação</option>
+                      <option value="Comédia">Comédia</option>
+                      <option value="Drama">Drama</option>
+                      <option value="Suspense">Suspense</option>
+                      <option value="Romance">Romance</option>
+                      <option value="Documentário">Documentário</option>
+                      <option value="Educação">Educação</option>
+                      <option value="Religioso">Religioso</option>
+                      <option value="Tutorial">Tutorial</option>
+                      <option value="Palestra">Palestra</option>
+                      <option value="Entrevista">Entrevista</option>
+                      <option value="Esportes">Esportes</option>
+                      <option value="Notícias">Notícias</option>
+                      <option value="Reality Show">Reality Show</option>
+                      <option value="Video blog">Video blog</option>
+                      <option value="Video Musicais">Video Musicais</option>
+                      <option value="Análise de Produto/Review">Análise de Produto/Review</option>
+                    </CFormSelect>
+                  </CInputGroup>
 
-                <CFormSelect
-                  value={generoDoVideo}
-                  onChange={(e) => setGeneroDoVideo(e.target.value)}
-                >
-                  <option value="">Selecione o Gênero do Vídeo</option>
-                  <option value="Ação">Ação</option>
-                  <option value="Comédia">Comédia</option>
-                  <option value="Drama">Drama</option>
-                  <option value="Suspense">Suspense</option>
-                  <option value="Romance">Romance</option>
-                  <option value="Documentário">Documentário</option>
-                  <option value="Educação">Educação</option>
-                  <option value="Religioso">Religioso</option>
-                  <option value="Tutorial">Tutorial</option>
-                  <option value="Palestra">Palestra</option>
-                  <option value="Entrevista">Entrevista</option>
-                  <option value="Esportes">Esportes</option>
-                  <option value="Notícias">Notícias</option>
-                  <option value="Reality Show">Reality Show</option>
-                  <option value="Video blog">Video blog</option>
-                  <option value="Video Musicais">Video Musicais</option>
-                  <option value="Análise de Produto/Review">Análise de Produto/Review</option>
-                </CFormSelect>
-              </CInputGroup>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilPencil} />
+                    </CInputGroupText>
+                    <CFormInput
+                      placeholder="Produtor"
+                      autoComplete="produtor"
+                      value={produtor}
+                      onChange={(e) => setProdutor(e.target.value)}
+                      required
+                    />
+                  </CInputGroup>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilPencil} />
-                </CInputGroupText>
-                <CFormInput
-                  placeholder="Produtor"
-                  autoComplete="produtor"
-                  value={produtor}
-                  onChange={(e) => setProdutor(e.target.value)}
-                  required
-                />
-              </CInputGroup>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilDescription} />
+                    </CInputGroupText>
+                    <textarea
+                      className="form-control"
+                      placeholder="Legenda"
+                      autoComplete="legenda"
+                      value={legenda === "" ? legenda : JSON.parse(legenda)}
+                      onChange={(e) => setLegenda(JSON.stringify(e.target.value))}
+                      rows={4}
+                      required
+                    />
+                  </CInputGroup>
 
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilDescription} />
-                </CInputGroupText>
-                <textarea
-                  className="form-control"
-                  placeholder="Legenda"
-                  autoComplete="legenda"
-                  value={legenda === "" ? legenda : JSON.parse(legenda)}
-                  onChange={(e) => setLegenda(JSON.stringify(e.target.value))}
-                  rows={4}
-                  required
-                />
-              </CInputGroup>
-
-              <CTooltip content="Selecione a data de lançamento">
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilCalendar} />
-                  </CInputGroupText>
-                  <CFormInput
-                    type="date"
-                    value={dataLancamento}
-                    onChange={(e) => setDataLancamento(e.target.value)}
-                    required
-                  />
-                </CInputGroup>
-              </CTooltip>
-
-              <CInputGroup className="mb-3">
-                <CInputGroupText>
-                  <CIcon icon={cilFile} />
-                </CInputGroupText>
-                <CFormInput
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) => setFicheiroVideo(e.target.files[0])}
-                />
-              </CInputGroup>
-
-              <CRow className="mb-3">
-                <CCol>
-                  <CFormCheck
-                    type="checkbox"
-                    name="video-pertenece"
-                    id="video-artista"
-                    label="Pertence a um Artista"
-                    checked={pertenceArtista}
-                    onChange={() => {
-                      setPertenceArtista(!pertenceArtista);
-                      setPertenceGrupoMusical(false); // Desmarcar grupo musical
-                    }}
-                  />
-                </CCol>
-                <CCol>
-                  <CFormCheck
-                    type="checkbox"
-                    name="video-pertenece"
-                    id="video-grupo"
-                    label="Pertence a um Grupo Musical"
-                    checked={pertenceGrupoMusical}
-                    onChange={() => {
-                      setPertenceGrupoMusical(!pertenceGrupoMusical);
-                      setPertenceArtista(false); // Desmarcar artista
-                    }}
-                  />
-                </CCol>
-              </CRow>
-
-              {pertenceArtista && (
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilUser} />
-                  </CInputGroupText>
-                  <CFormSelect
-                    value={fkArtista}
-                    onChange={(e) => setFkArtista(e.target.value)}
-                  >
-                    <option value="">Selecione o Artista</option>
-                    {artistas.map((artista) => (
-                      <option key={artista.codArtista} value={artista.codArtista}>
-                        {artista.nomeArtista}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CInputGroup>
+                  <CTooltip content="Selecione a data de lançamento">
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText>
+                        <CIcon icon={cilCalendar} />
+                      </CInputGroupText>
+                      <CFormInput
+                        type="date"
+                        value={dataLancamento}
+                        onChange={(e) => setDataLancamento(e.target.value)}
+                        required
+                      />
+                    </CInputGroup>
+                  </CTooltip>
+                </>
               )}
 
-              {pertenceGrupoMusical && (
-                <CInputGroup className="mb-3">
-                  <CInputGroupText>
-                    <CIcon icon={cilGroup} />
-                  </CInputGroupText>
-                  <CFormSelect
-                    value={fkGrupoMusical}
-                    onChange={(e) => setFkGrupoMusical(e.target.value)}
-                  >
-                    <option value="">Selecione o Grupo Musical</option>
-                    {gruposMusicais.map((grupo) => (
-                      <option key={grupo.codGrupoMusical} value={grupo.codGrupoMusical}>
-                        {grupo.nomeGrupoMusical}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                </CInputGroup>
+              {step === 1 && (
+                <>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupText>
+                      <CIcon icon={cilFile} />
+                    </CInputGroupText>
+                    <CFormInput
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => setFicheiroVideo(e.target.files[0])}
+                    />
+                  </CInputGroup>
+                </>
+              )}
+
+              {step === 3 && (
+                <>
+                  <CRow className="mb-3">
+                    <CCol>
+                      <CFormCheck
+                        type="checkbox"
+                        name="video-pertenece"
+                        id="video-artista"
+                        label="Pertence a um Artista"
+                        checked={pertenceArtista}
+                        onChange={() => {
+                          setPertenceArtista(!pertenceArtista);
+                          setPertenceGrupoMusical(false); // Desmarcar grupo musical
+                        }}
+                      />
+                    </CCol>
+                    <CCol>
+                      <CFormCheck
+                        type="checkbox"
+                        name="video-pertenece"
+                        id="video-grupo"
+                        label="Pertence a um Grupo Musical"
+                        checked={pertenceGrupoMusical}
+                        onChange={() => {
+                          setPertenceGrupoMusical(!pertenceGrupoMusical);
+                          setPertenceArtista(false); // Desmarcar artista
+                        }}
+                      />
+                    </CCol>
+                  </CRow>
+
+                  {pertenceArtista && (
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText>
+                        <CIcon icon={cilUser} />
+                      </CInputGroupText>
+                      <CFormSelect
+                        value={fkArtista}
+                        onChange={(e) => setFkArtista(e.target.value)}
+                      >
+                        <option value="">Selecione o Artista</option>
+                        {artistas.map((artista) => (
+                          <option key={artista.codArtista} value={artista.codArtista}>
+                            {artista.nomeArtista}
+                          </option>
+                        ))}
+                      </CFormSelect>
+                    </CInputGroup>
+                  )}
+
+                  {pertenceGrupoMusical && (
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText>
+                        <CIcon icon={cilGroup} />
+                      </CInputGroupText>
+                      <CFormSelect
+                        value={fkGrupoMusical}
+                        onChange={(e) => setFkGrupoMusical(e.target.value)}
+                      >
+                        <option value="">Selecione o Grupo Musical</option>
+                        {gruposMusicais.map((grupo) => (
+                          <option key={grupo.codGrupoMusical} value={grupo.codGrupoMusical}>
+                            {grupo.nomeGrupoMusical}
+                          </option>
+                        ))}
+                      </CFormSelect>
+                    </CInputGroup>
+                  )}
+                  {!idEditVideo && (
+                    <>
+                      <div className="mb-3">
+                        <CFormCheck
+                          type="radio"
+                          id="privatePlaylist"
+                          name="playlistOrGroup"
+                          label="Colocar em uma Playlist Privada"
+                          checked={isPrivatePlaylist}
+                          onChange={() => setIsPrivatePlaylist(true)}
+                        />
+                        <CFormCheck
+                          type="radio"
+                          id="group"
+                          name="playlistOrGroup"
+                          label="Colocar em um Grupo"
+                          checked={!isPrivatePlaylist}
+                          onChange={() => setIsPrivatePlaylist(false)}
+                        />
+                      </div>
+
+                      {isPrivatePlaylist && (
+                        <CTooltip content="Selecione uma playlist privada">
+                          <CInputGroup className="mb-3">
+                            <CInputGroupText>
+                              <CIcon icon={cilMusicNote} />
+                            </CInputGroupText>
+                            <CFormSelect
+                              value={selectedPlaylist}
+                              onChange={(e) => setSelectedPlaylist(e.target.value)}
+                              required
+                            >
+                              <option value="">Selecione uma playlist privada</option>
+                              {playlistsPrivadas.map((playlist) => (
+                                <option key={playlist.codPlayList} value={playlist.codPlayList}>
+                                  {playlist.nomePlayList}
+                                </option>
+                              ))}
+                            </CFormSelect>
+                          </CInputGroup>
+                        </CTooltip>
+                      )}
+
+                      {!isPrivatePlaylist && (
+                        <CTooltip content="Selecione um grupo">
+                          <CInputGroup className="mb-3">
+                            <CInputGroupText>
+                              <CIcon icon={cilGroup} />
+                            </CInputGroupText>
+                            <CFormSelect
+                              value={selectedGroup}
+                              onChange={(e) => setSelectedGroup(e.target.value)}
+                              required
+                            >
+                              <option value="">Público</option>
+                              {grupos.map((grupo) => (
+                                <option key={grupo.codGrupoDeAmigos} value={grupo.codGrupoDeAmigos}>
+                                  {grupo.nomeDoGrupo}
+                                </option>
+                              ))}
+                            </CFormSelect>
+                          </CInputGroup>
+                        </CTooltip>
+                      )}
+                    </>
+                  )}
+
+
+                </>
               )}
 
               <CRow className='w-100'>
                 <CCol xs={6}>
-                  <CButton color="primary" onClick={handleAddVideo} disabled={loading}>
-                    {loading ? <CSpinner size="sm" /> : 'Guardar'}
-                  </CButton>
+                  {step > 1 && <CButton color="secondary" onClick={handlePrevious}>Anterior</CButton>}
+                </CCol>
+                <CCol xs={6} className="text-end">
+                  {step < 4 && <CButton color="primary" onClick={handleNext}>Próximo</CButton>}
+                  {step === 4 &&
+                    <CButton color="primary" onClick={handleAddVideo} disabled={loading}>
+                      {loading ? <CSpinner size="sm" /> : 'Guardar'}
+                    </CButton>
+                  }
                 </CCol>
 
               </CRow>

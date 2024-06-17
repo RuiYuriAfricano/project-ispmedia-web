@@ -293,7 +293,7 @@ const Video = () => {
           <p><strong>Álbum:</strong> {videoDetalhes.album?.tituloAlbum}</p>
           <p><strong>Artista:</strong> {videoDetalhes.artista?.nomeArtista}</p>
           <p><strong>Grupo Musical:</strong> {videoDetalhes.grupoMusical?.nomeGrupoMusical}</p>
-
+          <p><strong>Visibilidade:</strong> {videoDetalhes.visibilidade}</p>
           <hr />
           <h5>Participações</h5>
           <CForm>
@@ -360,7 +360,7 @@ const Video = () => {
         </CModalFooter>
       </CModal>
 
-      <CModal visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
+      <CModal backdrop="static" visible={modalConfigVisible} onClose={() => handleModalConfigClose(false)}>
         <CModalHeader closeButton>
           {editVideoId ? 'Editar Vídeo' : 'Criar Novo Vídeo'}
         </CModalHeader>
