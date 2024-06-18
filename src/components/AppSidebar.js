@@ -12,10 +12,11 @@ import CIcon from '@coreui/icons-react';
 import { AppSidebarNav } from './AppSidebarNav';
 import { logo } from 'src/assets/brand/logo';
 import { sygnet } from 'src/assets/brand/sygnet';
-import navigation from '../_nav';
+import DynamicNav from '../_nav';
 import { setSidebarShow } from '../redux/app/slice'; // Importando a ação Redux
 
 const AppSidebar = () => {
+  const navItems = DynamicNav();
   const dispatch = useDispatch();
   const sidebarShow = useSelector((state) => state.app.sidebarShow); // Acessando o estado sidebarShow do Redux
 
@@ -40,7 +41,7 @@ const AppSidebar = () => {
           onClick={() => dispatch(setSidebarShow(false))} // Fechando o sidebar ao clicar no botão de fechar
         />
       </CSidebarHeader>
-      <AppSidebarNav items={navigation} />
+      <AppSidebarNav items={navItems} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler onClick={() => dispatch(setSidebarShow(!sidebarShow))} /> {/* Alternando a visibilidade do sidebar */}
       </CSidebarFooter>
