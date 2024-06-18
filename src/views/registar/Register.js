@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
   CButton,
   CCard,
@@ -12,7 +12,6 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
-  CFormSelect,
   CAlert,
   CSpinner,
 } from '@coreui/react';
@@ -20,17 +19,18 @@ import CIcon from '@coreui/icons-react';
 import { cilList, cilLockLocked, cilPhone, cilUser } from '@coreui/icons';
 import { service } from "./../../services";
 import { isNullOrUndef } from 'chart.js/helpers';
+import InputMask from 'react-input-mask';
 
 const Register = () => {
   if (!isNullOrUndef(localStorage.getItem("loggedUser"))) {
     return <Navigate to="/dashboard"></Navigate>
   }
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [senha, setSenha] = useState("");
   const [repetirSenha, setRepetirSenha] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [tipoDeUtilizador, setTipoDeUtilizador] = useState("");
   const [fotografia, setFotografia] = useState(null); // Novo estado para armazenar a fotografia
   const [corDoAlert, setCorDoAlert] = useState("");
   const [msgDoAlert, setMsgDoAlert] = useState("");
@@ -104,11 +104,6 @@ const Register = () => {
       setCorDoAlert("danger");
       return;
     }
-    if (!tipoDeUtilizador) {
-      setMsgDoAlert("Por favor, selecione o tipo de utilizador!");
-      setCorDoAlert("danger");
-      return;
-    }
 
     setLoading(true); // Start loading
 
@@ -118,7 +113,9 @@ const Register = () => {
       formData.append('senha', senha);
       formData.append('email', email);
       formData.append('telefone', telefone);
-      formData.append('tipoDeUtilizador', tipoDeUtilizador);
+      formData.append('estado', 'pendente');
+      const response2 = await service.auth.listar();
+      formData.append('tipoDeUtilizador', response2.data.length === 0 ? 'admin' : 'normal');
       if (fotografia) {
         // Obter a extensão do arquivo original
         const fileExtension = fotografia.name.split('.').pop();
@@ -142,6 +139,10 @@ const Register = () => {
         setEmail("");
         setTelefone("");
         setFotografia(null); // Limpa o estado da fotografia após o registro
+        localStorage.setItem("pendenteUser", JSON.stringify(response?.data));
+        setTimeout(() => {
+          navigate('/valida')
+        }, 1500);
 
       } else {
         setMsgDoAlert("Falha na Criação de Conta, Tente Novamente!");
@@ -189,6 +190,9 @@ const Register = () => {
                       autoComplete="new-password"
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
+                      onPaste={(e) => e.preventDefault()}  // Prevent paste
+                      onCopy={(e) => e.preventDefault()}  // Prevent copy
+                      onCut={(e) => e.preventDefault()}  // Prevent cut
                     />
                   </CInputGroup>
                   <CInputGroup className="mb-4">
@@ -201,32 +205,26 @@ const Register = () => {
                       autoComplete="new-password"
                       value={repetirSenha}
                       onChange={(e) => setRepetirSenha(e.target.value)}
+                      onPaste={(e) => e.preventDefault()}  // Prevent paste
+                      onCopy={(e) => e.preventDefault()}  // Prevent copy
+                      onCut={(e) => e.preventDefault()}  // Prevent cut
+
                     />
                   </CInputGroup>
                   <CInputGroup className="mb-4">
                     <CInputGroupText>
                       <CIcon icon={cilPhone} />
                     </CInputGroupText>
-                    <CFormInput
-                      type="text"
-                      placeholder="921-157-495"
-                      autoComplete="telefone"
+                    <InputMask
+                      mask="999-999-999"
                       value={telefone}
                       onChange={(e) => setTelefone(e.target.value)}
-                    />
+                    >
+                      {(inputProps) => <CFormInput {...inputProps} type="text" placeholder="999-999-999" />}
+                    </InputMask>
                   </CInputGroup>
-                  <CInputGroup className="mb-4">
-                    <CInputGroupText>
-                      <CIcon icon={cilList} />
-                    </CInputGroupText>
-                    <CFormSelect aria-label="Default select example"
-                      value={tipoDeUtilizador}
-                      onChange={(e) => setTipoDeUtilizador(e.target.value)}>
-                      <option>Selecionar Tipo de Conta</option>
-                      <option value="editor">Editor</option>
-                      <option value="naoEditor">Não Editor</option>
-                    </CFormSelect>
-                  </CInputGroup>
+
+
                   {/* Novo campo para fotografia */}
                   <CInputGroup className="mb-4">
                     <CInputGroupText>
