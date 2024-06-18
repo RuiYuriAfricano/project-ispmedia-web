@@ -17,17 +17,22 @@ import {
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {
+  cilAudio,
   cilBell,
   cilContrast,
+  cilLibrary,
   cilMenu,
   cilMoon,
+  cilMusicNote,
   cilPlus,
   cilSun,
+  cilVideo,
 } from '@coreui/icons';
 
 import { AppBreadcrumb } from './index';
 import { AppHeaderDropdown } from './header/index';
 import { setSidebarShow } from '../redux/app/slice';
+import { Link } from 'react-router-dom';
 
 const AppHeader = () => {
   const headerRef = useRef();
@@ -74,17 +79,54 @@ const AppHeader = () => {
         </CHeaderNav>
 
         <CHeaderNav className="ms-auto">
+          {/* ======================================================= */}
+
+          <CDropdown variant="nav-item" placement="bottom-end">
+            <CDropdownToggle caret={false}>
+              {(
+                <CIcon icon={cilPlus} size="lg" />
+              )}
+            </CDropdownToggle>
+            <CDropdownMenu>
+              <CDropdownItem
+
+                className="d-flex align-items-center"
+                as="button"
+                type="button"
+
+              >
+                <Link style={{ textDecoration: 'none', color: 'inherit' }} to='/video'><CIcon className="me-2" icon={cilVideo} size="lg" /> Vídeo</Link>
+              </CDropdownItem>
+              <CDropdownItem
+
+                className="d-flex align-items-center"
+                as="button"
+                type="button"
+
+              >
+                <Link style={{ textDecoration: 'none', color: 'inherit' }} to='/musica'><CIcon className="me-2" icon={cilMusicNote} size="lg" /> Música</Link>
+              </CDropdownItem>
+              <CDropdownItem
+                className="d-flex align-items-center"
+                as="button"
+                type="button"
+              >
+                <Link style={{ textDecoration: 'none', color: 'inherit' }} to='/album'><CIcon className="me-2" icon={cilLibrary} size="lg" /> Album</Link>
+              </CDropdownItem>
+            </CDropdownMenu>
+          </CDropdown>
+
+          {/* ======================================================= */}
+          <li className="nav-item py-1">
+            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
+          </li>
           <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilBell} size="lg" />
             </CNavLink>
           </CNavItem>
 
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilPlus} size="lg" />
-            </CNavLink>
-          </CNavItem>
+
 
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
