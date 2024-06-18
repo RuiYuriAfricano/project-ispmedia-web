@@ -79,7 +79,13 @@ const Login = () => {
         senha: senha,
       });
 
-      if (response?.status === 201) {
+      if (response?.status === 201 && response?.data.estado === 'pendente') {
+        localStorage.setItem("pendenteUser", JSON.stringify(response?.data));
+        navigate("/valida");
+      }
+
+
+      if (response?.status === 201 && response?.data.estado === 'ativo') {
         localStorage.setItem("loggedUser", JSON.stringify(response?.data));
         const tipoDeUtilizador = response?.data.tipoDeUtilizador;
         dispatch(
