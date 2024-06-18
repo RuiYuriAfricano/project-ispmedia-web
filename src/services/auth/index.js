@@ -27,7 +27,17 @@ async function register(formData) {
   } catch (error) {
     return error?.response;
   }
+} async function update(formData) {
+  try {
+    const response = await axiosInstance.put("utilizador", formData);
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
 }
+
+
 
 async function listar() {
   try {
@@ -43,4 +53,4 @@ async function listar() {
 
 
 
-export const auth = { login, register, listar };
+export const auth = { login, register, update, listar };
