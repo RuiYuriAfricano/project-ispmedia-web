@@ -101,8 +101,8 @@ const Playlist = () => {
                     </div>
                   </Link>
                   <div className="playlist-actions">
-                    <Link onClick={() => handleEdit(playlist.codPlayList)}><CIcon icon={cilPen} /></Link>
-                    <Link onClick={() => handleDelete(playlist.codPlayList)}><CIcon icon={cilTrash} /></Link>
+                    <Link className='ligacao' onClick={() => handleEdit(playlist.codPlayList)}><CIcon icon={cilPen} /></Link>
+                    <Link className='ligacao' onClick={() => handleDelete(playlist.codPlayList)}><CIcon icon={cilTrash} /></Link>
                   </div>
                 </div>
               ))}
