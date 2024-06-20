@@ -114,8 +114,8 @@ const GrupoDeAmigos = () => {
                     </div>
                   </Link>
                   <div className="group-actions">
-                    <Link onClick={() => handleEdit(grupo.codGrupoDeAmigos)}><CIcon icon={cilPen} /></Link>
-                    <Link onClick={() => handleDelete(grupo.codGrupoDeAmigos)}><CIcon icon={cilTrash} /></Link>
+                    <Link className='ligacao' onClick={() => handleEdit(grupo.codGrupoDeAmigos)}><CIcon icon={cilPen} /></Link>
+                    <Link className='ligacao' onClick={() => handleDelete(grupo.codGrupoDeAmigos)}><CIcon icon={cilTrash} /></Link>
                   </div>
                 </div>
               ))}
