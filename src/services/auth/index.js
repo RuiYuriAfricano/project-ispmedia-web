@@ -37,7 +37,15 @@ async function register(formData) {
   }
 }
 
+async function excluir(codUtilizador) {
+  try {
+    const response = await axiosInstance.delete("utilizador/" + codUtilizador);
 
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+}
 
 async function listar() {
   try {
@@ -53,4 +61,4 @@ async function listar() {
 
 
 
-export const auth = { login, register, update, listar };
+export const auth = { login, register, update, listar, excluir };
