@@ -19,7 +19,9 @@ import {
   CModal,
   CModalHeader,
   CModalBody,
-  CAvatar
+  CAvatar,
+  CPagination,
+  CPaginationItem
 } from '@coreui/react';
 import { Link } from 'react-router-dom';
 import { cilPen, cilPeople, cilPlus, cilTrash } from '@coreui/icons';
@@ -38,6 +40,8 @@ const Artista = () => {
   const [error, setError] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [artistaToEdit, setArtistaToEdit] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Define the number of items per page
 
   useEffect(() => {
     const fetchArtistas = async () => {
@@ -87,6 +91,13 @@ const Artista = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const selectedGrupos = artistas.slice(startIndex, startIndex + itemsPerPage);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -133,6 +144,23 @@ const Artista = () => {
                   ))}
                 </CTableBody>
               </CTable>
+              <CPagination align="center" className="mt-3">
+                <CPaginationItem disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+                  Anterior
+                </CPaginationItem>
+                {[...Array(Math.ceil(artistas.length / itemsPerPage)).keys()].map(number => (
+                  <CPaginationItem
+                    key={number + 1}
+                    active={currentPage === number + 1}
+                    onClick={() => handlePageChange(number + 1)}
+                  >
+                    {number + 1}
+                  </CPaginationItem>
+                ))}
+                <CPaginationItem disabled={currentPage === Math.ceil(artistas.length / itemsPerPage)} onClick={() => handlePageChange(currentPage + 1)}>
+                  Próxima
+                </CPaginationItem>
+              </CPagination>
             </CCardBody>
           </CCard>
         </CCol>
