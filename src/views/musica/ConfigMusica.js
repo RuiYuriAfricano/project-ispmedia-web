@@ -25,10 +25,14 @@ import {
   cilCalendar,
   cilFile,
   cilPencil,
+  cilTrash,
 } from '@coreui/icons';
 import { service } from './../../services';
 import { useParams, Link } from 'react-router-dom';
 import StepIndicator from '../StepIndicador/StepIndicator';
+import ReactAudioPlayer from 'react-audio-player';
+import './ConfigMusica.css'
+
 
 const ConfigMusica = ({ idEditMusica, onClose }) => {
 
@@ -61,6 +65,9 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
   { id: 2, txt: 'Detalhes' },
   { id: 3, txt: 'Autoria e Visibilidade' },
   { id: 4, txt: 'Finalizar' }];
+  const [audioFileUrl, setAudioFileUrl] = useState('');
+  const [thumbnailUrl, setThumbnailUrl] = useState('');
+
 
   useEffect(() => {
     const fetchArtistas = async () => {
@@ -325,6 +332,31 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
     }
   };
 
+  const handleAudioFileChange = (e) => {
+    const file = e.target.files[0];
+    setFicheiroMusical(file);
+    if (file) {
+      const fileUrl = URL.createObjectURL(file);
+      setAudioFileUrl(fileUrl);
+    }
+  };
+
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files[0];
+    setCapaMusica(file);
+    if (file) {
+      const fileUrl = URL.createObjectURL(file);
+      setThumbnailUrl(fileUrl);
+    }
+  };
+  const handleRemoveFiles = () => {
+    setCapaMusica(null);
+    setFicheiroMusical(null);
+    setThumbnailUrl('');
+    setAudioFileUrl('');
+  };
+
+
   return (
     <CRow className="justify-content-center mb-4">
       <CCol>
@@ -439,7 +471,7 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
                     <CFormInput
                       type="file"
                       accept="image/*"
-                      onChange={(e) => setCapaMusica(e.target.files[0])}
+                      onChange={handleThumbnailChange}
                     />
                   </CInputGroup>
 
@@ -450,12 +482,32 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
                     <CFormInput
                       type="file"
                       accept="audio/*"
-                      onChange={(e) => setFicheiroMusical(e.target.files[0])}
+                      onChange={handleAudioFileChange}
                     />
                   </CInputGroup>
 
+                  {(thumbnailUrl || audioFileUrl) && (
+                    <div className="mb-3 text-center audio-preview">
+                      {thumbnailUrl && (
+                        <img src={thumbnailUrl} alt="Thumbnail" className="audio-thumbnail" />
+                      )}
+                      {audioFileUrl && (
+                        <ReactAudioPlayer
+                          src={audioFileUrl}
+                          controls
+                          className="audio-player"
+                        />
+                      )}
+                      <CButton color="danger" onClick={handleRemoveFiles} className="mt-2">
+                        <CIcon icon={cilTrash} /> Remover Arquivos
+                      </CButton>
+                    </div>
+                  )}
                 </>
               )}
+
+
+
               {step === 3 && (
                 <>
                   <CRow className="mb-3">

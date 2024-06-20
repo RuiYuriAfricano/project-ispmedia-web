@@ -1,0 +1,17 @@
+.audio-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.audio-thumbnail {
+    max-width: 200px;
+    max-height: 130px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+.audio-player {
+    width: 100%;
+    max-width: 400px;
+}
