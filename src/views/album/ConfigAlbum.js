@@ -16,10 +16,11 @@ import {
     CTooltip,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMusicNote, cilUser, cilGroup, cilImage, cilDescription, cilCalendar, cilPencil } from '@coreui/icons';
+import { cilMusicNote, cilTrash, cilUser, cilGroup, cilImage, cilDescription, cilCalendar, cilPencil } from '@coreui/icons';
 import { service } from './../../services';
 import { useParams } from 'react-router-dom';
 import StepIndicator from '../StepIndicador/StepIndicator';
+import './ConfigAlbum.css'
 
 const ConfigAlbum = ({ idEditAlbum, onClose }) => {
 
@@ -231,6 +232,10 @@ const ConfigAlbum = ({ idEditAlbum, onClose }) => {
         }
     };
 
+    const handleRemoveCapa = () => {
+        setCapaAlbum(null);
+    };
+
 
     return (
         <CRow className="justify-content-center mb-4">
@@ -304,17 +309,30 @@ const ConfigAlbum = ({ idEditAlbum, onClose }) => {
                                     )}
 
                                     {(!idEditAlbum || (idEditAlbum && alterarCapa)) && (
-                                        <CInputGroup className="mb-3">
-                                            <CInputGroupText>
-                                                <CIcon icon={cilImage} />
-                                            </CInputGroupText>
-                                            <CFormInput
-                                                type="file"
-                                                onChange={(e) => setCapaAlbum(e.target.files[0])}
-                                                required
-                                            />
-                                        </CInputGroup>
+                                        <>
+                                            <CInputGroup className="mb-3">
+                                                <CInputGroupText>
+                                                    <CIcon icon={cilImage} />
+                                                </CInputGroupText>
+                                                <CFormInput
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => setCapaAlbum(e.target.files[0])}
+                                                    required
+                                                />
+                                            </CInputGroup>
+
+                                            {capaAlbum && (
+                                                <div className="mb-3 text-center">
+                                                    <img src={URL.createObjectURL(capaAlbum)} alt="Capa do Álbum" className="album-thumbnail" />
+                                                    <CButton color="danger" onClick={handleRemoveCapa} className="mt-2">
+                                                        <CIcon icon={cilTrash} /> Remover Capa
+                                                    </CButton>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
+
 
 
                                 </>
