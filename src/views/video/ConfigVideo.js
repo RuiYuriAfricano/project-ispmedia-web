@@ -25,6 +25,7 @@ import {
   cilFile,
   cilPencil,
   cilMusicNote,
+  cilTrash, // Adicionado
 } from '@coreui/icons';
 import { service } from './../../services';
 import { useParams, Link } from 'react-router-dom';
@@ -59,6 +60,8 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
   { id: 2, txt: 'Detalhes' },
   { id: 3, txt: 'Autoria e Visibilidade' },
   { id: 4, txt: 'Finalizar' }];
+  const [videoPreview, setVideoPreview] = useState(null); // Adicionado para pré-visualização do vídeo
+
 
 
   useEffect(() => {
@@ -225,6 +228,7 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
           setFkGrupoMusical('');
           setFkArtista('');
           setFicheiroVideo(null);
+          setVideoPreview(null); // Adicionado para limpar a pré-visualização
         }
         setTimeout(() => {
           onClose(true);
@@ -297,6 +301,20 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
     if (step > 1) {
       setStep(step - 1);
     }
+  };
+
+  const handleVideoFileChange = (e) => {
+    const file = e.target.files[0];
+    setFicheiroVideo(file);
+    if (file) {
+      const videoURL = URL.createObjectURL(file);
+      setVideoPreview(videoURL); // Definido para pré-visualização
+    }
+  };
+
+  const handleRemoveVideo = () => {
+    setFicheiroVideo(null);
+    setVideoPreview(null);
   };
 
 
@@ -406,9 +424,17 @@ const ConfigVideo = ({ idEditVideo, onClose }) => {
                     <CFormInput
                       type="file"
                       accept="video/*"
-                      onChange={(e) => setFicheiroVideo(e.target.files[0])}
+                      onChange={handleVideoFileChange} // Alterado para usar a nova função
                     />
                   </CInputGroup>
+                  {videoPreview && (
+                    <div className="mb-3">
+                      <video src={videoPreview} controls width="100%" />
+                      <CButton color="danger" onClick={handleRemoveVideo} className="mt-2">
+                        <CIcon icon={cilTrash} /> Remover Vídeo
+                      </CButton>
+                    </div>
+                  )}
                 </>
               )}
 
