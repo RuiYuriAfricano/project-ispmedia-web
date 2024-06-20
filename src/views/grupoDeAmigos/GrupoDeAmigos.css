@@ -42,11 +42,11 @@
 
 .ligacao {
     text-decoration: none;
+    color: inherit;
 }
 
 .group-info {
     padding: 10px;
-    color: white;
 }
 
 .group-info h5 {
@@ -67,7 +67,6 @@
 }
 
 .group-actions a {
-    color: white;
     font-size: 1.25rem;
     cursor: pointer;
 }
