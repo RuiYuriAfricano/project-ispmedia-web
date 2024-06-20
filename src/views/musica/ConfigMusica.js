@@ -184,15 +184,16 @@ const ConfigMusica = ({ idEditMusica, onClose }) => {
     let newCapaMusicaName = '';
     let newFicheiroMusicalName = '';
 
+    const response1 = await service.musica.listar();
     if (capaMusica) {
-      newCapaMusicaName = `${idEditMusica || 'new'}-${tituloMusica}-capa${capaMusica.name.slice(capaMusica.name.lastIndexOf('.'))}`;
+      newCapaMusicaName = `${idEditMusica || (response1.data[response1.data.length - 1].codMusica + 1)}-${tituloMusica}-capa${capaMusica.name.slice(capaMusica.name.lastIndexOf('.'))}`;
       const renamedCapaMusica = renameFile(capaMusica, newCapaMusicaName);
       formData.append('files', renamedCapaMusica);
       formData.append('capaMusica', newCapaMusicaName);
     }
 
     if (ficheiroMusical) {
-      newFicheiroMusicalName = `${idEditMusica || 'new'}-${tituloMusica}${ficheiroMusical.name.slice(ficheiroMusical.name.lastIndexOf('.'))}`;
+      newFicheiroMusicalName = `${idEditMusica || (response1.data[response1.data.length - 1].codMusica + 1)}-${tituloMusica}${ficheiroMusical.name.slice(ficheiroMusical.name.lastIndexOf('.'))}`;
       const renamedFicheiroMusical = renameFile(ficheiroMusical, newFicheiroMusicalName);
       formData.append('files', renamedFicheiroMusical);
       formData.append('ficheiroMusical', newFicheiroMusicalName);
