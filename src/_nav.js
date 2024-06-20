@@ -107,8 +107,8 @@ const DynamicNav = () => {
         {
           component: CNavItem,
           name: 'Utilizadores',
-          to: '/charts',
-          icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+          to: '/utilizadores',
+          icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
         },
         {
           component: CNavItem,
