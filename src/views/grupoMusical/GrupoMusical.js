@@ -21,7 +21,9 @@ import {
   CModalHeader,
   CModalBody,
   CModalFooter,
-  CImage
+  CImage,
+  CPagination,
+  CPaginationItem
 } from '@coreui/react';
 import { cilGroup, cilMediaPlay, cilPen, cilPlus, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -36,7 +38,8 @@ const GrupoMusical = () => {
   const [error, setError] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [editGrupoId, setEditGrupoId] = useState(null);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Define the number of items per page
   useEffect(() => {
     const fetchGrupos = async () => {
       try {
@@ -86,6 +89,13 @@ const GrupoMusical = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const selectedGrupos = grupos.slice(startIndex, startIndex + itemsPerPage);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -113,7 +123,7 @@ const GrupoMusical = () => {
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {grupos.map((grupo, index) => (
+                {selectedGrupos.map((grupo, index) => (
                   <CTableRow key={grupo.codGrupoMusical}>
                     <CTableHeaderCell scope="row">
                       <div className="thumbnail-wrapper" >
@@ -143,6 +153,23 @@ const GrupoMusical = () => {
                 ))}
               </CTableBody>
             </CTable>
+            <CPagination align="center" className="mt-3">
+              <CPaginationItem disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+                Anterior
+              </CPaginationItem>
+              {[...Array(Math.ceil(grupos.length / itemsPerPage)).keys()].map(number => (
+                <CPaginationItem
+                  key={number + 1}
+                  active={currentPage === number + 1}
+                  onClick={() => handlePageChange(number + 1)}
+                >
+                  {number + 1}
+                </CPaginationItem>
+              ))}
+              <CPaginationItem disabled={currentPage === Math.ceil(grupos.length / itemsPerPage)} onClick={() => handlePageChange(currentPage + 1)}>
+                Próxima
+              </CPaginationItem>
+            </CPagination>
           </CCardBody>
         </CCard>
       </CCol>
