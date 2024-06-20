@@ -98,7 +98,7 @@ const ValidaCodConfirmacao = () => {
                   <h1>Código de Confirmação</h1>
                   {!isValidated && (
                     <>
-                      <p className="text-body-secondary">Enviamos o código no seu email.</p>
+                      <p className="text-body-secondary">Enviamos o código para o email: {user.email}</p>
 
 
                       <CInputGroup className="mb-3">
