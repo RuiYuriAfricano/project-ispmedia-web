@@ -7,3 +7,27 @@
     margin-top: 10px;
     /* Garantir que a margem superior das músicas esteja proporcional */
 }
+
+.user-name {
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.comment {
+    margin-bottom: 1em;
+    margin-top: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.comment-text {
+    margin-left: 8px;
+}
+
+.star {
+    font-size: 1.5em;
+    margin: 0 6px;
+}
+
+.star.selected {
+    color: gold;
+}
