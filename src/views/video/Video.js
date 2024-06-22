@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   CButton,
@@ -16,6 +16,9 @@ import {
   CFormSelect,
   CCardFooter
 } from '@coreui/react';
+import {
+  Confirm,
+} from 'react-admin';
 import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus, cilMediaPlay } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import ReactPlayer from 'react-player';
@@ -37,7 +40,8 @@ const Video = () => {
   const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
   const [modalConfigVisible, setModalConfigVisible] = useState(false);
   const [editVideoId, setEditVideoId] = useState(null);
-
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteVideoId, setDeleteVideoId] = useState(null);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -69,12 +73,22 @@ const Video = () => {
     fetchArtistas();
   }, []);
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Tem certeza que deseja excluir este vídeo?");
-    if (confirmDelete) {
+  const openDeleteConfirm = (id) => {
+    setDeleteVideoId(id);
+    setConfirmOpen(true);
+  };
+
+  const closeDeleteConfirm = () => {
+    setDeleteVideoId(null);
+    setConfirmOpen(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteVideoId) {
       try {
-        await service.video.excluir(id);
-        setVideos(videos.filter(video => video.codVideo !== id));
+        await service.video.excluir(deleteVideoId);
+        setVideos(videos.filter(video => video.codVideo !== deleteVideoId));
+        closeDeleteConfirm();
       } catch (err) {
         console.error('Erro ao excluir o vídeo:', err);
       }
@@ -84,8 +98,6 @@ const Video = () => {
   const handleShare = (id) => {
     alert(`Sharing video with ID: ${id}`);
   };
-
-
 
   const fetchParticipacoes = async (videoId) => {
     try {
@@ -217,7 +229,6 @@ const Video = () => {
     <>
       <CRow className="justify-content-center mt-2">
         <CCol sm="12" className="mb-3 d-flex justify-content-end">
-
           <CButton color="primary" onClick={() => setModalConfigVisible(true)}>
             <CIcon icon={cilPlus} className="me-2" />
             Inserir Novo Vídeo
@@ -228,7 +239,6 @@ const Video = () => {
         {videos.map((video, index) => (
           <CCol lg="6" sm="12" xl="4" md="6" key={video.codVideo}>
             <CCard style={cardStyle}>
-
               <CCardBody style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0px' }}>
                 <div className='video-thumbnail mt-0'><ReactPlayer
                   url={`http://localhost:3333/video/downloadVideo/${video.codVideo}`}
@@ -252,7 +262,7 @@ const Video = () => {
                       <CIcon icon={cilPencil} size="lg" style={iconStyle} />
                     </Link>
                   </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(video.codVideo)}>
+                  <CButton color="secondary" style={buttonStyle} onClick={() => openDeleteConfirm(video.codVideo)}>
                     <Link style={{ color: 'white' }}>
                       <CIcon icon={cilTrash} size="lg" style={iconStyle} />
                     </Link>
@@ -368,6 +378,17 @@ const Video = () => {
           <ConfigVideo idEditVideo={editVideoId} onClose={handleModalConfigClose} />
         </CModalBody>
       </CModal>
+
+      <Confirm
+        isOpen={confirmOpen}
+        loading={false}
+        title="Excluir Vídeo"
+        content="Tem certeza que deseja excluir este vídeo?"
+        onConfirm={handleDeleteConfirm}
+        onClose={closeDeleteConfirm}
+        confirm='Confirmar'
+        cancel='Cancelar'
+      />
     </>
   );
 };
