@@ -68,6 +68,14 @@ async function listar() {
     }
 }
 
+async function listarPorPagina(page, pageSize) {
+    try {
+        const response = await axiosInstance.get(`video/listarVideosPorPagina/${page}/${pageSize}`);
+        return response;
+    } catch (error) {
+        return error?.response;
+    }
+}
 
 
-export const video = { add, update, excluir, pesquisaportitulo, listar, pesquisaporid };
+export const video = { add, update, excluir, pesquisaportitulo, listar, listarPorPagina, pesquisaporid };

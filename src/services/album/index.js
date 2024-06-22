@@ -69,6 +69,14 @@ async function listar() {
     }
 }
 
+async function listarPorPagina(page, pageSize) {
+    try {
+        const response = await axiosInstance.get(`album/listarAlbunsPorPagina/${page}/${pageSize}`);
+        return response;
+    } catch (error) {
+        return error?.response;
+    }
+}
 
 
-export const album = { add, update, excluir, pesquisaportitulo, listar, pesquisaporid };
+export const album = { add, update, excluir, pesquisaportitulo, listar, listarPorPagina, pesquisaporid };
