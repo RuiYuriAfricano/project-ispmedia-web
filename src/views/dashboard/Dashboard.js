@@ -4,16 +4,6 @@ import { CCard, CCardBody, CCardHeader, CCol, CRow, CCardImage, CCardFooter, CBu
 import "./style/dashboard.css";
 import { FaThumbsUp, FaComment, FaEye } from 'react-icons/fa';
 import { useEffect } from 'react';
-
-// Importando as imagens das capas das músicas
-
-import cover7 from './capas/Capa7.jpeg';
-import cover8 from './capas/Capa8.jpeg';
-import cover9 from './capas/Capa9.jpeg';
-import cover10 from './capas/Capa10.jpeg';
-import cover11 from './capas/Capa11.jpeg';
-import cover12 from './capas/Capa12.jpeg';
-
 import { isNullOrUndef } from 'chart.js/helpers';
 import StarRating from '../starRating/StarRating';
 import { useState } from 'react';
