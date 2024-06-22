@@ -28,7 +28,7 @@ const VideoList = () => {
 
   const fetchVideos = async (page) => {
     try {
-      const response = await service.video.listarPorPagina(page, 2);
+      const response = await service.video.listarPorPagina(page, 1);
       const sortedVideos = response.data.sort((a, b) => new Date(b.dataDeRegisto) - new Date(a.dataDeRegisto));
       setVideos((prevVideos) => [...prevVideos, ...sortedVideos]);
       setHasMore(response.data.length > 0);
@@ -85,7 +85,7 @@ const VideoList = () => {
               <CCard className="video-card mb-3" key={index}>
                 <CCardBody>
                   <div className="video-thumbnail">
-                    <video controls width="100%" height="300" controlsList="nodownload" disablePictureInPicture>
+                    <video controls width="100%" height="291" controlsList="nodownload" disablePictureInPicture>
                       <source src={`http://localhost:3333/video/downloadVideo/${video.codVideo}`} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
@@ -166,7 +166,7 @@ const MusicList = () => {
   useEffect(() => {
     const fetchMusicas = async () => {
       try {
-        const response = await service.musica.listarPorPagina(page, 2);
+        const response = await service.musica.listarPorPagina(page, 1);
         const sortedMusicas = response.data.sort((a, b) => new Date(b.dataDeRegisto) - new Date(a.dataDeRegisto));
         setMusicas((prevMusicas) => [...prevMusicas, ...sortedMusicas]);
         setHasMore(response.data.length > 0);
@@ -229,9 +229,9 @@ const MusicList = () => {
                     <p>{music.fkArtista ? music.artista?.nomeArtista : music.grupoMusical?.nomeGrupoMusical}, {new Date(music.dataLancamento).toLocaleDateString()}</p>
                   </div>
                 </CCardHeader>
-                <CCardBody>
+                <CCardBody className='musica-body'>
                   <div className="music-thumbnail">
-                    <CCardImage src={`http://localhost:3333/musica/downloadCapa/${music.codMusica}`} alt={music.tituloMusica} width="230" height="150" />
+                    <CCardImage src={`http://localhost:3333/musica/downloadCapa/${music.codMusica}`} alt={music.tituloMusica} width="230" height="200" />
                     {/* Definindo altura e largura */}
 
                   </div>
@@ -303,7 +303,7 @@ const AlbumList = () => {
   useEffect(() => {
     const fetchAlbuns = async () => {
       try {
-        const response = await service.album.listarPorPagina(page, 2);
+        const response = await service.album.listarPorPagina(page, 1);
         const sortedAlbuns = response.data.sort((a, b) => new Date(b.dataDeRegistro) - new Date(a.dataDeRegistro));
         setAlbuns((prevAlbuns) => [...prevAlbuns, ...sortedAlbuns]);
         setHasMore(response.data.length > 0);
@@ -377,9 +377,9 @@ const AlbumList = () => {
                     <p>{album.fkArtista ? album.artista?.nomeArtista : album.grupoMusical?.nomeGrupoMusical}, {new Date(album.dataLancamento).toLocaleDateString()}</p>
                   </div>
                 </CCardHeader>
-                <CCardBody>
+                <CCardBody className='album-body'>
                   <div className="album-thumbnail">
-                    <CCardImage src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} width="230" height="150" />
+                    <CCardImage src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} width="230" height="230" />
                   </div>
                 </CCardBody>
                 <CCardFooter style={{ textAlign: 'center', padding: '13px' }}>

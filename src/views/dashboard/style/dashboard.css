@@ -8,6 +8,18 @@
     /* Garantir que a margem superior das músicas esteja proporcional */
 }
 
+.musica-body {
+    padding-bottom: 25px;
+    padding-top: 25px;
+}
+
+.album-body {
+    padding-bottom: 45px;
+    padding-top: 45px;
+}
+
+
+
 .user-name {
     font-weight: bold;
     margin-left: 5px;
