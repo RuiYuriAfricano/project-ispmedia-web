@@ -29,7 +29,8 @@ const VideoList = () => {
     const fetchVideos = async () => {
       try {
         const response = await service.video.listar();
-        setVideos(response.data);
+        const sortedVideos = response.data.sort((a, b) => new Date(b.dataDeRegisto) - new Date(a.dataDeRegisto));
+        setVideos(sortedVideos);
         setLoading(false);
       } catch (err) {
         setError(err);
@@ -158,7 +159,8 @@ const MusicList = () => {
     const fetchMusicas = async () => {
       try {
         const response = await service.musica.listar();
-        setMusicas(response.data);
+        const sortedMusicas = response.data.sort((a, b) => new Date(b.dataDeRegisto) - new Date(a.dataDeRegisto));
+        setMusicas(sortedMusicas);
         setLoading(false);
       } catch (err) {
         setError(err);
@@ -279,7 +281,8 @@ const AlbumList = () => {
     const fetchAlbuns = async () => {
       try {
         const response = await service.album.listar();
-        setAlbuns(response.data);
+        const sortedAlbuns = response.data.sort((a, b) => new Date(b.dataDeRegistro) - new Date(a.dataDeRegistro));
+        setAlbuns(sortedAlbuns);
         setLoading(false);
       } catch (err) {
         setError(err);
