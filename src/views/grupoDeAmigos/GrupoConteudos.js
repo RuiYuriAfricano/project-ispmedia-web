@@ -36,11 +36,9 @@ import ReactPlayer from 'react-player';
 import { service } from './../../services';
 import thumbnail from './img/default-thumbnail.png';
 import './GrupoConteudo.css';
-import { Player, ControlBar } from 'video-react';
-import 'video-react/dist/video-react.css'; // Importa os estilos padrões do player
 import StarRating from './StarRating';
 
-const PlaylistConteudo = () => {
+const GrupoConteudo = () => {
     const { grupoId } = useParams();
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -561,4 +559,4 @@ const PlaylistConteudo = () => {
     );
 };
 
-export default PlaylistConteudo;
+export default GrupoConteudo;

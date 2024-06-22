@@ -36,9 +36,7 @@ import ReactPlayer from 'react-player';
 import { service } from './../../services';
 import thumbnail from './img/default-thumbnail.png';
 import './PlaylistConteudo.css';
-import { Player, ControlBar } from 'video-react';
-import 'video-react/dist/video-react.css'; // Importa os estilos padrões do player
-import StarRating from './StarRating';
+import StarRating from '../starRating/StarRating';
 
 const PlaylistConteudo = () => {
     const { playlistId } = useParams();
