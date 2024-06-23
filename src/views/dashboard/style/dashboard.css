@@ -18,7 +18,18 @@
     padding-top: 45px;
 }
 
+.vertical-dots {
+    font-size: 0.5rem;
+    line-height: 0.5;
+    cursor: pointer;
+    border-radius: 100%;
+    width: 5px;
+}
 
+.scrollable-table {
+    max-height: 500px;
+    overflow-y: auto;
+}
 
 .user-name {
     font-weight: bold;

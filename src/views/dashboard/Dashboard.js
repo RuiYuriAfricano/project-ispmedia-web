@@ -168,7 +168,7 @@ const VideoList = () => {
                 {expandedAlbum === index && (
                   <CCardFooter>
                     <div style={{ padding: '0' }}>
-                      <h6>Comentários:</h6>
+                      <h6>{comments[video.codVideo]?.length} Comentários:</h6>
                       {comments[video.codVideo] && comments[video.codVideo].length > 0 ? (
                         comments[video.codVideo].map((comment, commentIndex) => (
                           <div key={commentIndex} className="comment">
@@ -403,7 +403,7 @@ const MusicList = () => {
                 {expandedAlbum === index && (
                   <CCardFooter>
                     <div style={{ padding: '0' }}>
-                      <h6>Comentários:</h6>
+                      <h6>{comments[music.codMusica]?.length} Comentários:</h6>
                       {comments[music.codMusica] && comments[music.codMusica].length > 0 ? (
                         comments[music.codMusica].map((comment, commentIndex) => (
                           <div key={commentIndex} className="comment">
@@ -625,7 +625,7 @@ const AlbumList = () => {
                 {expandedAlbum === index && (
                   <CCardFooter>
                     <div style={{ padding: '0' }}>
-                      <h6>Comentários:</h6>
+                      <h6>{comments[album.codAlbum]?.length} Comentários:</h6>
                       {comments[album.codAlbum] && comments[album.codAlbum].length > 0 ? (
                         comments[album.codAlbum].map((comment, commentIndex) => (
                           <div key={commentIndex} className="comment">
