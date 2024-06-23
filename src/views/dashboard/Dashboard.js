@@ -17,10 +17,6 @@ const VideoList = () => {
   const [comments, setComments] = useState({});
   const [rating, setRating] = useState(0);
   const [newComment, setNewComment] = useState('');
-  const [currentUser, setCurrentUser] = useState({
-    name: 'Rui Malemba',
-    photo: 'http://localhost:3333/utilizador/download/' + user.username
-  });
   const [expandedAlbum, setExpandedAlbum] = useState(null);
   const [likedAlbums, setLikedAlbums] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -184,12 +180,13 @@ const VideoList = () => {
                             </div>
 
                             <CRow>
-                              <CCol><p className="comment-text">{comment.comentario}</p></CCol>
+                              <CCol xl="8"><p className="comment-text">{comment.comentario}</p></CCol>
                               <CCol>
                                 {comment.fkUtilizador === user.codUtilizador && (
                                   <CRow>
-                                    <CCol><CIcon icon={cilPencil} onClick={() => handleEditComment(comment)} style={{ cursor: 'pointer' }} /></CCol>
-                                    <CCol><CIcon icon={cilTrash} onClick={() => handleDeleteComment(comment.codCritica, video.codVideo)} style={{ cursor: 'pointer' }} /></CCol>
+                                    <CCol xl="7"></CCol>
+                                    <CCol xl="2"><CIcon icon={cilPencil} onClick={() => handleEditComment(comment)} style={{ cursor: 'pointer' }} /></CCol>
+                                    <CCol xl="2"><CIcon icon={cilTrash} onClick={() => handleDeleteComment(comment.codCritica, video.codVideo)} style={{ cursor: 'pointer' }} /></CCol>
                                   </CRow>
                                 )
 
@@ -234,8 +231,7 @@ const VideoList = () => {
 const MusicList = () => {
 
   const user = JSON.parse(localStorage.getItem("loggedUser"));
-
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState({});
   const [rating, setRating] = useState(0);
   const [newComment, setNewComment] = useState('');
   const [currentUser, setCurrentUser] = useState({
@@ -249,6 +245,7 @@ const MusicList = () => {
   const [musicas, setMusicas] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [editingComment, setEditingComment] = useState(null);
 
   useEffect(() => {
     const fetchMusicas = async () => {
@@ -279,20 +276,81 @@ const MusicList = () => {
     );
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async (musicaId) => {
     if (newComment.trim()) {
-      setComments([...comments, {
-        text: newComment,
-        rating,
-        user: currentUser
-      }]);
-      setNewComment('');
-      setRating(0);
+      const newCommentData = {
+        fkMusica: musicaId,
+        fkUtilizador: user.codUtilizador,
+        pontuacao: rating,
+        comentario: newComment
+      };
+      try {
+        if (editingComment) {
+          const newCommentData = {
+            fkMusica: musicaId,
+            fkUtilizador: user.codUtilizador,
+            pontuacao: rating,
+            comentario: newComment,
+            codCritica: Number(editingComment.codCritica)
+          };
+          // Editing existing comment
+          await service.criticas.update(newCommentData);
+          setEditingComment(null);
+        } else {
+          // Adding new comment
+          await service.criticas.add(newCommentData);
+        }
+        setNewComment('');
+        setRating(0);
+        fetchComments(musicaId); // Refresh comments
+      } catch (error) {
+        console.error("Error adding comment:", error);
+      }
     }
   };
 
-  const toggleComments = (index) => {
+  const handleEditComment = (comment) => {
+    setNewComment(comment.comentario);
+    setRating(comment.pontuacao);
+    setEditingComment(comment);
+  };
+
+  const handleDeleteComment = async (commentId, musicaId) => {
+    try {
+      await service.criticas.excluir(commentId);
+      fetchComments(musicaId); // Refresh comments
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
+  const toggleComments = (index, musicaId) => {
     setExpandedAlbum(expandedAlbum === index ? null : index);
+    if (expandedAlbum !== index) {
+      fetchComments(musicaId);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      musicas.forEach(musica => {
+        fetchComments(musica.codMusica);
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [musicas]);
+
+
+
+  const fetchComments = async (musicaId) => {
+    try {
+      const response = await service.criticas.listar();
+      const musicaComments = response.data.filter(comment => comment.fkMusica === musicaId);
+      setComments(prevComments => ({ ...prevComments, [musicaId]: musicaComments }));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -346,16 +404,41 @@ const MusicList = () => {
                   <CCardFooter>
                     <div style={{ padding: '0' }}>
                       <h6>Comentários:</h6>
-                      {comments.map((comment, commentIndex) => (
-                        <div key={commentIndex} className="comment">
-                          <div className="comment-header">
-                            <CImage width="50" height="50" src={comment.user.photo} alt={comment.user.name} className="user-photo" />
-                            <span className="user-name">{comment.user.name}</span>
-                            <StarRating className="star" rating={comment.rating} setRating={() => { }} />
+                      {comments[music.codMusica] && comments[music.codMusica].length > 0 ? (
+                        comments[music.codMusica].map((comment, commentIndex) => (
+                          <div key={commentIndex} className="comment">
+                            <div className="comment-header">
+                              <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                              <span className="user-name">{comment.utilizador.username}</span>
+                              <StarRating rating={comment.pontuacao} setRating={() => { }} />
+
+                            </div>
+
+                            <CRow>
+                              <CCol xl='8'><p className="comment-text">{comment.comentario}</p></CCol>
+                              <CCol>
+                                {comment.fkUtilizador === user.codUtilizador && (
+                                  <CRow>
+                                    <CCol xl='2' ><CIcon icon={cilPencil} onClick={() => handleEditComment(comment)} style={{ cursor: 'pointer' }} /></CCol>
+                                    <CCol xl='2'><CIcon icon={cilTrash} onClick={() => handleDeleteComment(comment.codCritica, music.codMusica)} style={{ cursor: 'pointer' }} /></CCol>
+                                  </CRow>
+                                )
+
+                                }
+                              </CCol>
+
+
+
+                            </CRow>
+
+
+
+
                           </div>
-                          <p className="comment-text">{comment.text}</p>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p>Sem comentários.</p>
+                      )}
                       <CForm>
                         <CInputGroup>
                           <CFormInput
@@ -365,7 +448,7 @@ const MusicList = () => {
                           />
                         </CInputGroup>
                         <StarRating rating={rating} setRating={setRating} />
-                        <CButton color="primary" onClick={handleAddComment}>Comentar</CButton>
+                        <CButton color="primary" onClick={() => handleAddComment(music.codMusica)}>Comentar</CButton>
                       </CForm>
                     </div>
                   </CCardFooter>
@@ -381,6 +464,8 @@ const MusicList = () => {
 
 const AlbumList = () => {
 
+  const [comments, setComments] = useState({});
+  const [editingComment, setEditingComment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [albuns, setAlbuns] = useState([]);
@@ -410,13 +495,9 @@ const AlbumList = () => {
 
   const user = JSON.parse(localStorage.getItem("loggedUser"));
 
-  const [comments, setComments] = useState([]);
+
   const [rating, setRating] = useState(0);
   const [newComment, setNewComment] = useState('');
-  const [currentUser, setCurrentUser] = useState({
-    name: 'Rui Malemba', // Substitua pelo nome do usuário atual
-    photo: 'http://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
-  });
   const [expandedAlbum, setExpandedAlbum] = useState(null);
   const [likedAlbums, setLikedAlbums] = useState([]);
 
@@ -428,20 +509,81 @@ const AlbumList = () => {
     );
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async (albumId) => {
     if (newComment.trim()) {
-      setComments([...comments, {
-        text: newComment,
-        rating,
-        user: currentUser
-      }]);
-      setNewComment('');
-      setRating(0);
+      const newCommentData = {
+        fkAlbum: albumId,
+        fkUtilizador: user.codUtilizador,
+        pontuacao: rating,
+        comentario: newComment
+      };
+      try {
+        if (editingComment) {
+          const newCommentData = {
+            fkAlbum: albumId,
+            fkUtilizador: user.codUtilizador,
+            pontuacao: rating,
+            comentario: newComment,
+            codCritica: Number(editingComment.codCritica)
+          };
+          // Editing existing comment
+          await service.criticas.update(newCommentData);
+          setEditingComment(null);
+        } else {
+          // Adding new comment
+          await service.criticas.add(newCommentData);
+        }
+        setNewComment('');
+        setRating(0);
+        fetchComments(albumId); // Refresh comments
+      } catch (error) {
+        console.error("Error adding comment:", error);
+      }
     }
   };
 
-  const toggleComments = (index) => {
+  const handleEditComment = (comment) => {
+    setNewComment(comment.comentario);
+    setRating(comment.pontuacao);
+    setEditingComment(comment);
+  };
+
+  const handleDeleteComment = async (commentId, albumId) => {
+    try {
+      await service.criticas.excluir(commentId);
+      fetchComments(albumId); // Refresh comments
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
+  const toggleComments = (index, albumId) => {
     setExpandedAlbum(expandedAlbum === index ? null : index);
+    if (expandedAlbum !== index) {
+      fetchComments(albumId);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      albuns.forEach(album => {
+        fetchComments(album.codAlbum);
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [albuns]);
+
+
+
+  const fetchComments = async (albumId) => {
+    try {
+      const response = await service.criticas.listar();
+      const albumComments = response.data.filter(comment => comment.fkAlbum === albumId);
+      setComments(prevComments => ({ ...prevComments, [albumId]: albumComments }));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -484,16 +626,41 @@ const AlbumList = () => {
                   <CCardFooter>
                     <div style={{ padding: '0' }}>
                       <h6>Comentários:</h6>
-                      {comments.map((comment, commentIndex) => (
-                        <div key={commentIndex} className="comment">
-                          <div className="comment-header">
-                            <CImage width="50" height="50" src={comment.user.photo} alt={comment.user.name} className="user-photo" />
-                            <span className="user-name">{comment.user.name}</span>
-                            <StarRating className="star" rating={comment.rating} setRating={() => { }} />
+                      {comments[album.codAlbum] && comments[album.codAlbum].length > 0 ? (
+                        comments[album.codAlbum].map((comment, commentIndex) => (
+                          <div key={commentIndex} className="comment">
+                            <div className="comment-header">
+                              <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                              <span className="user-name">{comment.utilizador.username}</span>
+                              <StarRating rating={comment.pontuacao} setRating={() => { }} />
+
+                            </div>
+
+                            <CRow>
+                              <CCol xl='8'><p className="comment-text">{comment.comentario}</p></CCol>
+                              <CCol>
+                                {comment.fkUtilizador === user.codUtilizador && (
+                                  <CRow>
+                                    <CCol xl='2' ><CIcon icon={cilPencil} onClick={() => handleEditComment(comment)} style={{ cursor: 'pointer' }} /></CCol>
+                                    <CCol xl='2'><CIcon icon={cilTrash} onClick={() => handleDeleteComment(comment.codCritica, album.codAlbum)} style={{ cursor: 'pointer' }} /></CCol>
+                                  </CRow>
+                                )
+
+                                }
+                              </CCol>
+
+
+
+                            </CRow>
+
+
+
+
                           </div>
-                          <p className="comment-text">{comment.text}</p>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p>Sem comentários.</p>
+                      )}
                       <CForm>
                         <CInputGroup>
                           <CFormInput
@@ -503,7 +670,7 @@ const AlbumList = () => {
                           />
                         </CInputGroup>
                         <StarRating rating={rating} setRating={setRating} />
-                        <CButton color="primary" onClick={handleAddComment}>Comentar</CButton>
+                        <CButton color="primary" onClick={() => handleAddComment(album.codAlbum)}>Comentar</CButton>
                       </CForm>
                     </div>
                   </CCardFooter>
