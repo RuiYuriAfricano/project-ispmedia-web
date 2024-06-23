@@ -3,17 +3,18 @@ import { Navigate } from 'react-router-dom';
 import { CCard, CCardBody, CCardHeader, CCol, CRow, CCardImage, CCardFooter, CButton, CImage, CForm, CInputGroup, CFormInput } from '@coreui/react';
 import "./style/dashboard.css";
 import { FaThumbsUp, FaComment, FaEye } from 'react-icons/fa';
+import { cilTrash, cilPencil } from '@coreui/icons';
 import { useEffect } from 'react';
 import { isNullOrUndef } from 'chart.js/helpers';
 import StarRating from '../starRating/StarRating';
 import { useState } from 'react';
 import { service } from './../../services';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import CIcon from '@coreui/icons-react';
 
 const VideoList = () => {
   const user = JSON.parse(localStorage.getItem("loggedUser"));
-
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState({});
   const [rating, setRating] = useState(0);
   const [newComment, setNewComment] = useState('');
   const [currentUser, setCurrentUser] = useState({
@@ -25,6 +26,7 @@ const VideoList = () => {
   const [videos, setVideos] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [editingComment, setEditingComment] = useState(null);
 
   const fetchVideos = async (page) => {
     try {
@@ -41,8 +43,29 @@ const VideoList = () => {
     fetchVideos(page);
   }, [page]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      videos.forEach(video => {
+        fetchComments(video.codVideo);
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [videos]);
+
+
   const fetchMoreVideos = () => {
     setPage((prevPage) => prevPage + 1);
+  };
+
+  const fetchComments = async (videoId) => {
+    try {
+      const response = await service.criticas.listar();
+      const videoComments = response.data.filter(comment => comment.fkVideo === videoId);
+      setComments(prevComments => ({ ...prevComments, [videoId]: videoComments }));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const toggleLike = (index) => {
@@ -53,20 +76,59 @@ const VideoList = () => {
     );
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async (videoId) => {
     if (newComment.trim()) {
-      setComments([...comments, {
-        text: newComment,
-        rating,
-        user: currentUser
-      }]);
-      setNewComment('');
-      setRating(0);
+      const newCommentData = {
+        fkVideo: videoId,
+        fkUtilizador: user.codUtilizador,
+        pontuacao: rating,
+        comentario: newComment
+      };
+      try {
+        if (editingComment) {
+          const newCommentData = {
+            fkVideo: videoId,
+            fkUtilizador: user.codUtilizador,
+            pontuacao: rating,
+            comentario: newComment,
+            codCritica: Number(editingComment.codCritica)
+          };
+          // Editing existing comment
+          await service.criticas.update(newCommentData);
+          setEditingComment(null);
+        } else {
+          // Adding new comment
+          await service.criticas.add(newCommentData);
+        }
+        setNewComment('');
+        setRating(0);
+        fetchComments(videoId); // Refresh comments
+      } catch (error) {
+        console.error("Error adding comment:", error);
+      }
     }
   };
 
-  const toggleComments = (index) => {
+  const handleEditComment = (comment) => {
+    setNewComment(comment.comentario);
+    setRating(comment.pontuacao);
+    setEditingComment(comment);
+  };
+
+  const handleDeleteComment = async (commentId, videoId) => {
+    try {
+      await service.criticas.excluir(commentId);
+      fetchComments(videoId); // Refresh comments
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
+  const toggleComments = (index, videoId) => {
     setExpandedAlbum(expandedAlbum === index ? null : index);
+    if (expandedAlbum !== index) {
+      fetchComments(videoId);
+    }
   };
 
   return (
@@ -103,7 +165,7 @@ const VideoList = () => {
                       style={{ cursor: 'pointer', color: likedAlbums.includes(index) ? '#6261cc' : 'inherit' }}
                       onClick={() => toggleLike(index)}
                     />
-                    <FaComment style={{ cursor: 'pointer' }} onClick={() => toggleComments(index)} />
+                    <FaComment style={{ cursor: 'pointer' }} onClick={() => toggleComments(index, video.codVideo)} />
                     <FaEye style={{ cursor: 'pointer' }} />
                   </div>
                 </CCardFooter>
@@ -111,16 +173,41 @@ const VideoList = () => {
                   <CCardFooter>
                     <div style={{ padding: '0' }}>
                       <h6>Comentários:</h6>
-                      {comments.map((comment, commentIndex) => (
-                        <div key={commentIndex} className="comment">
-                          <div className="comment-header">
-                            <CImage width="50" height="50" src={comment.user.photo} alt={comment.user.name} className="user-photo" />
-                            <span className="user-name">{comment.user.name}</span>
-                            <StarRating rating={comment.rating} setRating={() => { }} />
+                      {comments[video.codVideo] && comments[video.codVideo].length > 0 ? (
+                        comments[video.codVideo].map((comment, commentIndex) => (
+                          <div key={commentIndex} className="comment">
+                            <div className="comment-header">
+                              <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                              <span className="user-name">{comment.utilizador.username}</span>
+                              <StarRating rating={comment.pontuacao} setRating={() => { }} />
+
+                            </div>
+
+                            <CRow>
+                              <CCol><p className="comment-text">{comment.comentario}</p></CCol>
+                              <CCol>
+                                {comment.fkUtilizador === user.codUtilizador && (
+                                  <CRow>
+                                    <CCol><CIcon icon={cilPencil} onClick={() => handleEditComment(comment)} style={{ cursor: 'pointer' }} /></CCol>
+                                    <CCol><CIcon icon={cilTrash} onClick={() => handleDeleteComment(comment.codCritica, video.codVideo)} style={{ cursor: 'pointer' }} /></CCol>
+                                  </CRow>
+                                )
+
+                                }
+                              </CCol>
+
+
+
+                            </CRow>
+
+
+
+
                           </div>
-                          <p className="comment-text">{comment.text}</p>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p>Sem comentários.</p>
+                      )}
                       <CForm>
                         <CInputGroup>
                           <CFormInput
@@ -130,7 +217,7 @@ const VideoList = () => {
                           />
                         </CInputGroup>
                         <StarRating rating={rating} setRating={setRating} />
-                        <CButton color="primary" onClick={handleAddComment}>Comentar</CButton>
+                        <CButton color="primary" onClick={() => handleAddComment(video.codVideo)}>Comentar</CButton>
                       </CForm>
                     </div>
                   </CCardFooter>
@@ -140,7 +227,7 @@ const VideoList = () => {
           </InfiniteScroll>
         </CCardBody>
       </CCard>
-    </CCol>
+    </CCol >
   );
 };
 
