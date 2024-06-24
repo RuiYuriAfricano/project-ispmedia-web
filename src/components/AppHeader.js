@@ -13,18 +13,10 @@ import {
   CForm,
   CFormInput,
   useColorModes,
-  CRow,
-  CCol,
-  CImage,
-  CButton,
-  CDropdownHeader,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {
-  cilAudio,
-  cilBell,
   cilContrast,
-  cilEyedropper,
   cilLibrary,
   cilMenu,
   cilMoon,
@@ -38,10 +30,9 @@ import { AppBreadcrumb } from './index';
 import { AppHeaderDropdown } from './header/index';
 import { setSidebarShow } from '../redux/app/slice';
 import { Link } from 'react-router-dom';
+import NotificationList from './NotificationList';
 
 const AppHeader = () => {
-  // State to manage the number of notifications
-  const [notifications, setNotifications] = useState(5); // Example initial count
 
   const headerRef = useRef();
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme');
@@ -50,20 +41,8 @@ const AppHeader = () => {
   const sidebarShow = useSelector((state) => state.app.sidebarShow);
 
   const [isPlusDropdownOpen, setIsPlusDropdownOpen] = useState(false);
-  const [isBellDropdownOpen, setIsBellDropdownOpen] = useState(false);
   const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
-  const badgeStyle = {
-    position: 'absolute',
-    top: '-5px',
-    right: '-6px',
-    padding: '2px 8px',
-    borderRadius: '50%',
-    background: 'red',
-    color: 'white',
-    fontSize: '12px',
-  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,9 +66,6 @@ const AppHeader = () => {
     setIsModeDropdownOpen(false);
   };
 
-  const toggleBellDropdown = () => {
-    setIsBellDropdownOpen(!isBellDropdownOpen);
-  };
 
   const toggleModeDropdown = () => {
     setIsModeDropdownOpen(!isModeDropdownOpen);
@@ -98,13 +74,7 @@ const AppHeader = () => {
     setIsBellDropdownOpen(false);
   };
 
-  const toggleOptionsDropdown = () => {
-    setIsOptionsOpen(!isOptionsOpen);
-    // Fechar outros dropdowns se estiverem abertos
-    setIsPlusDropdownOpen(false);
-    setIsBellDropdownOpen(true);
-    setIsModeDropdownOpen(false);
-  };
+
 
   return (
     <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
@@ -129,6 +99,7 @@ const AppHeader = () => {
         </CHeaderNav>
 
         <CHeaderNav className="ms-auto">
+
           <CDropdown isOpen={isPlusDropdownOpen} toggle={togglePlusDropdown} variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false}>
               <CIcon icon={cilPlus} size="lg" />
@@ -156,37 +127,7 @@ const AppHeader = () => {
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
           </li>
 
-          <CDropdown isOpen={isBellDropdownOpen} toggle={toggleBellDropdown} variant="nav-item" placement="bottom-end">
-            <CDropdownToggle caret={false}>
-              <CIcon icon={cilBell} size="lg" />
-              {notifications > 0 && (
-                <span style={badgeStyle}>{notifications}</span>
-              )}
-            </CDropdownToggle>
-            <CDropdownMenu style={{ width: '300px' }} className="scrollable-table">
-              <CDropdownHeader style={{ borderBottom: 'solid 1px #333', marginBottom: '10px' }}>
-                <h6 style={{ color: '#fff' }}>Notificações</h6>
-              </CDropdownHeader>
-              <CDropdownItem>
-                {/* Conteúdo do dropdown de notificações */}
-                <CRow>
-                  <CCol xl='2'>
-                    <CImage style={{ marginLeft: '-18px', marginTop: '-10px' }} width="60" height="60" src={'http://localhost:3333/utilizador/download/' + 'RuiMalemba'} />
-                  </CCol>
-                  <CCol xl='8'>Texto Notificação 1</CCol>
-                  <CCol xl='2'>
-                    <CButton><CIcon icon={cilEyedropper} /></CButton>
-
-                  </CCol>
-                </CRow>
-                <CRow>
-                  <CCol xl='2'></CCol>
-                  <CCol xl='8' style={{ fontSize: '12px', color: '#999', marginTop: '-16px' }}>12/06/2023</CCol>
-                </CRow>
-              </CDropdownItem>
-
-            </CDropdownMenu>
-          </CDropdown>
+          <NotificationList />
 
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
@@ -248,4 +189,3 @@ const AppHeader = () => {
 };
 
 export default AppHeader;
-

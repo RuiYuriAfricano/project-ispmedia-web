@@ -187,6 +187,21 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
 
         }));
 
+        await Promise.all(utilizadoresAdicionados.map(item => {
+
+          return (
+            service.notificacao.add({
+              "fkUtilizador": Number(item.codUtilizador),
+              "utilizadorOrigem": user.username,
+              "textoNotificacao": item.isOwner ? "Você foi adicionado ao grupo " + nomeDoGrupo + " como owner." : "Você foi adicionado <br> ao grupo " + nomeDoGrupo,
+
+            })
+          )
+
+        }));
+
+
+
         setMsgDoAlert(`Grupo de Amigos ${idEditGrupo ? "Atualizado" : "Criado"} Com Sucesso!`);
         setCorDoAlert("success");
         if (!idEditGrupo) {
