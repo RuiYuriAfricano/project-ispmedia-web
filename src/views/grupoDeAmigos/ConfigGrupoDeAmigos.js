@@ -74,22 +74,24 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
     fetchUtilizadores();
   }, []);
 
-  useEffect(() => {
-    const fetchMembros = async () => {
-      try {
-        const response = await service.membrosDosGrupos.listar();
-        if (response?.status === 201) {
-          const membrosFiltrados = response.data.filter((membro) => parseInt(membro.fkGrupoDeAmigos) === parseInt(idEditGrupo));
-          setMembros(membrosFiltrados);
-        } else {
-          setMsgDoAlert("Erro ao carregar membros do grupo");
-          setCorDoAlert("danger");
-        }
-      } catch (error) {
-        setMsgDoAlert("Erro ao conectar com o servidor!");
+  const fetchMembros = async () => {
+    try {
+      const response = await service.membrosDosGrupos.listar();
+      if (response?.status === 201) {
+        const membrosFiltrados = response.data.filter((membro) => parseInt(membro.fkGrupoDeAmigos) === parseInt(idEditGrupo));
+        setMembros(membrosFiltrados);
+      } else {
+        setMsgDoAlert("Erro ao carregar membros do grupo");
         setCorDoAlert("danger");
       }
-    };
+    } catch (error) {
+      setMsgDoAlert("Erro ao conectar com o servidor!");
+      setCorDoAlert("danger");
+    }
+  };
+
+  useEffect(() => {
+
     fetchMembros();
   }, [idEditGrupo]);
 
@@ -127,7 +129,7 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
     setUtilizadoresAdicionados(utilizadoresAdicionados.filter(u => u.codUtilizador !== codUtilizador));
   };
 
-  const handleExcluirMembro = async (codMembro) => {
+  const handleExcluirMembro = async (codMembro, codUtilizador) => {
     const confirmDelete = window.confirm("Tem certeza que deseja excluir o membro deste grupo?");
     if (confirmDelete) {
       try {
@@ -135,11 +137,61 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
         await service.membrosDosGrupos.excluir(codMembro);
 
         setMembros(membros.filter(membro => !(membro.codMembro === codMembro)));
+
+        service.notificacao.add({
+          "fkUtilizador": Number(codUtilizador),
+          "utilizadorOrigem": user.username,
+          "textoNotificacao": "Você foi removido do grupo " + nomeDoGrupo + ".",
+
+        })
       } catch (err) {
         console.error('Erro ao excluir membro do grupo:', err);
       }
     }
   };
+
+  const handleRejeitar = async (codMembro, codUtilizador) => {
+
+    try {
+
+      await service.membrosDosGrupos.excluir(codMembro);
+
+      setMembros(membros.filter(membro => !(membro.codMembro === codMembro)));
+
+      service.notificacao.add({
+        "fkUtilizador": Number(codUtilizador),
+        "utilizadorOrigem": user.username,
+        "textoNotificacao": "O teu pedido de adesão ao grupo " + nomeDoGrupo + ", foi rejeitado.",
+
+      })
+    } catch (err) {
+      console.error('Erro ao rejeitar membro do grupo:', err);
+    }
+
+  };
+
+  const handleAceitar = async (codMembro, fkUtilizador) => {
+    const editMembro = {
+      "codMembro": codMembro,
+      "estado": 1,
+    };
+
+    try {
+
+      await service.membrosDosGrupos.update(editMembro);
+
+      fetchMembros()
+
+      service.notificacao.add({
+        "fkUtilizador": Number(fkUtilizador),
+        "utilizadorOrigem": user.username,
+        "textoNotificacao": "O teu pedido de adesão ao grupo " + nomeDoGrupo + ", foi aceite.",
+
+      })
+    } catch (err) {
+      console.error('Erro ao aceitar membro: ', err);
+    }
+  }
 
   const handleAddGrupoDeAmigos = async () => {
     const emptyFields = isAllFieldsFilled();
@@ -193,7 +245,7 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
             service.notificacao.add({
               "fkUtilizador": Number(item.codUtilizador),
               "utilizadorOrigem": user.username,
-              "textoNotificacao": item.isOwner ? "Você foi adicionado ao grupo " + nomeDoGrupo + " como owner." : "Você foi adicionado <br> ao grupo " + nomeDoGrupo,
+              "textoNotificacao": item.isOwner ? "Você foi adicionado ao grupo " + nomeDoGrupo + " como owner." : "Você foi adicionado ao grupo " + nomeDoGrupo + ".",
 
             })
           )
@@ -288,20 +340,27 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
             {membros.length === 0 && <p>Nenhum utilizador adicionado</p>}
             <ul>
 
-              {membros.map((membro) => (
-                <li key={membro.codUtilizador}>
-                  {membro.utilizador.username} {membro.isOwner === 1 ? '(Owner)' : ''}
-                  <CButton
-                    type="button"
-                    color="danger"
-                    size="sm"
-                    onClick={() => handleExcluirMembro(membro.codMembro)}
-                    className="ms-2"
-                  >
-                    <CIcon icon={cilTrash} />
-                  </CButton>
-                </li>
-              ))}
+              {membros.map((membro) => {
+                if (membro.fkUtilizador !== user.codUtilizador && membro.estado === 1) {
+                  return (
+                    <li key={membro.codUtilizador}>
+                      {membro.utilizador.username} {membro.isOwner === 1 ? '(Owner)' : ''}
+                      <CButton
+                        type="button"
+                        color="danger"
+                        size="sm"
+                        onClick={() => handleExcluirMembro(membro.codMembro, membro.fkUtilizador)}
+                        className="ms-2"
+                      >
+                        <CIcon icon={cilTrash} />
+                      </CButton>
+                    </li>
+                  )
+                }
+
+              }
+
+              )}
 
               {utilizadoresAdicionados.map((utilizador) => {
 
@@ -322,6 +381,49 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
 
 
               })}
+            </ul>
+          </div>
+          <div className="mb-3">
+
+            <h5>Pedidos de Adesão:</h5>
+            {membros.length === 0 && <p>Nenhum Pedido</p>}
+            <ul>
+
+              {membros.map((membro) => {
+
+
+                if (membro.fkUtilizador !== user.codUtilizador && membro.estado === 0) {
+                  return (
+
+                    <li key={membro.codUtilizador}>
+                      {membro.utilizador.username}
+
+                      <CButton
+                        type="button"
+                        color="primary"
+                        size="sm"
+                        onClick={() => handleAceitar(membro.codMembro, membro.fkUtilizador)}
+                        className="ms-2"
+                      >
+                        Aceitar
+                      </CButton>
+
+                      <CButton
+                        type="button"
+                        color="danger"
+                        size="sm"
+                        onClick={() => handleRejeitar(membro.codMembro, membro.fkUtilizador)}
+                        className="ms-2"
+                      >
+                        Rejeitar
+                      </CButton>
+                    </li>
+                  )
+                }
+
+              }
+
+              )}
             </ul>
           </div>
 
