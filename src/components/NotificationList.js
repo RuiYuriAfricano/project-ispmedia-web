@@ -113,6 +113,14 @@ const NotificationList = () => {
         color: 'white',
         fontSize: '12px',
     };
+    const handleDelete = async (id) => {
+        try {
+            await service.notificacao.excluir(id);
+            fetchNotificacoes()
+        } catch (err) {
+            console.error('Erro ao excluir a notificacao:', err);
+        }
+    };
     return (
         <div className="notification-dropdown">
             <button onClick={toggleNotifications} className="notification-button">
@@ -126,16 +134,16 @@ const NotificationList = () => {
                 <div className="notification-list">
                     <h6>Notificações</h6>
                     {notifications2.map(notification => (
-                        <div key={notification.id} className="notification-item">
+                        <div key={notification.codNotificacao} className="notification-item">
                             <img src={'http://localhost:3333/utilizador/download/' + notification.utilizadorOrigem} alt="user" className="user-image" />
                             <div className="notification-content">
                                 <div className="notification-info">
                                     <h4>{notification.textoNotificacao}</h4>
                                     <p>{"Há " + timeElapsed(notification.dataNotificacao).value + " " + timeElapsed(notification.dataNotificacao).unit}</p>
                                 </div>
-                                <img src={"https://via.placeholder.com/60"} alt="thumbnail" className="thumbnail2" />
+                                {/*<img src={"https://via.placeholder.com/60"} alt="thumbnail" className="thumbnail2" />*/}
                                 <CCol xl='2'>
-                                    <CButton><CIcon icon={cilEyedropper} /></CButton>
+                                    <CButton onClick={() => handleDelete(notification.codNotificacao)}><CIcon icon={cilEyedropper} /></CButton>
                                 </CCol>
                             </div>
                         </div>
