@@ -7,51 +7,6 @@ import CIcon from '@coreui/icons-react';
 import { cilBell, cilEyedropper } from '@coreui/icons';
 import { CButton, CCol } from '@coreui/react';
 
-const notifications = [
-    {
-        id: 1,
-        title: "Para si: SIM PASSEI",
-        time: "há 23 horas",
-        thumbnail: "https://via.placeholder.com/60",
-        userImage: "https://via.placeholder.com/40"
-    },
-    {
-        id: 2,
-        title: "Professor Ferretto carregou: 3 ASSUNTOS DE HISTÓRIA QUE MAIS CAEM NO ENEM! #SHORTS",
-        time: "há 3 dias",
-        thumbnail: "https://via.placeholder.com/60",
-        userImage: "https://via.placeholder.com/40"
-    },
-    {
-        id: 3,
-        title: "Para si: SIM PASSEI",
-        time: "há 3 dias",
-        thumbnail: "https://via.placeholder.com/60",
-        userImage: "https://via.placeholder.com/40"
-    },
-    {
-        id: 4,
-        title: "João Ribeiro carregou: QUE DISTRIBUIÇÕES LINUX VOCÊS USAM?",
-        time: "há 4 dias",
-        thumbnail: "https://via.placeholder.com/60",
-        userImage: "https://via.placeholder.com/40"
-    },
-    {
-        id: 5,
-        title: "Professor Ferretto carregou: Questão do sorteio do voucher: ENEM 2023 Matemática (Simplificada) - Probabilidade",
-        time: "há 5 dias",
-        thumbnail: "https://via.placeholder.com/60",
-        userImage: "https://via.placeholder.com/40"
-    },
-    {
-        id: 6,
-        title: "Professor Ferretto carregou: Questão da média dos salários:",
-        time: "há 5 dias",
-        thumbnail: "https://via.placeholder.com/60",
-        userImage: "https://via.placeholder.com/40"
-    }
-];
-
 const timeElapsed = (date) => {
     const now = new Date();
     const past = new Date(date);
@@ -84,15 +39,21 @@ const NotificationList = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const user = JSON.parse(localStorage.getItem("loggedUser"));
     const [notifications2, setNotifications2] = useState([]);
+    const [unseenNotificationsCount, setUnseenNotificationsCount] = useState(0);
+
 
     const fetchNotificacoes = async () => {
         try {
             const response = await service.notificacao.listar();
-            setNotifications2(response.data.filter((item) => item.fkUtilizador === user.codUtilizador));
+            const userNotifications = response.data.filter((item) => item.fkUtilizador === user.codUtilizador);
+            setNotifications2(userNotifications);
+            const unseenCount = userNotifications.filter(notification => notification.visto === 0).length;
+            setUnseenNotificationsCount(unseenCount);
         } catch (err) {
             console.error(err);
         }
     };
+
     useEffect(() => {
         const interval = setInterval(() => {
             fetchNotificacoes()
@@ -100,9 +61,22 @@ const NotificationList = () => {
 
         return () => clearInterval(interval);
     }, [user]);
-    const toggleNotifications = () => {
+    const toggleNotifications = async () => {
         setShowNotifications(!showNotifications);
+        setUnseenNotificationsCount(0);
+        // Aqui você pode também atualizar as notificações no backend para marcá-las como vistas
+        await Promise.all(notifications2.map(item => {
+
+            return (
+                service.notificacao.update({
+                    "codNotificacao": Number(item.codNotificacao),
+                    "visto": 1,
+                })
+            )
+
+        }));
     };
+
     const badgeStyle = {
         position: 'absolute',
         top: '-5px',
@@ -126,8 +100,8 @@ const NotificationList = () => {
             <button onClick={toggleNotifications} className="notification-button">
 
                 <CIcon icon={cilBell} size='lg' />
-                {notifications2?.length > 0 && (
-                    <span style={badgeStyle}>{notifications2?.length}</span>
+                {unseenNotificationsCount > 0 && (
+                    <span style={badgeStyle}>{unseenNotificationsCount}</span>
                 )}
             </button>
             {showNotifications && (
