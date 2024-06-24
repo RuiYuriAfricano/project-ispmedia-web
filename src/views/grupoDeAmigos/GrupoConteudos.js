@@ -65,7 +65,30 @@ const GrupoConteudo = () => {
         name: 'Nome do Usuário', // Substitua pelo nome do usuário atual
         photo: 'http://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
     });
+    const [membroOwner, setMembroOwner] = useState(false);
+    const [fkCriador, setFkCriador] = useState();
 
+    const fetchMembroOwner = async () => {
+        try {
+            const response = await service.membrosDosGrupos.listar();
+            if (response?.status === 201) {
+                const membrosFiltrado = response.data.some(membro => {
+                    console.log("Membro:", membro);
+                    return (membro.fkUtilizador === user.codUtilizador && membro.fkGrupoDeAmigos === parseInt(grupoId) && membro.isOwner === 1)
+                });
+                setMembroOwner(membrosFiltrado);
+            } else {
+                setMsgDoAlert("Erro ao carregar membros do grupo");
+                setCorDoAlert("danger");
+            }
+        } catch (error) {
+            setMsgDoAlert("Erro ao conectar com o servidor!");
+            setCorDoAlert("danger");
+        }
+    };
+    useEffect(() => {
+        fetchMembroOwner();
+    }, []);
 
     useEffect(() => {
         const fetchVideos = async () => {
@@ -112,6 +135,7 @@ const GrupoConteudo = () => {
             try {
                 const response = await service.grupoDeAmigos.pesquisaporid(grupoId);
                 setNomeGrupo(response.data.nomeDoGrupo);
+                setFkCriador(response.data.fkCriador);
             } catch (err) {
                 setError(err);
                 setLoading(false);
@@ -327,11 +351,16 @@ const GrupoConteudo = () => {
                             <CCol>
                                 <strong>{nomeGrupo}</strong>
                             </CCol>
-                            <CCol style={{ textAlign: 'right' }}>
-                                <CButton color="primary" onClick={() => setModal(true)}>
-                                    <CIcon icon={cilPlus} /> Adicionar
-                                </CButton>
-                            </CCol>
+                            {
+                                (membroOwner || user.tipoDeUtilizador === 'admin' || user.codUtilizador === fkCriador) && (
+                                    <CCol style={{ textAlign: 'right' }}>
+                                        <CButton color="primary" onClick={() => setModal(true)}>
+                                            <CIcon icon={cilPlus} /> Adicionar
+                                        </CButton>
+                                    </CCol>
+                                )
+                            }
+
                         </CRow>
                     </CCardHeader>
                     <CCardBody>
@@ -387,7 +416,13 @@ const GrupoConteudo = () => {
                                                                         </CDropdownToggle>
                                                                         <CDropdownMenu className="dropdown-menu-right">
                                                                             <CDropdownItem className="dropdown-item" onClick={() => alert('Ver detalhes')}>Ver detalhes</CDropdownItem>
-                                                                            <CDropdownItem className="dropdown-item" onClick={() => handleRemoveFromPlaylist(video)}>Remover do grupo</CDropdownItem>
+
+                                                                            {
+                                                                                (membroOwner || user.tipoDeUtilizador === 'admin' || user.codUtilizador === fkCriador) && (
+                                                                                    <CDropdownItem className="dropdown-item" onClick={() => handleRemoveFromPlaylist(video)}>Remover do grupo</CDropdownItem>
+                                                                                )
+                                                                            }
+
                                                                         </CDropdownMenu>
                                                                     </CDropdown>
                                                                 </div>
