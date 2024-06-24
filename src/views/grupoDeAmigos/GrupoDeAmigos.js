@@ -14,7 +14,7 @@ import {
   CPagination,
   CPaginationItem
 } from '@coreui/react';
-import { cilPlus, cilMediaPlay, cilTrash, cilPen } from '@coreui/icons';
+import { cilPlus, cilMediaPlay, cilTrash, cilPen, cilUserPlus } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
 import ConfigGrupoDeAmigos from './ConfigGrupoDeAmigos';
@@ -29,19 +29,22 @@ const GrupoDeAmigos = () => {
   const [editGrupoId, setEditGrupoId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // Define the number of items per page
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
+  const [membros, setMembros] = useState([]);
+  const [msgDoAlert, setMsgDoAlert] = useState("");
+  const [corDoAlert, setCorDoAlert] = useState("");
 
+  const fetchGrupos = async () => {
+    try {
+      const response = await service.grupoDeAmigos.listar();
+      setGrupos(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError(err);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchGrupos = async () => {
-      try {
-        const response = await service.grupoDeAmigos.listar();
-        setGrupos(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError(err);
-        setLoading(false);
-      }
-    };
-
     fetchGrupos();
   }, []);
 
@@ -60,6 +63,41 @@ const GrupoDeAmigos = () => {
   const handleEdit = (id) => {
     setEditGrupoId(id);
     setModalVisible(true);
+  };
+
+  const handleEntrarNoGrupo = async (codGrupoDeAmigos, codCriador, nomeDoGrupo) => {
+
+    const addMembro = {
+      "fkUtilizador": user.codUtilizador,
+      "fkGrupoDeAmigos": codGrupoDeAmigos,
+      "estado": 0,
+      "isOwner": 0,
+    };
+
+    try {
+      let response;
+      response = await service.membrosDosGrupos.add(addMembro);
+
+      if (response?.status === 201 || response?.status === 200) {
+
+        alert("Pedido enviado, aguarde a resposta.");
+        fetchGrupos()
+        fetchMembros()
+
+        const response2 = service.notificacao.add({
+          "fkUtilizador": Number(codCriador),
+          "utilizadorOrigem": user.username,
+          "textoNotificacao": "O utilizador " + user.username + ", deseja entrar no grupo " + nomeDoGrupo + ".",
+
+        })
+
+        console.log(response2)
+      } else {
+        alert("Erro ao entrar no grupo.");
+      }
+    } catch (error) {
+      console.log("Erro ao conectar com o servidor!, ", error);
+    }
   };
 
   const handleModalClose = async (success) => {
@@ -82,6 +120,25 @@ const GrupoDeAmigos = () => {
     setCurrentPage(page);
   };
 
+  const fetchMembros = async () => {
+    try {
+      const response = await service.membrosDosGrupos.listar();
+      if (response?.status === 201) {
+        const membrosFiltrado = response.data.filter(membro => membro.fkUtilizador === user.codUtilizador);
+        setMembros(membrosFiltrado);
+      } else {
+        setMsgDoAlert("Erro ao carregar membros do grupo");
+        setCorDoAlert("danger");
+      }
+    } catch (error) {
+      setMsgDoAlert("Erro ao conectar com o servidor!");
+      setCorDoAlert("danger");
+    }
+  };
+  useEffect(() => {
+    fetchMembros();
+  }, []);
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const selectedGrupos = grupos.slice(startIndex, startIndex + itemsPerPage);
 
@@ -102,10 +159,13 @@ const GrupoDeAmigos = () => {
             <div className="group-grid">
               {selectedGrupos.map((grupo) => (
                 <div className="group-card" key={grupo.codGrupoDeAmigos}>
-                  <Link to={`/grupoConteudo/${grupo.codGrupoDeAmigos}`} className='ligacao'>
+                  <Link to={(membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador) ? `/grupoConteudo/${grupo.codGrupoDeAmigos}` : `#`} className='ligacao'>
                     <div className="thumbnail-wrapper">
                       <CImage className="thumbnail" src="https://images.unsplash.com/photo-1517048676732-d65bc937f952" alt={grupo.nomeDoGrupo} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
-                      <CIcon icon={cilMediaPlay} className="play-icon" />
+                      {
+                        (membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador) && (<CIcon icon={cilMediaPlay} className="play-icon" />)
+                      }
+
                     </div>
                     <div className="group-info">
                       <h5>{grupo.nomeDoGrupo}</h5>
@@ -114,8 +174,34 @@ const GrupoDeAmigos = () => {
                     </div>
                   </Link>
                   <div className="group-actions">
-                    <Link className='ligacao' onClick={() => handleEdit(grupo.codGrupoDeAmigos)}><CIcon icon={cilPen} /></Link>
-                    <Link className='ligacao' onClick={() => handleDelete(grupo.codGrupoDeAmigos)}><CIcon icon={cilTrash} /></Link>
+                    {
+                      (membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador) &&
+                      (
+                        <>
+                          <Link className='ligacao' onClick={() => handleEdit(grupo.codGrupoDeAmigos)}><CIcon icon={cilPen} /></Link>
+                          <Link className='ligacao' onClick={() => handleDelete(grupo.codGrupoDeAmigos)}><CIcon icon={cilTrash} /></Link>
+                        </>
+                      )
+                    }
+                    {
+                      (!membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos) && grupo.fkCriador !== user.codUtilizador) &&
+                      (
+                        <>
+                          <Link className='ligacao' onClick={() => handleEntrarNoGrupo(grupo.codGrupoDeAmigos, grupo.fkCriador, grupo.nomeDoGrupo)}>
+                            Entrar no Grupo</Link>
+                        </>
+                      )
+                    }
+
+                    {
+                      (membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 0) && grupo.fkCriador !== user.codUtilizador) &&
+                      (
+                        <>
+                          <Link className='ligacao'>
+                            Pedido Enviado </Link>
+                        </>
+                      )
+                    }
                   </div>
                 </div>
               ))}
