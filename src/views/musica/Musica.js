@@ -208,6 +208,7 @@ const Musica = () => {
   const participacaoButtonStyle = {
     marginLeft: '10px',
   };
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
 
   return (
     <>
@@ -222,53 +223,59 @@ const Musica = () => {
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
-        {musicas.map((musica) => (
-          <CCol lg="4" sm="12" xl="4" md="6" key={musica.codMusica}>
-            <CCard style={cardStyle}>
-              <CCardHeader>
-                <h5>{musica.tituloMusica}</h5>
-              </CCardHeader>
-              <CCardBody style={cardBodyStyle}>
-                <div className='w-100'>
-                  <img src={`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`} alt={musica.tituloMusica} style={imageStyle} />
-                  <ReactPlayer
-                    url={`http://localhost:3333/musica/downloadMusica/${musica.codMusica}`}
-                    controls={true}
-                    width="100%"
-                    height="50px"
-                  />
-                </div>
-                <div style={buttonGroupStyle}>
-                  <CButton color="secondary" style={buttonStyle}>
-                    <Link onClick={() => handleEdit(musica.codMusica)} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
-                      <CIcon icon={cilPencil} size="lg" style={iconStyle} />
+        {musicas.map((musica) => {
+          if (musica.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
+            return (
+              <CCol lg="4" sm="12" xl="4" md="6" key={musica.codMusica}>
+                <CCard style={cardStyle}>
+                  <CCardHeader>
+                    <h5>{musica.tituloMusica}</h5>
+                  </CCardHeader>
+                  <CCardBody style={cardBodyStyle}>
+                    <div className='w-100'>
+                      <img src={`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`} alt={musica.tituloMusica} style={imageStyle} />
+                      <ReactPlayer
+                        url={`http://localhost:3333/musica/downloadMusica/${musica.codMusica}`}
+                        controls={true}
+                        width="100%"
+                        height="50px"
+                      />
+                    </div>
+                    <div style={buttonGroupStyle}>
+                      <CButton color="secondary" style={buttonStyle}>
+                        <Link onClick={() => handleEdit(musica.codMusica)} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                          <CIcon icon={cilPencil} size="lg" style={iconStyle} />
 
-                    </Link>
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(musica.codMusica)}>
+                        </Link>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(musica.codMusica)}>
 
-                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
-                      <CIcon icon={cilTrash} size="lg" style={iconStyle} />
-                    </Link>
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(musica.codMusica)}>
-                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
-                      <CIcon icon={cilShare} size="lg" style={iconStyle} />
-                    </Link>
+                        <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                          <CIcon icon={cilTrash} size="lg" style={iconStyle} />
+                        </Link>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(musica.codMusica)}>
+                        <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                          <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                        </Link>
 
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(musica)}>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(musica)}>
 
-                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
-                      <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
-                    </Link>
+                        <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                          <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
+                        </Link>
 
-                  </CButton>
-                </div>
-              </CCardBody>
-            </CCard>
-          </CCol>
-        ))}
+                      </CButton>
+                    </div>
+                  </CCardBody>
+                </CCard>
+              </CCol>
+            )
+          }
+        }
+
+        )}
       </CRow>
 
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
