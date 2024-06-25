@@ -46,7 +46,7 @@ const EstacoesRadio = () => {
               <h5>{station.name}</h5>
             </CCardHeader>
             <CCardBody style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <img src={station.image} alt={station.name} style={{ marginBottom: '1rem', maxWidth: '200%', height: '120px' }} />
+              <img src={station.image} alt={station.name} style={{ marginBottom: '1rem', width: '180px', height: '120px', borderRadius: '2px' }} />
               <ReactPlayer url={station.link} playing={false} controls={true} width="100%" height="50px" />
               <CButton color="primary" className="mt-3" to={station.link} style={buttonStyle}>
                 <CIcon icon={station.icon} size="5xl" style={iconStyle} /> {/* Ajusta o tamanho dos ícones */}
