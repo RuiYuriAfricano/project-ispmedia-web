@@ -40,6 +40,7 @@ const GrupoMusical = () => {
   const [editGrupoId, setEditGrupoId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // Define the number of items per page
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
   useEffect(() => {
     const fetchGrupos = async () => {
       try {
@@ -123,34 +124,40 @@ const GrupoMusical = () => {
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {selectedGrupos.map((grupo, index) => (
-                  <CTableRow key={grupo.codGrupoMusical}>
-                    <CTableHeaderCell scope="row">
-                      <div className="thumbnail-wrapper" >
-                        <Link>
-                          <CImage
-                            className="thumbnail"
-                            src={thumbnail} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
-                            alt={grupo.nomeGrupoMusical}
-                          />
-                          <CIcon icon={cilMediaPlay} className="play-icon" />
-                        </Link>
-                      </div>
-                    </CTableHeaderCell>
-                    <CTableDataCell>{grupo.nomeGrupoMusical}</CTableDataCell>
-                    <CTableDataCell>{grupo.historia}</CTableDataCell>
-                    <CTableDataCell>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</CTableDataCell>
-                    <CTableDataCell>{new Date(grupo.dataDeRegisto).toLocaleDateString()}</CTableDataCell>
-                    <CTableDataCell>{grupo.registadopor?.username}</CTableDataCell>
-                    <CTableDataCell>
+                {selectedGrupos.map((grupo, index) => {
+                  if (grupo.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
+                    return (
+                      <CTableRow key={grupo.codGrupoMusical}>
+                        <CTableHeaderCell scope="row">
+                          <div className="thumbnail-wrapper" >
+                            <Link>
+                              <CImage
+                                className="thumbnail"
+                                src={thumbnail} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                alt={grupo.nomeGrupoMusical}
+                              />
+                              <CIcon icon={cilMediaPlay} className="play-icon" />
+                            </Link>
+                          </div>
+                        </CTableHeaderCell>
+                        <CTableDataCell>{grupo.nomeGrupoMusical}</CTableDataCell>
+                        <CTableDataCell>{grupo.historia}</CTableDataCell>
+                        <CTableDataCell>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</CTableDataCell>
+                        <CTableDataCell>{new Date(grupo.dataDeRegisto).toLocaleDateString()}</CTableDataCell>
+                        <CTableDataCell>{grupo.registadopor?.username}</CTableDataCell>
+                        <CTableDataCell>
 
-                      <Link onClick={() => handleEdit(grupo.codGrupoMusical)}><CIcon icon={cilPen} /></Link>
-                      <span>    </span>
-                      <Link onClick={() => handleDelete(grupo.codGrupoMusical)}><CIcon icon={cilTrash} /></Link>
+                          <Link onClick={() => handleEdit(grupo.codGrupoMusical)}><CIcon icon={cilPen} /></Link>
+                          <span>    </span>
+                          <Link onClick={() => handleDelete(grupo.codGrupoMusical)}><CIcon icon={cilTrash} /></Link>
 
-                    </CTableDataCell>
-                  </CTableRow>
-                ))}
+                        </CTableDataCell>
+                      </CTableRow>
+                    )
+                  }
+                }
+
+                )}
               </CTableBody>
             </CTable>
             <CPagination align="center" className="mt-3">
