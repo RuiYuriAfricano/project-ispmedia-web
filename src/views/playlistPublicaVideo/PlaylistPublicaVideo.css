@@ -1,0 +1,118 @@
+.player-container {
+    position: relative;
+    padding-top: 56.25%;
+    /* 16:9 Aspect Ratio */
+    height: 0;
+    background-color: #000;
+    border-radius: 10px;
+}
+
+.player-container>div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.no-video {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 1.5rem;
+    color: #999;
+}
+
+.thumbnail-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.thumbnail-wrapper .play-icon-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+}
+
+.scrollable-table {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.thumbnail-wrapper .play-icon {
+    width: 50px;
+    height: 50px;
+    color: white;
+    font-size: 60px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+}
+
+/* comentario*/
+.star {
+    font-size: 1.5em;
+    margin: 0 5px;
+}
+
+.star.selected {
+    color: gold;
+}
+
+.comment {
+    margin-bottom: 1em;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-name {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/*fim comentário */
+
+.react-player div>video::cue {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    /* semi-transparente */
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.vertical-dots {
+    font-size: 0.5rem;
+    line-height: 0.5;
+    cursor: pointer;
+    border-radius: 100%;
+    width: 5px;
+}
+
+.dropdown-item {
+    cursor: pointer;
+}
+
+.dropdown-menu-right {
+    left: auto;
+    right: 0;
+}
