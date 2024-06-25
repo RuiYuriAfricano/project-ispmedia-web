@@ -29,7 +29,7 @@ import {
 import { AppBreadcrumb } from './index';
 import { AppHeaderDropdown } from './header/index';
 import { setSidebarShow } from '../redux/app/slice';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import NotificationList from './NotificationList';
 
 const AppHeader = () => {
@@ -74,7 +74,18 @@ const AppHeader = () => {
     setIsBellDropdownOpen(false);
   };
 
+  const searchInputRef = useRef();
+  const navigate = useNavigate();
 
+  const handleSearchKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const query = searchInputRef.current.value;
+      if (query) {
+        navigate(`/search/${query}`);
+      }
+    }
+  };
 
   return (
     <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
@@ -88,10 +99,11 @@ const AppHeader = () => {
             <CForm className="w-100">
               <div className="mb-0">
                 <CFormInput
-                  type="Search"
-                  id="exampleFormControlInput1"
-                  placeholder="Pesquisar Conteúdo"
+                  type="search"
+                  placeholder="Search Content"
                   className="w-100"
+                  onKeyDown={handleSearchKeyPress}
+                  ref={searchInputRef}
                 />
               </div>
             </CForm>
