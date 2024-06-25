@@ -11,8 +11,10 @@ import { useState } from 'react';
 import { service } from './../../services';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import CIcon from '@coreui/icons-react';
+import { useNavigate } from 'react-router-dom';
 
 const VideoList = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const user = JSON.parse(localStorage.getItem("loggedUser"));
   const [comments, setComments] = useState({});
   const [rating, setRating] = useState(0);
@@ -126,6 +128,9 @@ const VideoList = () => {
       fetchComments(videoId);
     }
   };
+  const handleClickVideo = (video) => { // Function to handle click
+    navigate(`/videoReproducao/${video.codVideo}`);
+  };
 
   return (
     <CCol md={6}>
@@ -162,7 +167,7 @@ const VideoList = () => {
                       onClick={() => toggleLike(index)}
                     />
                     <FaComment style={{ cursor: 'pointer' }} onClick={() => toggleComments(index, video.codVideo)} />
-                    <FaEye style={{ cursor: 'pointer' }} />
+                    <FaEye onClick={() => handleClickVideo(video)} style={{ cursor: 'pointer' }} />
                   </div>
                 </CCardFooter>
                 {expandedAlbum === index && (
@@ -229,7 +234,7 @@ const VideoList = () => {
 };
 
 const MusicList = () => {
-
+  const navigate = useNavigate(); // Initialize useNavigate
   const user = JSON.parse(localStorage.getItem("loggedUser"));
   const [comments, setComments] = useState({});
   const [rating, setRating] = useState(0);
@@ -353,6 +358,11 @@ const MusicList = () => {
     }
   };
 
+
+  const handleClickMusica = (musica) => { // Function to handle click
+    navigate(`/musicaReproducao/${musica.codMusica}`);
+  };
+
   return (
     <CCol md={3} >
       <CCard className="mb-4" >
@@ -397,7 +407,7 @@ const MusicList = () => {
                     />
 
                     <FaComment style={{ cursor: 'pointer' }} onClick={() => toggleComments(index)} />
-                    <FaEye style={{ cursor: 'pointer' }} />
+                    <FaEye onClick={() => handleClickMusica(music)} style={{ cursor: 'pointer' }} />
                   </div>
                 </CCardFooter>
                 {expandedAlbum === index && (
@@ -463,7 +473,7 @@ const MusicList = () => {
 };
 
 const AlbumList = () => {
-
+  const navigate = useNavigate(); // Initialize useNavigate
   const [comments, setComments] = useState({});
   const [editingComment, setEditingComment] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -586,6 +596,10 @@ const AlbumList = () => {
     }
   };
 
+  const handleClickAlbum = (album) => { // Function to handle click
+    navigate(`/albumReproducao/${album.codAlbum}`);
+  };
+
   return (
     <CCol md={3}>
       <CCard className="mb-4">
@@ -619,7 +633,7 @@ const AlbumList = () => {
                     />
 
                     <FaComment style={{ cursor: 'pointer' }} onClick={() => toggleComments(index)} />
-                    <FaEye style={{ cursor: 'pointer' }} />
+                    <FaEye onClick={() => handleClickAlbum(album)} style={{ cursor: 'pointer' }} />
                   </div>
                 </CCardFooter>
                 {expandedAlbum === index && (
