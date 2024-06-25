@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
     CCard,
@@ -37,6 +37,7 @@ import { service } from './../../services';
 import thumbnail from './img/default-thumbnail.png';
 import './PlaylistConteudo.css';
 import StarRating from '../starRating/StarRating';
+import video2 from './img/animacaoDeAudio.mp4'
 
 const PlaylistConteudo = () => {
     const { playlistId } = useParams();
@@ -66,7 +67,17 @@ const PlaylistConteudo = () => {
         name: 'Rui Malemba', // Substitua pelo nome do usuário atual
         photo: 'http://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
     });
+    const [playing, setPlaying] = useState(true);
+    const player1Ref = useRef(null);
+    const player2Ref = useRef(null);
 
+    const handlePause = () => {
+        setPlaying(false);
+    };
+
+    const handlePlay = () => {
+        setPlaying(true);
+    };
     useEffect(() => {
         const fetchVideos = async () => {
             try {
@@ -211,13 +222,38 @@ const PlaylistConteudo = () => {
                 <CCard className="mb-4">
                     <CCardBody className="player-container">
                         {
+                            selectedTipo === 'musica' ? (
+                                <ReactPlayer
+                                    ref={player1Ref}
+                                    url={video2}
+                                    controls={false}
+                                    width="100%"
+                                    height="100%"
+                                    playing={playing}
+                                    onPlay={handlePlay}
+                                    onPause={handlePause}
+                                    loop
+                                    config={{
+                                        file: {
+                                            attributes: {
+                                                controlsList: 'nodownload'
+                                            }
+                                        }
+                                    }}
+
+                                />
+                            ) : (
+                                <div className="no-video"></div>
+                            )
+                        }
+                        {
                             selectedTipo === 'musica' && selectedUrlCapa ? (
                                 <CImage
                                     src={selectedUrlCapa}
                                     width="100%"
                                     alt={selectedUrlCapa}
                                     height="85%"
-                                    style={{ position: 'absolute', padding: '15px', borderRadius: '20px', top: '0', left: '0', zIndex: '1' }}
+                                    style={{ width: "180px", height: '120px', position: 'absolute', padding: '15px', borderRadius: '20px', top: '60%', left: '0', zIndex: '1' }}
                                 />
                             ) : (
                                 <div className="no-video"></div>
@@ -244,12 +280,15 @@ const PlaylistConteudo = () => {
                             ) :
                                 selectedVideo && selectedTipo === 'musica' ? (
                                     <ReactPlayer
+                                        ref={player2Ref}
                                         className="react-player"
                                         url={selectedVideo}
                                         controls={true}
                                         width="98%"
                                         height="98%"
-                                        playing={true}
+                                        playing={playing}
+                                        onPlay={handlePlay}
+                                        onPause={handlePause}
                                         style={{ marginLeft: '6px' }}
                                         config={{
                                             file: {
@@ -329,7 +368,7 @@ const PlaylistConteudo = () => {
                                                         className="thumbnail"
                                                         src={video.tipo === 'video' ? `http://localhost:3333/video/${video.codigo}/thumbnail` : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                         alt={video.nome}
-                                                        style={{ width: "100%", borderRadius: "5px" }}
+                                                        style={{ width: "180px", height: '120px', borderRadius: "5px" }}
                                                     />
                                                     <div className="play-icon-wrapper">
                                                         <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
