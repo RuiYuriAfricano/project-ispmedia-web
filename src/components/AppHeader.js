@@ -100,7 +100,7 @@ const AppHeader = () => {
               <div className="mb-0">
                 <CFormInput
                   type="search"
-                  placeholder="Search Content"
+                  placeholder="Pesquisar Conteúdo"
                   className="w-100"
                   onKeyDown={handleSearchKeyPress}
                   ref={searchInputRef}
