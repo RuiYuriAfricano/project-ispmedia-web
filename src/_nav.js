@@ -65,12 +65,6 @@ const DynamicNav = () => {
           icon: <CIcon icon={cilList} customClassName="nav-icon" />,
         },
         {
-          component: CNavItem,
-          name: 'Pesquisar Conteúdo',
-          to: '/theme/typography',
-          icon: <CIcon icon={cilSearch} customClassName="nav-icon" />,
-        },
-        {
           component: CNavTitle,
           name: 'Avançado',
         },
