@@ -42,6 +42,7 @@ const Artista = () => {
   const [artistaToEdit, setArtistaToEdit] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // Define the number of items per page
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
 
   useEffect(() => {
     const fetchArtistas = async () => {
@@ -126,22 +127,30 @@ const Artista = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {artistas.map((artista, index) => (
-                    <CTableRow key={artista.codArtista}>
-                      <CTableHeaderCell scope="row"><CAvatar size="md" src={avatar1} status='success' /></CTableHeaderCell>
-                      <CTableDataCell>{artista.nomeArtista}</CTableDataCell>
-                      <CTableDataCell>{artista.generoMusical}</CTableDataCell>
-                      <CTableDataCell>{artista.grupoMusical?.nomeGrupoMusical}</CTableDataCell>
-                      <CTableDataCell>{artista.registadopor?.username}</CTableDataCell>
-                      <CTableDataCell>
+                  {artistas.map((artista, index) => {
 
-                        <Link onClick={() => openModal(artista)}><CIcon icon={cilPen} /></Link>
-                        <span>    </span>
-                        <Link onClick={() => handleDelete(artista.codArtista)}><CIcon icon={cilTrash} /></Link>
+                    if (artista.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
+                      return (
+                        <CTableRow key={artista.codArtista}>
+                          <CTableHeaderCell scope="row"><CAvatar size="md" src={avatar1} status='success' /></CTableHeaderCell>
+                          <CTableDataCell>{artista.nomeArtista}</CTableDataCell>
+                          <CTableDataCell>{artista.generoMusical}</CTableDataCell>
+                          <CTableDataCell>{artista.grupoMusical?.nomeGrupoMusical}</CTableDataCell>
+                          <CTableDataCell>{artista.registadopor?.username}</CTableDataCell>
+                          <CTableDataCell>
 
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
+                            <Link onClick={() => openModal(artista)}><CIcon icon={cilPen} /></Link>
+                            <span>    </span>
+                            <Link onClick={() => handleDelete(artista.codArtista)}><CIcon icon={cilTrash} /></Link>
+
+                          </CTableDataCell>
+                        </CTableRow>
+                      )
+                    }
+
+                  }
+
+                  )}
                 </CTableBody>
               </CTable>
               <CPagination align="center" className="mt-3">
