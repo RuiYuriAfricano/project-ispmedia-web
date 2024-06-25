@@ -42,6 +42,7 @@ const Video = () => {
   const [editVideoId, setEditVideoId] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteVideoId, setDeleteVideoId] = useState(null);
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -236,60 +237,66 @@ const Video = () => {
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
-        {videos.map((video, index) => (
-          <CCol lg="6" sm="12" xl="4" md="6" key={video.codVideo}>
-            <CCard style={cardStyle}>
-              <CCardBody style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0px' }}>
-                <div className='video-thumbnail mt-0'><ReactPlayer
-                  url={`http://localhost:3333/video/downloadVideo/${video.codVideo}`}
-                  playing={false}
-                  controls={true}
-                  width="100%"
-                  height="280px"
-                  style={{ marginTop: '0px', padding: '0' }}
-                  config={{
-                    file: {
-                      attributes: {
-                        disablePictureInPicture: true,
-                        controlsList: 'nodownload'
-                      }
-                    }
-                  }}
-                /></div>
-                <div style={buttonGroupStyle} className='mt-5'>
-                  <CButton color="secondary" style={buttonStyle}>
-                    <Link onClick={() => handleEdit(video.codVideo)} style={{ color: 'white' }}>
-                      <CIcon icon={cilPencil} size="lg" style={iconStyle} />
-                    </Link>
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => openDeleteConfirm(video.codVideo)}>
-                    <Link style={{ color: 'white' }}>
-                      <CIcon icon={cilTrash} size="lg" style={iconStyle} />
-                    </Link>
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(video.codVideo)}>
-                    <Link style={{ color: 'white' }}>
-                      <CIcon icon={cilShare} size="lg" style={iconStyle} />
-                    </Link>
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(video)}>
-                    <Link style={{ color: 'white' }}>
-                      <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
-                    </Link>
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShowVideoModal(video)}>
-                    <Link style={{ color: 'white' }}>
-                      <CIcon icon={cilMediaPlay} size="lg" style={iconStyle} />
-                    </Link>
-                  </CButton>
-                </div>
-              </CCardBody>
-              <CCardFooter>
-                <h5 style={{ color: '#fff' }}>{video.tituloVideo}</h5>
-              </CCardFooter>
-            </CCard>
-          </CCol>
-        ))}
+        {videos.map((video, index) => {
+          if (video.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
+            return (
+              <CCol lg="6" sm="12" xl="4" md="6" key={video.codVideo}>
+                <CCard style={cardStyle}>
+                  <CCardBody style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0px' }}>
+                    <div className='video-thumbnail mt-0'><ReactPlayer
+                      url={`http://localhost:3333/video/downloadVideo/${video.codVideo}`}
+                      playing={false}
+                      controls={true}
+                      width="100%"
+                      height="280px"
+                      style={{ marginTop: '0px', padding: '0' }}
+                      config={{
+                        file: {
+                          attributes: {
+                            disablePictureInPicture: true,
+                            controlsList: 'nodownload'
+                          }
+                        }
+                      }}
+                    /></div>
+                    <div style={buttonGroupStyle} className='mt-5'>
+                      <CButton color="secondary" style={buttonStyle}>
+                        <Link onClick={() => handleEdit(video.codVideo)} style={{ color: 'white' }}>
+                          <CIcon icon={cilPencil} size="lg" style={iconStyle} />
+                        </Link>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => openDeleteConfirm(video.codVideo)}>
+                        <Link style={{ color: 'white' }}>
+                          <CIcon icon={cilTrash} size="lg" style={iconStyle} />
+                        </Link>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(video.codVideo)}>
+                        <Link style={{ color: 'white' }}>
+                          <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                        </Link>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(video)}>
+                        <Link style={{ color: 'white' }}>
+                          <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
+                        </Link>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShowVideoModal(video)}>
+                        <Link style={{ color: 'white' }}>
+                          <CIcon icon={cilMediaPlay} size="lg" style={iconStyle} />
+                        </Link>
+                      </CButton>
+                    </div>
+                  </CCardBody>
+                  <CCardFooter>
+                    <h5 style={{ color: '#fff' }}>{video.tituloVideo}</h5>
+                  </CCardFooter>
+                </CCard>
+              </CCol>
+            )
+          }
+        }
+
+        )}
       </CRow>
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
         <CModalHeader onClose={() => setShowModal(false)}>
