@@ -15,6 +15,7 @@ const GrupoDeAmigos = React.lazy(() => import('./views/grupoDeAmigos/GrupoDeAmig
 const PlaylistConteudo = React.lazy(() => import('./views/playlist/PlaylistConteudos'))
 const GrupoConteudo = React.lazy(() => import('./views/grupoDeAmigos/GrupoConteudos'))
 const Utilizadores = React.lazy(() => import('./views/utilizadores/Utilizadores'))
+const SearchResults = React.lazy(() => import('./views/searchResults/SearchResults'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -32,6 +33,7 @@ const routes = [
   { path: '/playlistConteudo/:playlistId', name: 'PlaylistConteudo', element: PlaylistConteudo },
   { path: '/grupoConteudo/:grupoId', name: 'GrupoConteudo', element: GrupoConteudo },
   { path: '/utilizadores', name: 'Utilizadores', element: Utilizadores },
+  { path: '/search/:query', name: 'ResultadosDaPesquisa', element: SearchResults },
 ]
 
 export default routes
