@@ -54,7 +54,7 @@ const GerirConteudo = () => {
               <h5>{item.name}</h5>
             </CCardHeader>
             <CCardBody style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <img src={item.image} alt={item.name} style={{ marginBottom: '1rem', maxWidth: '100%', height: '180px' }} />
+              <img src={item.image} alt={item.name} style={{ marginBottom: '1rem', maxWidth: '300px', height: '180px' }} />
               <Link to={item.link}>
                 <CButton color="primary" className="mt-3" to={item.link} component={Link} style={buttonStyle}>
                   <CIcon icon={item.icon} size="5xl" style={iconStyle} /> {/* Ajusta o tamanho dos ícones */}
