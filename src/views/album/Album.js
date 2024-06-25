@@ -26,6 +26,7 @@ const Album = () => {
   const [modalConfigVisible, setModalConfigVisible] = useState(false);
   const [editAlbumId, setEditAlbumId] = useState(null);
   const [albumDetalhes, setAlbumDetalhes] = useState({});
+  const user = JSON.parse(localStorage.getItem("loggedUser"));//isPublicGroup
 
   useEffect(() => {
     const fetchAlbuns = async () => {
@@ -143,41 +144,48 @@ const Album = () => {
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
-        {albuns.map((album) => (
-          <CCol lg="6" sm="12" xl="4" md="6" key={album.codAlbum}>
-            <CCard style={cardStyle}>
-              <CCardHeader>
-                <h5>{album.tituloAlbum}</h5>
-              </CCardHeader>
-              <CCardBody style={cardBodyStyle}>
-                <img src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} style={imageStyle} />
-                <div style={buttonGroupStyle}>
-                  <CButton color="secondary" style={buttonStyle}>
+        {albuns.map((album) => {
+          if (album.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
+            return (
 
-                    <Link onClick={() => handleEdit(album.codAlbum)} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}> <CIcon icon={cilPencil} size="lg" style={iconStyle} /></Link>
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(album.codAlbum)}>
+              <CCol lg="6" sm="12" xl="4" md="6" key={album.codAlbum}>
+                <CCard style={cardStyle}>
+                  <CCardHeader>
+                    <h5>{album.tituloAlbum}</h5>
+                  </CCardHeader>
+                  <CCardBody style={cardBodyStyle}>
+                    <img src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} style={imageStyle} />
+                    <div style={buttonGroupStyle}>
+                      <CButton color="secondary" style={buttonStyle}>
 
-                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}><CIcon icon={cilTrash} size="lg" style={iconStyle} /></Link>
+                        <Link onClick={() => handleEdit(album.codAlbum)} style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}> <CIcon icon={cilPencil} size="lg" style={iconStyle} /></Link>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleDelete(album.codAlbum)}>
 
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(album.codAlbum)}>
+                        <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}><CIcon icon={cilTrash} size="lg" style={iconStyle} /></Link>
 
-                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
-                      <CIcon icon={cilShare} size="lg" style={iconStyle} />
-                    </Link>
-                  </CButton>
-                  <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(album)}>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(album.codAlbum)}>
 
-                    <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
-                      <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
-                    </Link>
-                  </CButton>
-                </div>
-              </CCardBody>
-            </CCard>
-          </CCol>
-        ))}
+                        <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                          <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                        </Link>
+                      </CButton>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(album)}>
+
+                        <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
+                          <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
+                        </Link>
+                      </CButton>
+                    </div>
+                  </CCardBody>
+                </CCard>
+              </CCol>
+            )
+          }
+        }
+
+        )}
       </CRow>
 
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
