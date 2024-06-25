@@ -78,5 +78,17 @@ async function listarPorPagina(page, pageSize) {
     }
 }
 
+async function pesquisarVideosMusicasEAlbunsDoGrupoPorTitulo(palavraChave) {
+    try {
 
-export const album = { add, update, excluir, pesquisaportitulo, listar, listarPorPagina, pesquisaporid };
+        const response = await axiosInstance.post('album/pesquisar/', {
+            "palavraChave": palavraChave,
+        });
+        return response;
+    } catch (error) {
+        return error?.response;
+    }
+}
+
+
+export const album = { add, update, excluir, pesquisaportitulo, listar, pesquisarVideosMusicasEAlbunsDoGrupoPorTitulo, listarPorPagina, pesquisaporid };
