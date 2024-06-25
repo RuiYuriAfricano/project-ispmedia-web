@@ -1,0 +1,56 @@
+.search-results {
+    padding: 20px;
+}
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.result-item {
+    display: flex;
+    margin: 10px 0;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.thumbnail {
+    width: 530px;
+    height: 330px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.result-info {
+    display: flex;
+    margin-left: 15px;
+}
+
+.author-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.result-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.result-details h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #777;
+}
+
+.author-name {
+    font-size: 14px;
+    color: #888;
+    margin: 5px 0;
+}
+
+.views-timestamp {
+    font-size: 14px;
+    color: #888;
+}
