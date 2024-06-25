@@ -8,7 +8,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: white;
+    color: inherit;
     outline: none;
     margin-top: 8px;
 }
