@@ -143,7 +143,7 @@ const VideoList = () => {
               <CCard className="video-card mb-3" key={index}>
                 <CCardBody>
                   <div className="video-thumbnail">
-                    <video controls width="100%" height="291" controlsList="nodownload" disablePictureInPicture>
+                    <video style={{ borderRadius: '12px' }} controls width="100%" height="291" controlsList="nodownload" disablePictureInPicture>
                       <source src={`http://localhost:3333/video/downloadVideo/${video.codVideo}`} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
