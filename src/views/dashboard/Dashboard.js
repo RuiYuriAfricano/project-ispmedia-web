@@ -376,7 +376,7 @@ const MusicList = () => {
                 </CCardHeader>
                 <CCardBody className='musica-body'>
                   <div className="music-thumbnail">
-                    <CCardImage src={`http://localhost:3333/musica/downloadCapa/${music.codMusica}`} alt={music.tituloMusica} width="230" height="200" />
+                    <CCardImage src={`http://localhost:3333/musica/downloadCapa/${music.codMusica}`} alt={music.tituloMusica} width="230" height="180" />
                     {/* Definindo altura e largura */}
 
                   </div>
@@ -608,7 +608,7 @@ const AlbumList = () => {
                 </CCardHeader>
                 <CCardBody className='album-body'>
                   <div className="album-thumbnail">
-                    <CCardImage src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} width="230" height="230" />
+                    <CCardImage src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} width="230" height="190" />
                   </div>
                 </CCardBody>
                 <CCardFooter style={{ textAlign: 'center', padding: '13px' }}>
