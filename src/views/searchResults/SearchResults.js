@@ -75,7 +75,14 @@ const SearchResults = () => {
     };
 
     const handleClick = (result) => { // Function to handle click
-        navigate(`/play/${result.tipo}/${result.codigo}`);
+        navigate(`/videoReproducao/${result.codigo}`);
+    };
+
+    const handleClickMusica = (result) => { // Function to handle click
+        navigate(`/musicaReproducao/${result.codigo}`);
+    };
+    const handleClickAlbum = (result) => { // Function to handle click
+        navigate(`/albumReproducao/${result.codigo}`);
     };
 
     return (
@@ -110,6 +117,7 @@ const SearchResults = () => {
                                     <div className="result-details">
                                         <h3>{result.titulo}</h3>
                                         <p className="author-name">{isNumber(result.fkArtista) ? result.artista.nomeArtista : result.grupoMusical.nomeGrupoMusical}</p>
+                                        <p className="author-name">Mídia: Video</p>
                                         <p className="views-timestamp">6.7M views • {"Há " + timeElapsed(result.dataDeRegisto).value + " " + timeElapsed(result.dataDeRegisto).unit}</p>
                                     </div>
                                 </div>
@@ -118,13 +126,16 @@ const SearchResults = () => {
                     }
                     else if (result.tipo === 'musica') {
                         return (
-                            <div key={result.id} className="result-item">
+                            <div key={result.codigo + '-' + result.tipo}
+                                onClick={() => handleClickMusica(result)}
+                                className="result-item">
                                 <img className="thumbnail" src={`http://localhost:3333/musica/downloadCapa/${result.codigo}`} alt={result.titulo} />
                                 <div className="result-info">
                                     <img className="author-image" src={'http://localhost:3333/utilizador/download/' + 'RuiMalemba'} alt={result.fkArtista ? result.artista.nomeArtita : result.grupoMusical.nomeGrupoMusical} />
                                     <div className="result-details">
                                         <h3>{result.titulo}</h3>
                                         <p className="author-name">{isNumber(result.fkArtista) ? result.artista.nomeArtista : result.grupoMusical.nomeGrupoMusical}</p>
+                                        <p className="author-name">Mídia: Música</p>
                                         <p className="views-timestamp">6.7M views • {"Há " + timeElapsed(result.dataDeRegisto).value + " " + timeElapsed(result.dataDeRegisto).unit}</p>
                                     </div>
                                 </div>
@@ -133,13 +144,16 @@ const SearchResults = () => {
                     }
                     else if (result.tipo === 'album') {
                         return (
-                            <div key={result.id} className="result-item">
+                            <div key={result.codigo + '-' + result.tipo}
+                                onClick={() => handleClickAlbum(result)}
+                                className="result-item">
                                 <img className="thumbnail" src={`http://localhost:3333/album/downloadCapa/${result.codigo}`} alt={result.titulo} />
                                 <div className="result-info">
                                     <img className="author-image" src={'http://localhost:3333/utilizador/download/' + 'RuiMalemba'} alt={result.fkArtista ? result.artista.nomeArtita : result.grupoMusical.nomeGrupoMusical} />
                                     <div className="result-details">
                                         <h3>{result.titulo}</h3>
                                         <p className="author-name">{isNumber(result.fkArtista) ? result.artista.nomeArtista : result.grupoMusical.nomeGrupoMusical}</p>
+                                        <p className="author-name">Album</p>
                                         <p className="views-timestamp">6.7M views • {"Há " + timeElapsed(result.dataDeRegisto).value + " " + timeElapsed(result.dataDeRegisto).unit}</p>
                                     </div>
                                 </div>
