@@ -383,49 +383,52 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
               })}
             </ul>
           </div>
-          <div className="mb-3">
+          {
+            idEditGrupo && (<div className="mb-3">
 
-            <h5>Pedidos de Adesão:</h5>
-            {membros.length === 0 && <p>Nenhum Pedido</p>}
-            <ul>
+              <h5>Pedidos de Adesão:</h5>
+              {membros.length === 0 && <p>Nenhum Pedido</p>}
+              <ul>
 
-              {membros.map((membro) => {
+                {membros.map((membro) => {
 
 
-                if (membro.fkUtilizador !== user.codUtilizador && membro.estado === 0) {
-                  return (
+                  if (membro.fkUtilizador !== user.codUtilizador && membro.estado === 0) {
+                    return (
 
-                    <li key={membro.codUtilizador}>
-                      {membro.utilizador.username}
+                      <li key={membro.codUtilizador}>
+                        {membro.utilizador.username}
 
-                      <CButton
-                        type="button"
-                        color="primary"
-                        size="sm"
-                        onClick={() => handleAceitar(membro.codMembro, membro.fkUtilizador)}
-                        className="ms-2"
-                      >
-                        Aceitar
-                      </CButton>
+                        <CButton
+                          type="button"
+                          color="primary"
+                          size="sm"
+                          onClick={() => handleAceitar(membro.codMembro, membro.fkUtilizador)}
+                          className="ms-2"
+                        >
+                          Aceitar
+                        </CButton>
 
-                      <CButton
-                        type="button"
-                        color="danger"
-                        size="sm"
-                        onClick={() => handleRejeitar(membro.codMembro, membro.fkUtilizador)}
-                        className="ms-2"
-                      >
-                        Rejeitar
-                      </CButton>
-                    </li>
-                  )
+                        <CButton
+                          type="button"
+                          color="danger"
+                          size="sm"
+                          onClick={() => handleRejeitar(membro.codMembro, membro.fkUtilizador)}
+                          className="ms-2"
+                        >
+                          Rejeitar
+                        </CButton>
+                      </li>
+                    )
+                  }
+
                 }
 
-              }
+                )}
+              </ul>
+            </div>)
+          }
 
-              )}
-            </ul>
-          </div>
 
           <CRow>
             <CCol xs={6}>
