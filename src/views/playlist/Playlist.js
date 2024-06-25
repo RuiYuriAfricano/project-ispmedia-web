@@ -71,6 +71,7 @@ const Playlist = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const selectedPlaylists = playlists.slice(startIndex, startIndex + itemsPerPage);
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -87,25 +88,34 @@ const Playlist = () => {
           </CCardHeader>
           <CCardBody>
             <div className="playlist-grid">
-              {selectedPlaylists.map((playlist, index) => (
-                <div className="playlist-card" key={playlist.codPlayList}>
-                  <Link to={`/playlistConteudo/${playlist.codPlayList}`} className='ligacao'>
-                    <div className="thumbnail-wrapper">
-                      <CImage className="thumbnail" src={thumbnail} alt={playlist.nomePlayList} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
-                      <CIcon icon={cilMediaPlay} className="play-icon" />
-                    </div>
-                    <div className="playlist-info">
-                      <h5>{playlist.nomePlayList}</h5>
-                      <p>{playlist.tipoPlayList}</p>
-                      <p>{new Date(playlist.dataDeCriacao).toLocaleDateString()}</p>
-                    </div>
-                  </Link>
-                  <div className="playlist-actions">
-                    <Link className='ligacao' onClick={() => handleEdit(playlist.codPlayList)}><CIcon icon={cilPen} /></Link>
-                    <Link className='ligacao' onClick={() => handleDelete(playlist.codPlayList)}><CIcon icon={cilTrash} /></Link>
-                  </div>
-                </div>
-              ))}
+              {selectedPlaylists.map((playlist, index) => {
+                if ((playlist.tipoPlayList === 'privada' && playlist.fkUtilizador === user.codUtilizador) || user.tipoDeUtilizador === 'admin' || playlist.tipoPlayList === 'pública') {
+                  return (<div className="playlist-card" key={playlist.codPlayList}>
+                    <Link to={`/playlistConteudo/${playlist.codPlayList}`} className='ligacao'>
+                      <div className="thumbnail-wrapper">
+                        <CImage className="thumbnail3" src={thumbnail} alt={playlist.nomePlayList} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
+                        <CIcon icon={cilMediaPlay} className="play-icon" />
+                      </div>
+                      <div className="playlist-info">
+                        <h5>{playlist.nomePlayList}</h5>
+                        <p>{playlist.tipoPlayList}</p>
+                        <p>{new Date(playlist.dataDeCriacao).toLocaleDateString()}</p>
+                      </div>
+                    </Link>
+                    {
+                      (playlist.fkUtilizador === user.codUtilizador || user.tipoDeUtilizador === 'admin') && (
+                        <div className="playlist-actions">
+                          <Link className='ligacao' onClick={() => handleEdit(playlist.codPlayList)}><CIcon icon={cilPen} /></Link>
+                          <Link className='ligacao' onClick={() => handleDelete(playlist.codPlayList)}><CIcon icon={cilTrash} /></Link>
+                        </div>
+                      )
+                    }
+
+                  </div>)
+                }
+              }
+
+              )}
             </div>
             <CPagination align="center" className="mt-3">
               <CPaginationItem disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>

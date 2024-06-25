@@ -31,8 +31,9 @@
     position: relative;
 }
 
-.thumbnail {
-    width: 100%;
+.thumbnail3 {
+    width: 200px;
+    height: 130px;
     display: block;
 }
 
