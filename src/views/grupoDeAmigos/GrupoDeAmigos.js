@@ -159,11 +159,11 @@ const GrupoDeAmigos = () => {
             <div className="group-grid">
               {selectedGrupos.map((grupo) => (
                 <div className="group-card" key={grupo.codGrupoDeAmigos}>
-                  <Link to={(membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador) ? `/grupoConteudo/${grupo.codGrupoDeAmigos}` : `#`} className='ligacao'>
+                  <Link to={(membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador || user.tipoDeUtilizador === 'admin') ? `/grupoConteudo/${grupo.codGrupoDeAmigos}` : `#`} className='ligacao'>
                     <div className="thumbnail-wrapper">
-                      <CImage className="thumbnail" src="https://images.unsplash.com/photo-1517048676732-d65bc937f952" alt={grupo.nomeDoGrupo} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
+                      <CImage className="thumbnail4" src="https://images.unsplash.com/photo-1517048676732-d65bc937f952" alt={grupo.nomeDoGrupo} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
                       {
-                        (membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador) && (<CIcon icon={cilMediaPlay} className="play-icon" />)
+                        (membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador || user.tipoDeUtilizador === 'admin') && (<CIcon icon={cilMediaPlay} className="play-icon" />)
                       }
 
                     </div>
