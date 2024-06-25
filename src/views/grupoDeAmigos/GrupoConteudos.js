@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
     CCard,
@@ -37,6 +37,7 @@ import { service } from './../../services';
 import thumbnail from './img/default-thumbnail.png';
 import './GrupoConteudo.css';
 import StarRating from './StarRating';
+import video2 from './img/animacaoDeAudio.mp4'
 
 const GrupoConteudo = () => {
     const { grupoId } = useParams();
@@ -67,6 +68,17 @@ const GrupoConteudo = () => {
     });
     const [membroOwner, setMembroOwner] = useState(false);
     const [fkCriador, setFkCriador] = useState();
+    const [playing, setPlaying] = useState(true);
+    const player1Ref = useRef(null);
+    const player2Ref = useRef(null);
+
+    const handlePause = () => {
+        setPlaying(false);
+    };
+
+    const handlePlay = () => {
+        setPlaying(true);
+    };
 
     const fetchMembroOwner = async () => {
         try {
@@ -256,14 +268,39 @@ const GrupoConteudo = () => {
             <CCol md={8}>
                 <CCard className="mb-4">
                     <CCardBody className="player-container">
+
+                        {
+                            selectedTipo === 'musica' || selectedTipo === 'album' ? (
+                                <ReactPlayer
+                                    ref={player1Ref}
+                                    url={video2}
+                                    controls={false}
+                                    width="100%"
+                                    height="100%"
+                                    playing={playing}
+                                    onPlay={handlePlay}
+                                    onPause={handlePause}
+                                    loop
+                                    config={{
+                                        file: {
+                                            attributes: {
+                                                controlsList: 'nodownload'
+                                            }
+                                        }
+                                    }}
+
+                                />
+                            ) : (
+                                <div className="no-video"></div>
+                            )
+                        }
+
                         {
                             selectedTipo !== 'video' && selectedUrlCapa ? (
                                 <CImage
                                     src={selectedUrlCapa}
-                                    width="100%"
                                     alt={selectedUrlCapa}
-                                    height="85%"
-                                    style={{ position: 'absolute', padding: '15px', borderRadius: '20px', top: '0', left: '0', zIndex: '1' }}
+                                    style={{ width: "180px", height: '120px', position: 'absolute', padding: '15px', borderRadius: '20px', top: '60%', left: '0', zIndex: '1' }}
                                 />
                             ) : (
                                 <div className="no-video"></div>
@@ -272,6 +309,8 @@ const GrupoConteudo = () => {
 
                         {
                             selectedVideo && selectedTipo === 'video' ? (
+
+
                                 <ReactPlayer
                                     url={selectedVideo}
                                     controls={true}
@@ -289,14 +328,18 @@ const GrupoConteudo = () => {
                                 />
                             ) :
                                 selectedVideo && selectedTipo !== 'video' ? (
+
                                     <ReactPlayer
+                                        ref={player2Ref}
                                         className="react-player"
                                         url={selectedVideo}
                                         controls={true}
                                         width="98%"
                                         height="98%"
-                                        playing={true}
-                                        style={{ marginLeft: '6px' }}
+                                        playing={playing}
+                                        onPlay={handlePlay}
+                                        onPause={handlePause}
+                                        style={{ marginLeft: '6px', }}
                                         config={{
                                             file: {
                                                 attributes: {
@@ -388,7 +431,7 @@ const GrupoConteudo = () => {
                                                                         className="thumbnail"
                                                                         src={`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                         alt={musica.tituloMusica}
-                                                                        style={{ width: "100%", borderRadius: "5px" }}
+                                                                        style={{ width: "180px", height: '120px', borderRadius: "5px" }}
                                                                     />
                                                                     <div className="play-icon-wrapper">
                                                                         <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
@@ -442,7 +485,7 @@ const GrupoConteudo = () => {
                                                                 className="thumbnail"
                                                                 src={video.tipo === 'video' ? thumbnail : `http://localhost:3333/album/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                 alt={video.nome}
-                                                                style={{ width: "100%", borderRadius: "5px" }}
+                                                                style={{ width: "180px", height: '120px', borderRadius: "5px" }}
                                                             />
                                                             <div className="play-icon-wrapper">
                                                                 <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
@@ -489,7 +532,7 @@ const GrupoConteudo = () => {
                                                                 className="thumbnail"
                                                                 src={video.tipo === 'video' ? `http://localhost:3333/video/${video.codigo}/thumbnail` : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                 alt={video.nome}
-                                                                style={{ width: "100%", borderRadius: "5px" }}
+                                                                style={{ width: "180px", height: '120px', borderRadius: "5px" }}
                                                             />
                                                             <div className="play-icon-wrapper">
                                                                 <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
