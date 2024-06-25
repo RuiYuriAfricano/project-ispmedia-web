@@ -14,7 +14,9 @@ import {
   CModalFooter,
   CForm,
   CFormSelect,
-  CCardFooter
+  CCardFooter,
+  CPagination,
+  CPaginationItem
 } from '@coreui/react';
 import {
   Confirm,
@@ -178,6 +180,14 @@ const Video = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Define the number of items per page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const selectedVideos = videos.slice(startIndex, startIndex + itemsPerPage);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -237,7 +247,7 @@ const Video = () => {
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
-        {videos.map((video, index) => {
+        {selectedVideos.map((video, index) => {
           if (video.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
             return (
               <CCol lg="6" sm="12" xl="4" md="6" key={video.codVideo}>
@@ -297,6 +307,24 @@ const Video = () => {
         }
 
         )}
+
+        <CPagination align="center" className="mt-3">
+          <CPaginationItem disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+            Anterior
+          </CPaginationItem>
+          {[...Array(Math.ceil(videos.length / itemsPerPage)).keys()].map(number => (
+            <CPaginationItem
+              key={number + 1}
+              active={currentPage === number + 1}
+              onClick={() => handlePageChange(number + 1)}
+            >
+              {number + 1}
+            </CPaginationItem>
+          ))}
+          <CPaginationItem disabled={currentPage === Math.ceil(videos.length / itemsPerPage)} onClick={() => handlePageChange(currentPage + 1)}>
+            Próxima
+          </CPaginationItem>
+        </CPagination>
       </CRow>
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
         <CModalHeader onClose={() => setShowModal(false)}>
