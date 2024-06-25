@@ -11,7 +11,9 @@ import {
   CModalHeader,
   CModalTitle,
   CModalBody,
-  CModalFooter
+  CModalFooter,
+  CPagination,
+  CPaginationItem
 } from '@coreui/react';
 import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -89,6 +91,14 @@ const Album = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Define the number of items per page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const selectedGAlbuns = albuns.slice(startIndex, startIndex + itemsPerPage);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -144,7 +154,7 @@ const Album = () => {
         </CCol>
       </CRow>
       <CRow className="justify-content-center mt-3">
-        {albuns.map((album) => {
+        {selectedGAlbuns.map((album) => {
           if (album.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
             return (
 
@@ -186,6 +196,24 @@ const Album = () => {
         }
 
         )}
+
+        <CPagination align="center" className="mt-3">
+          <CPaginationItem disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+            Anterior
+          </CPaginationItem>
+          {[...Array(Math.ceil(albuns.length / itemsPerPage)).keys()].map(number => (
+            <CPaginationItem
+              key={number + 1}
+              active={currentPage === number + 1}
+              onClick={() => handlePageChange(number + 1)}
+            >
+              {number + 1}
+            </CPaginationItem>
+          ))}
+          <CPaginationItem disabled={currentPage === Math.ceil(albuns.length / itemsPerPage)} onClick={() => handlePageChange(currentPage + 1)}>
+            Próxima
+          </CPaginationItem>
+        </CPagination>
       </CRow>
 
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
