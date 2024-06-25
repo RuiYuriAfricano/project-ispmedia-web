@@ -15,10 +15,13 @@
 }
 
 .thumbnail {
-    width: 530px;
-    height: 330px;
+    width: 500px;
+    height: 300px;
     object-fit: cover;
     border-radius: 10px;
+    cursor: pointer;
+    /* Add cursor pointer for clickable items */
+
 }
 
 .result-info {
@@ -53,4 +56,12 @@
 .views-timestamp {
     font-size: 14px;
     color: #888;
+}
+
+.thumbnail,
+.video-preview {
+    width: 500px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
 }
