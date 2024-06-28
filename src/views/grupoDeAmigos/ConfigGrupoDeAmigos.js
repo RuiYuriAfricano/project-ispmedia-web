@@ -202,6 +202,12 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
       setCorDoAlert('danger');
       return;
     }
+
+    if (utilizadoresAdicionados.length < 3 && !idEditGrupo) {
+      setMsgDoAlert(`Por favor, adicione 3 um utilizadores para criar o grupo.`);
+      setCorDoAlert('danger');
+      return;
+    }
     setLoading(true);
 
     const novoGrupo = {
