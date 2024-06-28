@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   CButton,
   CCard,
@@ -17,7 +17,7 @@ import {
   CPagination,
   CPaginationItem
 } from '@coreui/react';
-import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@coreui/icons';
+import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus, cilMediaPlay } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import ReactPlayer from 'react-player';
 import { service } from './../../services';
@@ -25,6 +25,7 @@ import { color } from 'chart.js/helpers';
 import ConfigMusica from './ConfigMusica';
 
 const Musica = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const [musicas, setMusicas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -78,8 +79,9 @@ const Musica = () => {
     }
   };
 
-  const handleShare = (id) => {
-    alert(`Sharing music with ID: ${id}`);
+
+  const handleClickMusica = (id) => { // Function to handle click
+    navigate(`/musicaReproducao/${id}`);
   };
 
   const fetchParticipacoes = async (musicaId) => {
@@ -263,9 +265,9 @@ const Musica = () => {
                           <CIcon icon={cilTrash} size="lg" style={iconStyle} />
                         </Link>
                       </CButton>
-                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(musica.codMusica)}>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleClickMusica(musica.codMusica)}>
                         <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
-                          <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                          <CIcon icon={cilMediaPlay} size="lg" style={iconStyle} />
                         </Link>
 
                       </CButton>
