@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   CButton,
   CCard,
@@ -28,15 +28,12 @@ import { service } from './../../services';
 import ConfigVideo from './ConfigVideo';
 
 const Video = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
   const [videoDetalhes, setVideoDetalhes] = useState({});
-  const [modalVideoUrl, setModalVideoUrl] = useState('');
-  const [currentCaption, setCurrentCaption] = useState('');
-  const [showCaption, setShowCaption] = useState(false);
   const [participacoes, setParticipacoes] = useState([]);
   const [selectedArtista, setSelectedArtista] = useState('');
   const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
@@ -126,6 +123,10 @@ const Video = () => {
     setVideoDetalhes(video);
     setShowVideoModal(true);
     setModalVideoUrl(`http://localhost:3333/video/downloadVideo/${video.codVideo}`)
+  };
+
+  const handleClickVideo = (id) => { // Function to handle click
+    navigate(`/videoReproducao/${id}`);
   };
 
   const handleAddParticipacao = async () => {
@@ -280,17 +281,12 @@ const Video = () => {
                           <CIcon icon={cilTrash} size="lg" style={iconStyle} />
                         </Link>
                       </CButton>
-                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(video.codVideo)}>
-                        <Link style={{ color: 'white' }}>
-                          <CIcon icon={cilShare} size="lg" style={iconStyle} />
-                        </Link>
-                      </CButton>
                       <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(video)}>
                         <Link style={{ color: 'white' }}>
                           <CIcon icon={cilMagnifyingGlass} size="lg" style={iconStyle} />
                         </Link>
                       </CButton>
-                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShowVideoModal(video)}>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handleClickVideo(video.codVideo)}>
                         <Link style={{ color: 'white' }}>
                           <CIcon icon={cilMediaPlay} size="lg" style={iconStyle} />
                         </Link>
@@ -370,38 +366,6 @@ const Video = () => {
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowModal(false)}>Fechar</CButton>
-        </CModalFooter>
-      </CModal>
-      <CModal visible={showVideoModal} onClose={() => setShowVideoModal(false)} size="lg">
-        <CModalHeader onClose={() => setShowVideoModal(false)}>
-          <CModalTitle>{videoDetalhes.tituloVideo}</CModalTitle>
-        </CModalHeader>
-        <CModalBody style={{ padding: 0, position: 'relative' }}>
-          <ReactPlayer
-            url={modalVideoUrl}
-            playing={false}
-            controls={true}
-            width="100%"
-            height="500px"
-          />
-          {showCaption && (
-            <div style={{
-              position: 'absolute',
-              bottom: '65px',
-              width: '100%',
-              textAlign: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              color: 'white',
-              padding: '0.5rem',
-              fontSize: '1.2rem'
-            }}>
-              {currentCaption}
-            </div>
-          )}
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="info" onClick={() => setShowCaption(!showCaption)}>Exibir Legenda</CButton>
-          <CButton color="secondary" onClick={() => setShowVideoModal(false)}>Fechar</CButton>
         </CModalFooter>
       </CModal>
 
