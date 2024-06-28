@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   CCard,
   CCardBody,
@@ -22,6 +22,8 @@ import './GrupoDeAmigos.css';
 import thumbnail from './img/default-thumbnail.png';
 
 const GrupoDeAmigos = () => {
+  const { id } = useParams();
+
   const [grupos, setGrupos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,7 +39,20 @@ const GrupoDeAmigos = () => {
   const fetchGrupos = async () => {
     try {
       const response = await service.grupoDeAmigos.listar();
-      setGrupos(response.data);
+      if (id != undefined) {
+        const responde2 = await service.membrosDasListas.listar();
+
+        const filtro = responde2.data.filter((item) => item.fkListaDePartilha === parseInt(id))
+        const gruposDaListaDePartilha = response.data.filter((item) => {
+          const search = filtro.find((v) => v.fkGrupoDeAmigos === item.codGrupoDeAmigos)
+          if (search) return item
+        })
+        setGrupos(gruposDaListaDePartilha);
+      }
+      else {
+        setGrupos(response.data);
+      }
+
       setLoading(false);
     } catch (err) {
       setError(err);
@@ -161,7 +176,7 @@ const GrupoDeAmigos = () => {
                 <div className="group-card" key={grupo.codGrupoDeAmigos}>
                   <Link to={(membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador || user.tipoDeUtilizador === 'admin') ? `/grupoConteudo/${grupo.codGrupoDeAmigos}` : `#`} className='ligacao'>
                     <div className="thumbnail-wrapper">
-                      <CImage className="thumbnail4" src="https://images.unsplash.com/photo-1517048676732-d65bc937f952" alt={grupo.nomeDoGrupo} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
+                      <CImage className="thumbnail4" src="https://www.rockstarmarketing.co.uk/wp-content/uploads/Facebook-Ads-In-Groups-Cover.jpg" alt={grupo.nomeDoGrupo} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
                       {
                         (membros.some((membro) => membro.fkGrupoDeAmigos === grupo.codGrupoDeAmigos && membro.estado === 1) || grupo.fkCriador === user.codUtilizador || user.tipoDeUtilizador === 'admin') && (<CIcon icon={cilMediaPlay} className="play-icon" />)
                       }
