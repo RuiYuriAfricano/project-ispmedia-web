@@ -95,7 +95,7 @@ const DynamicNav = () => {
         {
           component: CNavItem,
           name: 'Lista de Partilhas',
-          to: '/charts',
+          to: '/listaDePartilha',
           icon: <CIcon icon={cilList} customClassName="nav-icon" />,
         },
         {
