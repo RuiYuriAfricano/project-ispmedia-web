@@ -19,6 +19,8 @@ const SearchResults = React.lazy(() => import('./views/searchResults/SearchResul
 const PlaylistPublicaVideos = React.lazy(() => import('./views/playlistPublicaVideo/PlaylistPublicaVideo'))
 const PlaylistPublicaMusicas = React.lazy(() => import('./views/playlistPublicaMusica/PlaylistPublicaMusica'))
 const PlaylistPublicaAlbuns = React.lazy(() => import('./views/playlistPublicaAlbum/PlaylistPublicaAlbum'))
+const ListaDePartilha = React.lazy(() => import('./views/listaDePartilha/ListaDePartilha'))
+
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -31,7 +33,7 @@ const routes = [
   { path: '/album', name: 'Album', element: Album },
   { path: '/musica', name: 'Musica', element: Musica },
   { path: '/video', name: 'Video', element: Video },
-  { path: '/grupoDeAmigos', name: 'GrupoDeAmigos', element: GrupoDeAmigos },
+  { path: '/grupoDeAmigos/:id?', name: 'GrupoDeAmigos', element: GrupoDeAmigos },
   { path: '/playlist', name: 'Playlist', element: Playlist },
   { path: '/playlistConteudo/:playlistId', name: 'PlaylistConteudo', element: PlaylistConteudo },
   { path: '/grupoConteudo/:grupoId', name: 'GrupoConteudo', element: GrupoConteudo },
@@ -40,6 +42,7 @@ const routes = [
   { path: '/videoReproducao/:id', name: 'ReproducaoVideo', element: PlaylistPublicaVideos },
   { path: '/musicaReproducao/:id', name: 'ReproducaoMusica', element: PlaylistPublicaMusicas },
   { path: '/albumReproducao/:id', name: 'ReproducaoAlbum', element: PlaylistPublicaAlbuns },
+  { path: '/listaDePartilha', name: 'ListaDePartilha', element: ListaDePartilha },
 ]
 
 export default routes
