@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   CCard,
   CCardBody,
@@ -15,12 +15,13 @@ import {
   CPagination,
   CPaginationItem
 } from '@coreui/react';
-import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus } from '@coreui/icons';
+import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus, cilEyedropper, cilMediaPlay } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
 import ConfigAlbum from './ConfigAlbum';
 
 const Album = () => {
+  const navigate = useNavigate(); // Initialize useNavigateconst navigate = useNavigate(); // Initialize useNavigate
   const [albuns, setAlbuns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -60,8 +61,10 @@ const Album = () => {
     }
   };
 
-  const handleShare = (id) => {
-    alert(`Sharing album with ID: ${id}`);
+  const handlePlay = (id) => {
+
+    navigate(`/albumReproducao/${id}`);
+
   };
 
   const handleShowDetails = (album) => {
@@ -175,10 +178,10 @@ const Album = () => {
                         <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}><CIcon icon={cilTrash} size="lg" style={iconStyle} /></Link>
 
                       </CButton>
-                      <CButton color="secondary" style={buttonStyle} onClick={() => handleShare(album.codAlbum)}>
+                      <CButton color="secondary" style={buttonStyle} onClick={() => handlePlay(album.codAlbum)}>
 
                         <Link style={{ color: 'white', textDecoration: 'none', marginLeft: '2px' }}>
-                          <CIcon icon={cilShare} size="lg" style={iconStyle} />
+                          <CIcon icon={cilMediaPlay} size="lg" style={iconStyle} />
                         </Link>
                       </CButton>
                       <CButton color="secondary" style={buttonStyle} onClick={() => handleShowDetails(album)}>
