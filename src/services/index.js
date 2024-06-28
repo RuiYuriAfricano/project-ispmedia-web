@@ -14,9 +14,11 @@ import { membrosDosGrupos } from "./membrosDosGrupos";
 import { conteudoDosGrupos } from "./conteudoDosGrupos";
 import { criticas } from "./criticas";
 import { notificacao } from "./notificacao";
+import { listaDePartilha } from "./listaDePartilha"
+import { membrosDasListas } from "./membrosDasListas";
 
 export const service = {
   auth, grupoMusical, artista, album, musica, video, participacaoMusica, participacaoVideo,
   playlist, musicasDaPlaylist, videosDaPlaylist, grupoDeAmigos, membrosDosGrupos, conteudoDosGrupos,
-  criticas, notificacao
+  criticas, notificacao, listaDePartilha, membrosDasListas
 };
