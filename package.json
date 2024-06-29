@@ -16,7 +16,8 @@
     "build": "vite build",
     "lint": "eslint \"src/**/*.js\"",
     "serve": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "start-https": "set HTTPS=true && set SSL_CRT_FILE=certificado/cert.pem && set SSL_KEY_FILE=certificado/key.pem && vite"
   },
   "dependencies": {
     "@coreui/chartjs": "^4.0.0",

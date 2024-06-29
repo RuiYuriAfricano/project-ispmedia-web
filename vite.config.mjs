@@ -1,7 +1,8 @@
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'node:path'
-import autoprefixer from 'autoprefixer'
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'node:path';
+import autoprefixer from 'autoprefixer';
+import fs from 'fs';
 
 export default defineConfig(({ mode }) => {
   return {
@@ -41,9 +42,13 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 3000,
+      https: {
+        key: fs.readFileSync(path.resolve(__dirname, 'certificado/key.pem')),
+        cert: fs.readFileSync(path.resolve(__dirname, 'certificado/cert.pem')),
+      },
       proxy: {
         // https://vitejs.dev/config/server-options.html
       },
     },
-  }
-})
+  };
+});
