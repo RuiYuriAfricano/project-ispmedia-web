@@ -429,7 +429,7 @@ const GrupoConteudo = () => {
                                                                 <div className="thumbnail-wrapper">
                                                                     <CImage
                                                                         className="thumbnail"
-                                                                        src={`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                                        src={`http://localhost:3333/album/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                         alt={musica.tituloMusica}
                                                                         style={{ width: "180px", height: '120px', borderRadius: "5px" }}
                                                                     />
