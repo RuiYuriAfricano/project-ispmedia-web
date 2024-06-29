@@ -45,12 +45,15 @@ const ConfigAlbum = ({ idEditAlbum, onClose }) => {
     const [alterarCapa, setAlterarCapa] = useState(false);
     const [pertenceArtista, setPertenceArtista] = useState(true);
     const [isPublicGroup, setIsPublicGroup] = useState(true);
+
     const [selectedGroup, setSelectedGroup] = useState("");
     const user = JSON.parse(localStorage.getItem("loggedUser"));//isPublicGroup
     const vetor = [{ id: 1, txt: 'Detalhes' },
     { id: 2, txt: 'Autoria e Visibilidade' },
     { id: 3, txt: 'Finalizar' }];
-
+    const [isGrupoEspecifico, setIsGrupoEspecifico] = useState(true)
+    const [selectedLista, setSelectedLista] = useState("");
+    const [listas, setListas] = useState([]);
     useEffect(() => {
         const fetchArtistas = async () => {
             try {
@@ -92,10 +95,21 @@ const ConfigAlbum = ({ idEditAlbum, onClose }) => {
             }
         };
 
+        const fetchListas = async () => {
+            try {
+                const response = await service.listaDePartilha.listar(); // Assuming this is the correct service call
+                setListas(response.data.filter(item => item.fkUtilizador === user.codUtilizador));
+            } catch (error) {
+                setMsgDoAlert("Erro ao carregar listas");
+                setCorDoAlert("danger");
+            }
+        };
+        fetchListas()
         fetchArtistas();
         fetchGruposMusicais();
         fetchGrupos();
         fetchMusicas();
+
 
         if (idEditAlbum) {
             const fetchAlbum = async () => {
@@ -171,24 +185,36 @@ const ConfigAlbum = ({ idEditAlbum, onClose }) => {
                 response = await service.album.add(formData);
 
 
-                if (!isPublicGroup) {
+                if (!isPublicGroup & isGrupoEspecifico) {
                     response2 = await service.conteudoDosGrupos.add({
                         "fkGrupoDeAmigos": Number(selectedGroup),
                         "fkAlbum": Number(response.data.codAlbum),
                     });
                 }
+                if (!isPublicGroup & !isGrupoEspecifico) {
+                    const r1 = await service.membrosDasListas.listar();
+                    const gruposDaLista = r1.data.filter(item => parseInt(item.fkListaDePartilha) === parseInt(selectedLista))
+                    await Promise.all(gruposDaLista.map(item => {
 
-                console.log(response)
+                        return (service.conteudoDosGrupos.add({
+                            "fkGrupoDeAmigos": Number(item.fkGrupoDeAmigos),
+                            "fkAlbum": Number(response.data.codAlbum),
+                        }))
+                    }
+                    )
+                    )
+                }
 
                 const resp = await service.musica.pesquisaporid(codMusica)
                 resp.data.fkAlbum = response.data.codAlbum
                 delete resp.data.registadopor
                 delete resp.data.artista
-                console.log(resp.data)
+                delete resp.data.grupoMusical
+                delete resp.data.album
                 const response3 = await service.musica.update(resp.data)
             }
 
-            if (response?.status === 200 || (response?.status === 201 && (response2?.status === 201 || isPublicGroup))) {
+            if (response?.status === 200 || (response?.status === 201)) {
                 setMsgDoAlert(`Álbum ${idEditAlbum ? "Atualizado" : "Criado"} Com Sucesso!`);
                 setCorDoAlert("success");
                 if (!idEditAlbum) {
@@ -229,7 +255,8 @@ const ConfigAlbum = ({ idEditAlbum, onClose }) => {
             if (!idEditAlbum && codMusica.trim() === '') emptyFields.push('Música do Album');
         } else if (currentStep === 2) {
             if (!fkArtista && !fkGrupoMusical) emptyFields.push('Artista ou Grupo Musical');
-            if (!isPublicGroup && selectedGroup.trim() === '') emptyFields.push('Grupo');
+            if (!isPublicGroup && isGrupoEspecifico && selectedGroup.trim() === '') emptyFields.push('Grupo');
+            if (!isPublicGroup && !isGrupoEspecifico && selectedLista.trim() === '') emptyFields.push('Lista');
         }
 
         if (emptyFields.length > 0) {
@@ -476,25 +503,74 @@ const ConfigAlbum = ({ idEditAlbum, onClose }) => {
                                             </div>
 
                                             {!isPublicGroup && (
-                                                <CTooltip content="Selecione um grupo">
-                                                    <CInputGroup className="mb-3">
-                                                        <CInputGroupText>
-                                                            <CIcon icon={cilGroup} />
-                                                        </CInputGroupText>
-                                                        <CFormSelect
-                                                            value={selectedGroup}
-                                                            onChange={(e) => setSelectedGroup(e.target.value)}
-                                                            required
-                                                        >
-                                                            <option value="">Selecione um grupo</option>
-                                                            {grupos.map((grupo) => (
-                                                                <option key={grupo.codGrupoDeAmigos} value={grupo.codGrupoDeAmigos}>
-                                                                    {grupo.nomeDoGrupo}
-                                                                </option>
-                                                            ))}
-                                                        </CFormSelect>
-                                                    </CInputGroup>
-                                                </CTooltip>
+
+                                                <>
+
+                                                    <div className="mb-3">
+                                                        <CFormCheck
+                                                            type="radio"
+                                                            id="grupoEspecifico"
+                                                            name="grupoEspecificoOuLista"
+                                                            label="Escolher um grupo específico"
+                                                            checked={isGrupoEspecifico}
+                                                            onChange={() => setIsGrupoEspecifico(true)}
+                                                        />
+                                                        <CFormCheck
+                                                            type="radio"
+                                                            id="listaDeGrupos"
+                                                            name="grupoEspecificoOuLista"
+                                                            label="Escolher uma lista de grupos"
+                                                            checked={!isGrupoEspecifico}
+                                                            onChange={() => setIsGrupoEspecifico(false)}
+                                                        />
+                                                    </div>
+                                                    {isGrupoEspecifico && (
+                                                        <CTooltip content="Selecione um grupo">
+                                                            <CInputGroup className="mb-3">
+                                                                <CInputGroupText>
+                                                                    <CIcon icon={cilGroup} />
+                                                                </CInputGroupText>
+                                                                <CFormSelect
+                                                                    value={selectedGroup}
+                                                                    onChange={(e) => setSelectedGroup(e.target.value)}
+                                                                    required
+                                                                >
+                                                                    <option value="">Selecione um grupo</option>
+                                                                    {grupos.map((grupo) => (
+                                                                        <option key={grupo.codGrupoDeAmigos} value={grupo.codGrupoDeAmigos}>
+                                                                            {grupo.nomeDoGrupo}
+                                                                        </option>
+                                                                    ))}
+                                                                </CFormSelect>
+                                                            </CInputGroup>
+                                                        </CTooltip>
+                                                    )
+                                                    }
+
+                                                    {!isGrupoEspecifico && (
+                                                        <CTooltip content="Selecione uma lista">
+                                                            <CInputGroup className="mb-3">
+                                                                <CInputGroupText>
+                                                                    <CIcon icon={cilGroup} />
+                                                                </CInputGroupText>
+                                                                <CFormSelect
+                                                                    value={selectedLista}
+                                                                    onChange={(e) => setSelectedLista(e.target.value)}
+                                                                    required
+                                                                >
+                                                                    <option value="">Selecione um lista</option>
+                                                                    {listas.map((lista) => (
+                                                                        <option key={lista.codListaDePartilha} value={lista.codListaDePartilha}>
+                                                                            {lista.nomeDaLista}
+                                                                        </option>
+                                                                    ))}
+                                                                </CFormSelect>
+                                                            </CInputGroup>
+                                                        </CTooltip>
+                                                    )
+                                                    }
+
+                                                </>
                                             )}
                                         </>
                                     )}
