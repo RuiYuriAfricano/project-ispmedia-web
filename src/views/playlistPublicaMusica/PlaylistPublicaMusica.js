@@ -23,7 +23,7 @@ import {
     CDropdownItem,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMediaPlay, cilPlus } from '@coreui/icons';
+import { cilMediaPlay, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
 import ReactPlayer from 'react-player';
 import { service } from '../../services';
 import './PlaylistPublicaMusica.css';
@@ -41,7 +41,7 @@ const PlaylistPublicaMusica = () => {
     const { id } = useParams();
     const user = JSON.parse(localStorage.getItem("loggedUser"));
 
-    const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState({});
     const [rating, setRating] = useState(0);
     const [newComment, setNewComment] = useState('');
     const [currentUser, setCurrentUser] = useState({
@@ -53,7 +53,7 @@ const PlaylistPublicaMusica = () => {
     const [playing, setPlaying] = useState(true);
     const player1Ref = useRef(null);
     const player2Ref = useRef(null);
-
+    const [editingComment, setEditingComment] = useState(null);
     const handlePause = () => {
         setPlaying(false);
     };
@@ -84,15 +84,72 @@ const PlaylistPublicaMusica = () => {
         fetchVideos();
     }, [id]);
 
-    const handleAddComment = () => {
+    const handleAddComment = async (musicaId) => {
         if (newComment.trim()) {
-            setComments([...comments, {
-                text: newComment,
-                rating,
-                user: currentUser
-            }]);
-            setNewComment('');
-            setRating(0);
+            const newCommentData = {
+                fkMusica: musicaId,
+                fkUtilizador: user.codUtilizador,
+                pontuacao: rating,
+                comentario: newComment
+            };
+            try {
+                if (editingComment) {
+                    const newCommentData = {
+                        fkMusica: musicaId,
+                        fkUtilizador: user.codUtilizador,
+                        pontuacao: rating,
+                        comentario: newComment,
+                        codCritica: Number(editingComment.codCritica)
+                    };
+                    // Editing existing comment
+                    await service.criticas.update(newCommentData);
+                    setEditingComment(null);
+                } else {
+                    // Adding new comment
+                    await service.criticas.add(newCommentData);
+                }
+                setNewComment('');
+                setRating(0);
+                fetchComments(musicaId); // Refresh comments
+            } catch (error) {
+                console.error("Error adding comment:", error);
+            }
+        }
+    };
+
+    const handleEditComment = (comment) => {
+        setNewComment(comment.comentario);
+        setRating(comment.pontuacao);
+        setEditingComment(comment);
+    };
+
+    const handleDeleteComment = async (commentId, musicaId) => {
+        try {
+            await service.criticas.excluir(commentId);
+            fetchComments(musicaId); // Refresh comments
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+        }
+    };
+
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            videos.forEach(musica => {
+                fetchComments(musica.codMusica);
+            });
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, [videos]);
+
+    const fetchComments = async (musicaId) => {
+        try {
+            const response = await service.criticas.listar();
+            const musicaComments = response.data.filter(comment => comment.fkMusica === musicaId);
+            setComments(prevComments => ({ ...prevComments, [musicaId]: musicaComments }));
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -161,18 +218,43 @@ const PlaylistPublicaMusica = () => {
                     </CCardBody>
                     <CCardFooter>
                         <h5>{selectedTitulo}</h5>
-                        <div>
-                            <h6>Comentários:</h6>
-                            {comments.map((comment, index) => (
-                                <div key={index} className="comment">
-                                    <div className="comment-header">
-                                        <CImage src={comment.user.photo} alt={comment.user.name} className="user-photo" />
-                                        <span className="user-name">{comment.user.name}</span>
-                                        <StarRating rating={comment.rating} setRating={() => { }} />
+                        <div style={{ padding: '0' }}>
+                            <h6>{comments[selectedItem.codMusica]?.length} Comentários:</h6>
+                            {comments[selectedItem.codMusica] && comments[selectedItem.codMusica].length > 0 ? (
+                                comments[selectedItem.codMusica].map((comment, commentIndex) => (
+                                    <div key={commentIndex} className="comment">
+                                        <div className="comment-header">
+                                            <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                                            <span className="user-name">{comment.utilizador.username}</span>
+                                            <StarRating rating={comment.pontuacao} setRating={() => { }} />
+
+                                        </div>
+
+                                        <CRow>
+                                            <CCol xl='8'><p className="comment-text">{comment.comentario}</p></CCol>
+                                            <CCol>
+                                                {comment.fkUtilizador === user.codUtilizador && (
+                                                    <CRow>
+                                                        <CCol xl='2' ><CIcon icon={cilPencil} onClick={() => handleEditComment(comment)} style={{ cursor: 'pointer' }} /></CCol>
+                                                        <CCol xl='2'><CIcon icon={cilTrash} onClick={() => handleDeleteComment(comment.codCritica, selectedItem.codMusica)} style={{ cursor: 'pointer' }} /></CCol>
+                                                    </CRow>
+                                                )
+
+                                                }
+                                            </CCol>
+
+
+
+                                        </CRow>
+
+
+
+
                                     </div>
-                                    <p>{comment.text}</p>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <p>Sem comentários.</p>
+                            )}
                             <CForm>
                                 <CInputGroup>
                                     <CFormInput
@@ -182,7 +264,7 @@ const PlaylistPublicaMusica = () => {
                                     />
                                 </CInputGroup>
                                 <StarRating rating={rating} setRating={setRating} />
-                                <CButton color="primary" onClick={handleAddComment}>Comentar</CButton>
+                                <CButton color="primary" onClick={() => handleAddComment(selectedItem.codMusica)}>Comentar</CButton>
                             </CForm>
                         </div>
                     </CCardFooter>
