@@ -66,7 +66,7 @@ const PlaylistConteudo = () => {
     const [newComment, setNewComment] = useState('');
     const [currentUser, setCurrentUser] = useState({
         name: 'Rui Malemba', // Substitua pelo nome do usuário atual
-        photo: 'http://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
+        photo: 'https://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
     });
     const [playing, setPlaying] = useState(true);
     const player1Ref = useRef(null);
@@ -87,11 +87,11 @@ const PlaylistConteudo = () => {
                 setVideos(response.data.success ? response.data.data : []);
                 if (response.data.data.length > 0) {
                     if (response.data.data[0].tipo === 'video') {
-                        setSelectedVideo(`http://localhost:3333/video/downloadVideo/${response.data.data[0].codigo}`);
-                        setSelectedUrlCapa(`http://localhost:3333/video/${response.data.data[0].codigo}/thumbnail`);
+                        setSelectedVideo(`https://localhost:3333/video/downloadVideo/${response.data.data[0].codigo}`);
+                        setSelectedUrlCapa(`https://localhost:3333/video/${response.data.data[0].codigo}/thumbnail`);
                     } else if (response.data.data[0].tipo === 'musica') {
-                        setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${response.data.data[0].codigo}`);
-                        setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${response.data.data[0].codigo}`);
+                        setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${response.data.data[0].codigo}`);
+                        setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${response.data.data[0].codigo}`);
                     }
                     setSelectedTipo(response.data.data[0].tipo);
                     setSelectedTitulo(response.data.data[0].titulo);
@@ -375,7 +375,7 @@ const PlaylistConteudo = () => {
                                 comments[selectedItem.codigo].map((comment, commentIndex) => (
                                     <div key={commentIndex} className="comment">
                                         <div className="comment-header">
-                                            <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                                            <CImage width="50" height="50" src={'https://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
                                             <span className="user-name">{comment.utilizador.username}</span>
                                             <StarRating rating={comment.pontuacao} setRating={() => { }} />
 
@@ -453,19 +453,19 @@ const PlaylistConteudo = () => {
                                                 <div className="thumbnail-wrapper">
                                                     <CImage
                                                         className="thumbnail"
-                                                        src={video.tipo === 'video' ? `http://localhost:3333/video/${video.codigo}/thumbnail` : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                        src={video.tipo === 'video' ? `https://localhost:3333/video/${video.codigo}/thumbnail` : `https://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                         alt={video.nome}
-                                                        style={{ width: "180px", height: '120px', borderRadius: "5px" }}
+                                                        style={{ width: "160px", height: '100px', borderRadius: "5px" }}
                                                     />
                                                     <div className="play-icon-wrapper">
                                                         <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
                                                             if (video.tipo === "video") {
-                                                                setSelectedVideo(`http://localhost:3333/video/downloadVideo/${video.codigo}`);
-                                                                setSelectedUrlCapa(`http://localhost:3333/video/${video.codigo}/thumbnail`);
+                                                                setSelectedVideo(`https://localhost:3333/video/downloadVideo/${video.codigo}`);
+                                                                setSelectedUrlCapa(`https://localhost:3333/video/${video.codigo}/thumbnail`);
                                                             }
                                                             else {
-                                                                setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${video.codigo}`);
-                                                                setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${video.codigo}`);
+                                                                setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${video.codigo}`);
+                                                                setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${video.codigo}`);
                                                             }
                                                             setSelectedTitulo(video.titulo)
                                                             setSelectedTipo(video.tipo);
@@ -478,7 +478,7 @@ const PlaylistConteudo = () => {
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <h6>{video.titulo}</h6>
-                                                        {video.autor}
+                                                        <p style={{ color: '#999', fontSize: '14px' }}>{video.autor}</p>
                                                     </div>
                                                     <CDropdown className="ml-2">
                                                         <CDropdownToggle className="vertical-dots" caret={false}>

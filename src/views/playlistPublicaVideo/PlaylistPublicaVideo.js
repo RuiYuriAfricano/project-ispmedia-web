@@ -46,7 +46,7 @@ const PlaylistPublicaVideo = () => {
     const [newComment, setNewComment] = useState('');
     const [currentUser, setCurrentUser] = useState({
         name: 'Rui Malemba', // Substitua pelo nome do usuário atual
-        photo: 'http://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
+        photo: 'https://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
     });
     useEffect(() => {
         const fetchVideos = async () => {
@@ -55,7 +55,7 @@ const PlaylistPublicaVideo = () => {
                 const response = await service.video.listar();
                 setVideos(response.data.length > 0 ? response.data.filter(item => item.visibilidade === 'Publico') : []);
                 if (response.data.length > 0) {
-                    setSelectedVideo(`http://localhost:3333/video/downloadVideo/${id}`);
+                    setSelectedVideo(`https://localhost:3333/video/downloadVideo/${id}`);
 
                     setSelectedTitulo(responseID.data.tituloVideo);
                     setSelectedItem(responseID.data)
@@ -184,7 +184,7 @@ const PlaylistPublicaVideo = () => {
                                 comments[selectedItem.codVideo].map((comment, commentIndex) => (
                                     <div key={commentIndex} className="comment">
                                         <div className="comment-header">
-                                            <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                                            <CImage width="50" height="50" src={'https://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
                                             <span className="user-name">{comment.utilizador.username}</span>
                                             <StarRating rating={comment.pontuacao} setRating={() => { }} />
 
@@ -257,14 +257,14 @@ const PlaylistPublicaVideo = () => {
                                                 <div className="thumbnail-wrapper">
                                                     <CImage
                                                         className="thumbnail"
-                                                        src={`http://localhost:3333/video/${video.codVideo}/thumbnail`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                        src={`https://localhost:3333/video/${video.codVideo}/thumbnail`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                         alt={video.tituloVideo}
-                                                        style={{ width: "180px", height: '120px', borderRadius: "5px" }}
+                                                        style={{ width: "160px", height: '100px', borderRadius: "5px" }}
                                                     />
                                                     <div className="play-icon-wrapper">
                                                         <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
 
-                                                            setSelectedVideo(`http://localhost:3333/video/downloadVideo/${video.codVideo}`);
+                                                            setSelectedVideo(`https://localhost:3333/video/downloadVideo/${video.codVideo}`);
 
                                                             setSelectedTitulo(video.tituloVideo)
                                                             setSelectedItem(video); // Define o item selecionado
@@ -276,7 +276,7 @@ const PlaylistPublicaVideo = () => {
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <h6>{video.tituloVideo}</h6>
-                                                        {isNumber(video.fkArtista) ? video.artista.nomeArtista : video.grupoMusical.nomeGrupoMusical}
+                                                        <p style={{ color: '#999', fontSize: '14px' }}>{isNumber(video.fkArtista) ? video.artista.nomeArtista : video.grupoMusical.nomeGrupoMusical}</p>
                                                     </div>
                                                     <CDropdown className="ml-2">
                                                         <CDropdownToggle className="vertical-dots" caret={true}>

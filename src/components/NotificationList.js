@@ -109,7 +109,7 @@ const NotificationList = () => {
                     <h6>Notificações</h6>
                     {notifications2.map(notification => (
                         <div key={notification.codNotificacao} className="notification-item">
-                            <img src={'http://localhost:3333/utilizador/download/' + notification.utilizadorOrigem} alt="user" className="user-image" />
+                            <img src={'https://localhost:3333/utilizador/download/' + notification.utilizadorOrigem} alt="user" className="user-image" />
                             <div className="notification-content">
                                 <div className="notification-info">
                                     <h4>{notification.textoNotificacao}</h4>

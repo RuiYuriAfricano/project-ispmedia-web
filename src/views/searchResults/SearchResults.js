@@ -101,19 +101,19 @@ const SearchResults = () => {
                                 style={{ cursor: 'pointer' }}
                             >
                                 <img className="thumbnail"
-                                    src={`http://localhost:3333/video/${result.codigo}/thumbnail`}
+                                    src={`https://localhost:3333/video/${result.codigo}/thumbnail`}
                                     alt={result.titulo}
                                 />
                                 {result.tipo === 'video' && (
                                     <video
                                         className="video-preview"
-                                        src={`http://localhost:3333/video/downloadVideo/${result.codigo}`}
+                                        src={`https://localhost:3333/video/downloadVideo/${result.codigo}`}
                                         style={{ display: 'none', width: '500px', height: '300px', borderRadius: '10px' }}
                                         muted
                                     />
                                 )}
                                 <div className="result-info">
-                                    <img className="author-image" src={'http://localhost:3333/utilizador/download/' + 'RuiMalemba'} alt={result.fkArtista ? result.artista.nomeArtita : result.grupoMusical.nomeGrupoMusical} />
+                                    <img className="author-image" src={'https://localhost:3333/utilizador/download/' + 'RuiMalemba'} alt={result.fkArtista ? result.artista.nomeArtita : result.grupoMusical.nomeGrupoMusical} />
                                     <div className="result-details">
                                         <h3>{result.titulo}</h3>
                                         <p className="author-name">{isNumber(result.fkArtista) ? result.artista.nomeArtista : result.grupoMusical.nomeGrupoMusical}</p>
@@ -129,9 +129,9 @@ const SearchResults = () => {
                             <div key={result.codigo + '-' + result.tipo}
                                 onClick={() => handleClickMusica(result)}
                                 className="result-item">
-                                <img className="thumbnail" src={`http://localhost:3333/musica/downloadCapa/${result.codigo}`} alt={result.titulo} />
+                                <img className="thumbnail" src={`https://localhost:3333/musica/downloadCapa/${result.codigo}`} alt={result.titulo} />
                                 <div className="result-info">
-                                    <img className="author-image" src={'http://localhost:3333/utilizador/download/' + 'RuiMalemba'} alt={result.fkArtista ? result.artista.nomeArtita : result.grupoMusical.nomeGrupoMusical} />
+                                    <img className="author-image" src={'https://localhost:3333/utilizador/download/' + 'RuiMalemba'} alt={result.fkArtista ? result.artista.nomeArtita : result.grupoMusical.nomeGrupoMusical} />
                                     <div className="result-details">
                                         <h3>{result.titulo}</h3>
                                         <p className="author-name">{isNumber(result.fkArtista) ? result.artista.nomeArtista : result.grupoMusical.nomeGrupoMusical}</p>
@@ -147,9 +147,9 @@ const SearchResults = () => {
                             <div key={result.codigo + '-' + result.tipo}
                                 onClick={() => handleClickAlbum(result)}
                                 className="result-item">
-                                <img className="thumbnail" src={`http://localhost:3333/album/downloadCapa/${result.codigo}`} alt={result.titulo} />
+                                <img className="thumbnail" src={`https://localhost:3333/album/downloadCapa/${result.codigo}`} alt={result.titulo} />
                                 <div className="result-info">
-                                    <img className="author-image" src={'http://localhost:3333/utilizador/download/' + 'RuiMalemba'} alt={result.fkArtista ? result.artista.nomeArtita : result.grupoMusical.nomeGrupoMusical} />
+                                    <img className="author-image" src={'https://localhost:3333/utilizador/download/' + 'RuiMalemba'} alt={result.fkArtista ? result.artista.nomeArtita : result.grupoMusical.nomeGrupoMusical} />
                                     <div className="result-details">
                                         <h3>{result.titulo}</h3>
                                         <p className="author-name">{isNumber(result.fkArtista) ? result.artista.nomeArtista : result.grupoMusical.nomeGrupoMusical}</p>

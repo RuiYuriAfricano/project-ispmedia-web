@@ -149,7 +149,7 @@ const VideoList = () => {
                 <CCardBody>
                   <div className="video-thumbnail">
                     <video style={{ borderRadius: '12px' }} controls width="100%" height="291" controlsList="nodownload" disablePictureInPicture>
-                      <source src={`http://localhost:3333/video/downloadVideo/${video.codVideo}`} type="video/mp4" />
+                      <source src={`https://localhost:3333/video/downloadVideo/${video.codVideo}`} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                   </div>
@@ -178,7 +178,7 @@ const VideoList = () => {
                         comments[video.codVideo].map((comment, commentIndex) => (
                           <div key={commentIndex} className="comment">
                             <div className="comment-header">
-                              <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                              <CImage width="50" height="50" src={'https://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
                               <span className="user-name">{comment.utilizador.username}</span>
                               <StarRating rating={comment.pontuacao} setRating={() => { }} />
 
@@ -241,7 +241,7 @@ const MusicList = () => {
   const [newComment, setNewComment] = useState('');
   const [currentUser, setCurrentUser] = useState({
     name: 'Rui Malemba', // Substitua pelo nome do usuário atual
-    photo: 'http://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
+    photo: 'https://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
   });
   const [expandedAlbum, setExpandedAlbum] = useState(null);
   const [likedAlbums, setLikedAlbums] = useState([]);
@@ -386,7 +386,7 @@ const MusicList = () => {
                 </CCardHeader>
                 <CCardBody className='musica-body'>
                   <div className="music-thumbnail">
-                    <CCardImage src={`http://localhost:3333/musica/downloadCapa/${music.codMusica}`} alt={music.tituloMusica} width="230" height="180" />
+                    <CCardImage src={`https://localhost:3333/musica/downloadCapa/${music.codMusica}`} alt={music.tituloMusica} width="230" height="180" />
                     {/* Definindo altura e largura */}
 
                   </div>
@@ -394,7 +394,7 @@ const MusicList = () => {
                 <CCardFooter style={{ textAlign: 'center', paddingBottom: '18px' }}>
                   <div style={{ width: '100%', height: '45px', marginTop: '10px', overflow: 'hidden' }}>
                     <audio controlsList="nodownload" controls style={{ width: '100%', height: '100%' }}>
-                      <source src={`http://localhost:3333/musica/downloadMusica/${music.codMusica}`} type="audio/mpeg" />
+                      <source src={`https://localhost:3333/musica/downloadMusica/${music.codMusica}`} type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
                   </div>
@@ -418,7 +418,7 @@ const MusicList = () => {
                         comments[music.codMusica].map((comment, commentIndex) => (
                           <div key={commentIndex} className="comment">
                             <div className="comment-header">
-                              <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                              <CImage width="50" height="50" src={'https://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
                               <span className="user-name">{comment.utilizador.username}</span>
                               <StarRating rating={comment.pontuacao} setRating={() => { }} />
 
@@ -622,7 +622,7 @@ const AlbumList = () => {
                 </CCardHeader>
                 <CCardBody className='album-body'>
                   <div className="album-thumbnail">
-                    <CCardImage src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} width="230" height="190" />
+                    <CCardImage src={`https://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} width="230" height="190" />
                   </div>
                 </CCardBody>
                 <CCardFooter style={{ textAlign: 'center', padding: '13px' }}>
@@ -644,7 +644,7 @@ const AlbumList = () => {
                         comments[album.codAlbum].map((comment, commentIndex) => (
                           <div key={commentIndex} className="comment">
                             <div className="comment-header">
-                              <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                              <CImage width="50" height="50" src={'https://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
                               <span className="user-name">{comment.utilizador.username}</span>
                               <StarRating rating={comment.pontuacao} setRating={() => { }} />
 

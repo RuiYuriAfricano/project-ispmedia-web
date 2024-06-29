@@ -122,7 +122,7 @@ const Video = () => {
   const handleShowVideoModal = async (video) => {
     setVideoDetalhes(video);
     setShowVideoModal(true);
-    setModalVideoUrl(`http://localhost:3333/video/downloadVideo/${video.codVideo}`)
+    setModalVideoUrl(`https://localhost:3333/video/downloadVideo/${video.codVideo}`)
   };
 
   const handleClickVideo = (id) => { // Function to handle click
@@ -255,7 +255,7 @@ const Video = () => {
                 <CCard style={cardStyle}>
                   <CCardBody style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0px' }}>
                     <div className='video-thumbnail mt-0'><ReactPlayer
-                      url={`http://localhost:3333/video/downloadVideo/${video.codVideo}`}
+                      url={`https://localhost:3333/video/downloadVideo/${video.codVideo}`}
                       playing={false}
                       controls={true}
                       width="100%"

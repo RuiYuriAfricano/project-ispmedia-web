@@ -244,9 +244,9 @@ const Musica = () => {
                   </CCardHeader>
                   <CCardBody style={cardBodyStyle}>
                     <div className='w-100'>
-                      <img src={`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`} alt={musica.tituloMusica} style={imageStyle} />
+                      <img src={`https://localhost:3333/musica/downloadCapa/${musica.codMusica}`} alt={musica.tituloMusica} style={imageStyle} />
                       <ReactPlayer
-                        url={`http://localhost:3333/musica/downloadMusica/${musica.codMusica}`}
+                        url={`https://localhost:3333/musica/downloadMusica/${musica.codMusica}`}
                         controls={true}
                         width="100%"
                         height="50px"

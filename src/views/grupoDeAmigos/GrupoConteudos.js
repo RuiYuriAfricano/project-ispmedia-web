@@ -65,7 +65,7 @@ const GrupoConteudo = () => {
     const [newComment, setNewComment] = useState('');
     const [currentUser, setCurrentUser] = useState({
         name: 'Nome do Usuário', // Substitua pelo nome do usuário atual
-        photo: 'http://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
+        photo: 'https://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
     });
     const [membroOwner, setMembroOwner] = useState(false);
     const [fkCriador, setFkCriador] = useState();
@@ -111,24 +111,24 @@ const GrupoConteudo = () => {
                 setVideos(response.data.success ? response.data.data : []);
                 if (response.data.data.length > 0) {
                     if (response.data.data[0].tipo === 'video') {
-                        setSelectedVideo(`http://localhost:3333/video/downloadVideo/${response.data.data[0].codigo}`);
-                        setSelectedUrlCapa(`http://localhost:3333/video/${response.data.data[0].codigo}/thumbnail`);
+                        setSelectedVideo(`https://localhost:3333/video/downloadVideo/${response.data.data[0].codigo}`);
+                        setSelectedUrlCapa(`https://localhost:3333/video/${response.data.data[0].codigo}/thumbnail`);
                         setSelectedTitulo(response.data.data[0].titulo);
                         setSelectedItem(response.data.data[0])
                     } else if (response.data.data[0].tipo === 'musica') {
-                        setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${response.data.data[0].codigo}`);
-                        setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${response.data.data[0].codigo}`);
+                        setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${response.data.data[0].codigo}`);
+                        setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${response.data.data[0].codigo}`);
                         setSelectedTitulo(response.data.data[0].titulo);
                         setSelectedItem(response.data.data[0])
                     }
                     else if (response.data.data[0].tipo === 'album') {
                         if (response.data.data[0].musicasDoAlbum.length === 0) {
                             setSelectedVideo('');
-                            setSelectedUrlCapa(`http://localhost:3333/album/downloadCapa/${response.data.data[0].codigo}`);
+                            setSelectedUrlCapa(`https://localhost:3333/album/downloadCapa/${response.data.data[0].codigo}`);
                             setSelectedTitulo(response.data.data[0].titulo);
                         } else {
-                            setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
-                            setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
+                            setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
+                            setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
                             setSelectedTitulo(response.data.data[0].musicasDoAlbum[0].tituloMusica);
                         }
 
@@ -424,7 +424,7 @@ const GrupoConteudo = () => {
                                 comments[selectedItem.codigo].map((comment, commentIndex) => (
                                     <div key={commentIndex} className="comment">
                                         <div className="comment-header">
-                                            <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                                            <CImage width="50" height="50" src={'https://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
                                             <span className="user-name">{comment.utilizador.username}</span>
                                             <StarRating rating={comment.pontuacao} setRating={() => { }} />
 
@@ -515,15 +515,15 @@ const GrupoConteudo = () => {
                                                                 <div className="thumbnail-wrapper">
                                                                     <CImage
                                                                         className="thumbnail"
-                                                                        src={`http://localhost:3333/album/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                                        src={`https://localhost:3333/album/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                         alt={musica.tituloMusica}
-                                                                        style={{ width: "180px", height: '120px', borderRadius: "5px" }}
+                                                                        style={{ width: "160px", height: '100px', borderRadius: "5px" }}
                                                                     />
                                                                     <div className="play-icon-wrapper">
                                                                         <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
 
-                                                                            setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${musica.codMusica}`);
-                                                                            setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${musica.codMusica}`);
+                                                                            setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${musica.codMusica}`);
+                                                                            setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${musica.codMusica}`);
 
                                                                             setSelectedTitulo(musica.tituloMusica)
                                                                             setSelectedTipo(video.tipo);
@@ -534,10 +534,10 @@ const GrupoConteudo = () => {
                                                             </CTableDataCell>
                                                             <CTableDataCell>
                                                                 <div className="d-flex justify-content-between align-items-center">
-                                                                    <div>
+                                                                    <div >
                                                                         <h6>{musica.tituloMusica}</h6>
-                                                                        Album: {video.titulo}
-                                                                        <p>{video.autor}</p>
+                                                                        <p style={{ color: '#ccc', fontSize: '14px' }}>{"Album: " + video.titulo}</p>
+                                                                        <p style={{ color: '#999', fontSize: '14px' }}>{video.autor}</p>
                                                                     </div>
                                                                     <CDropdown className="ml-2">
                                                                         <CDropdownToggle className="vertical-dots" caret={false}>
@@ -569,15 +569,15 @@ const GrupoConteudo = () => {
                                                         <div className="thumbnail-wrapper">
                                                             <CImage
                                                                 className="thumbnail"
-                                                                src={video.tipo === 'video' ? thumbnail : `http://localhost:3333/album/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                                src={video.tipo === 'video' ? thumbnail : `https://localhost:3333/album/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                 alt={video.nome}
-                                                                style={{ width: "180px", height: '120px', borderRadius: "5px" }}
+                                                                style={{ width: "160px", height: '100px', borderRadius: "5px" }}
                                                             />
                                                             <div className="play-icon-wrapper">
                                                                 <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
 
                                                                     setSelectedVideo(null);
-                                                                    setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${video.codigo}`);
+                                                                    setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${video.codigo}`);
 
                                                                     setSelectedTitulo(video.titulo)
                                                                     setSelectedTipo(video.tipo);
@@ -590,7 +590,7 @@ const GrupoConteudo = () => {
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
                                                                 <h6>{video.titulo}</h6>
-                                                                {video.autor}
+                                                                <p style={{ color: '#999', fontSize: '14px' }}>{video.autor}</p>
                                                             </div>
                                                             <CDropdown className="ml-2">
                                                                 <CDropdownToggle className="vertical-dots" caret={false}>
@@ -616,19 +616,19 @@ const GrupoConteudo = () => {
                                                         <div className="thumbnail-wrapper">
                                                             <CImage
                                                                 className="thumbnail"
-                                                                src={video.tipo === 'video' ? `http://localhost:3333/video/${video.codigo}/thumbnail` : `http://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                                                src={video.tipo === 'video' ? `https://localhost:3333/video/${video.codigo}/thumbnail` : `https://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                 alt={video.nome}
-                                                                style={{ width: "180px", height: '120px', borderRadius: "5px" }}
+                                                                style={{ width: "160px", height: '100px', borderRadius: "5px" }}
                                                             />
                                                             <div className="play-icon-wrapper">
                                                                 <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
                                                                     if (video.tipo === "video") {
-                                                                        setSelectedVideo(`http://localhost:3333/video/downloadVideo/${video.codigo}`);
-                                                                        setSelectedUrlCapa(`http://localhost:3333/video/${video.codigo}/thumbnail`);
+                                                                        setSelectedVideo(`https://localhost:3333/video/downloadVideo/${video.codigo}`);
+                                                                        setSelectedUrlCapa(`https://localhost:3333/video/${video.codigo}/thumbnail`);
                                                                     }
                                                                     else {
-                                                                        setSelectedVideo(`http://localhost:3333/musica/downloadMusica/${video.codigo}`);
-                                                                        setSelectedUrlCapa(`http://localhost:3333/musica/downloadCapa/${video.codigo}`);
+                                                                        setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${video.codigo}`);
+                                                                        setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${video.codigo}`);
                                                                     }
                                                                     setSelectedTitulo(video.titulo)
                                                                     setSelectedTipo(video.tipo);
@@ -641,7 +641,7 @@ const GrupoConteudo = () => {
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
                                                                 <h6>{video.titulo}</h6>
-                                                                {video.autor}
+                                                                <p style={{ color: '#999', fontSize: '14px' }}>{video.autor}</p>
                                                             </div>
                                                             <CDropdown className="ml-2">
                                                                 <CDropdownToggle className="vertical-dots" caret={false}>

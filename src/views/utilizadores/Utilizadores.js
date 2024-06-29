@@ -99,7 +99,7 @@ const Utilizadores = () => {
                     if (utilizador.codUtilizador !== user.codUtilizador && utilizador.estado !== 'excluido') {
                       return (
                         <CTableRow key={utilizador.codUtilizador}>
-                          <CTableHeaderCell scope="row"><CAvatar size="md" src={"http://localhost:3333/utilizador/download/" + utilizador?.username} status='success' /></CTableHeaderCell>
+                          <CTableHeaderCell scope="row"><CAvatar size="md" src={"https://localhost:3333/utilizador/download/" + utilizador?.username} status='success' /></CTableHeaderCell>
                           <CTableDataCell>{utilizador.username}</CTableDataCell>
                           <CTableDataCell>{utilizador.email}</CTableDataCell>
                           <CTableDataCell>{utilizador.telefone}</CTableDataCell>

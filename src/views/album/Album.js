@@ -167,7 +167,7 @@ const Album = () => {
                     <h5>{album.tituloAlbum}</h5>
                   </CCardHeader>
                   <CCardBody style={cardBodyStyle}>
-                    <img src={`http://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} style={imageStyle} />
+                    <img src={`https://localhost:3333/album/downloadCapa/${album.codAlbum}`} alt={album.tituloAlbum} style={imageStyle} />
                     <div style={buttonGroupStyle}>
                       <CButton color="secondary" style={buttonStyle}>
 
