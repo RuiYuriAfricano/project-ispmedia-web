@@ -31,7 +31,7 @@ import {
     CDropdownItem,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMediaPlay, cilPlus } from '@coreui/icons';
+import { cilMediaPlay, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
 import ReactPlayer from 'react-player';
 import { service } from './../../services';
 import thumbnail from './img/default-thumbnail.png';
@@ -59,7 +59,8 @@ const GrupoConteudo = () => {
     const user = JSON.parse(localStorage.getItem("loggedUser"));
     const [cart, setCart] = useState([]);
 
-    const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState({});
+    const [editingComment, setEditingComment] = useState(null);
     const [rating, setRating] = useState(0);
     const [newComment, setNewComment] = useState('');
     const [currentUser, setCurrentUser] = useState({
@@ -158,18 +159,77 @@ const GrupoConteudo = () => {
         fetchVideos();
     }, [grupoId]);
 
-    const handleAddComment = () => {
-        if (newComment.trim()) {
-            setComments([...comments, {
-                text: newComment,
-                rating,
-                user: currentUser
-            }]);
-            setNewComment('');
-            setRating(0);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            videos.forEach(video => {
+                fetchComments(video.codigo);
+            });
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, [videos]);
+
+    const fetchComments = async (videoId) => {
+        try {
+            const response = await service.criticas.listar();
+            const videoComments = response.data.filter(comment => comment.fkVideo === videoId || comment.fkMusica === videoId || comment.fkAlbum === videoId);
+            setComments(prevComments => ({ ...prevComments, [videoId]: videoComments }));
+        } catch (err) {
+            console.error(err);
         }
     };
 
+    const handleAddComment = async (videoId) => {
+        if (newComment.trim()) {
+            const newCommentData = {
+                fkVideo: selectedTipo === 'video' ? videoId : null,
+                fkMusica: selectedTipo === 'musica' ? videoId : null,
+                fkAlbum: selectedTipo === 'album' ? videoId : null,
+                fkUtilizador: user.codUtilizador,
+                pontuacao: rating,
+                comentario: newComment
+            };
+            try {
+                if (editingComment) {
+                    const newCommentData = {
+                        fkVideo: selectedTipo === 'video' ? videoId : null,
+                        fkMusica: selectedTipo === 'musica' ? videoId : null,
+                        fkAlbum: selectedTipo === 'album' ? videoId : null,
+                        fkUtilizador: user.codUtilizador,
+                        pontuacao: rating,
+                        comentario: newComment,
+                        codCritica: Number(editingComment.codCritica)
+                    };
+                    // Editing existing comment
+                    await service.criticas.update(newCommentData);
+                    setEditingComment(null);
+                } else {
+                    // Adding new comment
+                    await service.criticas.add(newCommentData);
+                }
+                setNewComment('');
+                setRating(0);
+                fetchComments(videoId); // Refresh comments
+            } catch (error) {
+                console.error("Error adding comment:", error);
+            }
+        }
+    };
+
+    const handleEditComment = (comment) => {
+        setNewComment(comment.comentario);
+        setRating(comment.pontuacao);
+        setEditingComment(comment);
+    };
+
+    const handleDeleteComment = async (commentId, videoId) => {
+        try {
+            await service.criticas.excluir(commentId);
+            fetchComments(videoId); // Refresh comments
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+        }
+    };
 
     const handleSearch = async () => {
         // Verificar se todos os campos obrigatórios estão preenchidos
@@ -358,18 +418,44 @@ const GrupoConteudo = () => {
                     </CCardBody>
                     <CCardFooter>
                         <h5>{selectedTitulo}</h5>
-                        <div>
-                            <h6>Comentários:</h6>
-                            {comments.map((comment, index) => (
-                                <div key={index} className="comment">
-                                    <div className="comment-header">
-                                        <CImage src={comment.user.photo} alt={comment.user.name} className="user-photo" />
-                                        <span className="user-name">{comment.user.name}</span>
-                                        <StarRating rating={comment.rating} setRating={() => { }} />
+                        <div style={{ padding: '0' }}>
+                            <h6>{comments[selectedItem.codigo]?.length} Comentários:</h6>
+                            {comments[selectedItem.codigo] && comments[selectedItem.codigo].length > 0 ? (
+                                comments[selectedItem.codigo].map((comment, commentIndex) => (
+                                    <div key={commentIndex} className="comment">
+                                        <div className="comment-header">
+                                            <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                                            <span className="user-name">{comment.utilizador.username}</span>
+                                            <StarRating rating={comment.pontuacao} setRating={() => { }} />
+
+                                        </div>
+
+                                        <CRow>
+                                            <CCol xl="8"><p className="comment-text">{comment.comentario}</p></CCol>
+                                            <CCol>
+                                                {comment.fkUtilizador === user.codUtilizador && (
+                                                    <CRow>
+                                                        <CCol xl="7"></CCol>
+                                                        <CCol xl="2"><CIcon icon={cilPencil} onClick={() => handleEditComment(comment)} style={{ cursor: 'pointer' }} /></CCol>
+                                                        <CCol xl="2"><CIcon icon={cilTrash} onClick={() => handleDeleteComment(comment.codCritica, selectedItem.codigo)} style={{ cursor: 'pointer' }} /></CCol>
+                                                    </CRow>
+                                                )
+
+                                                }
+                                            </CCol>
+
+
+
+                                        </CRow>
+
+
+
+
                                     </div>
-                                    <p>{comment.text}</p>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <p>Sem comentários.</p>
+                            )}
                             <CForm>
                                 <CInputGroup>
                                     <CFormInput
@@ -379,7 +465,7 @@ const GrupoConteudo = () => {
                                     />
                                 </CInputGroup>
                                 <StarRating rating={rating} setRating={setRating} />
-                                <CButton color="primary" onClick={handleAddComment}>Comentar</CButton>
+                                <CButton color="primary" onClick={() => handleAddComment(selectedItem.codigo)}>Comentar</CButton>
                             </CForm>
                         </div>
                     </CCardFooter>
