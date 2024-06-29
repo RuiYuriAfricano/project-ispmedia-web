@@ -124,32 +124,37 @@ const ListaDePartilha = () => {
           </CCardHeader>
           <CCardBody>
             <div className="group-grid">
-              {selectedGrupos.map((grupo) => (
-                <div className="group-card" key={grupo.codListaDePartilha}>
-                  <Link to={`/grupoDeAmigos/${grupo.codListaDePartilha}`} className='ligacao'>
-                    <div className="thumbnail-wrapper">
-                      <CImage className="thumbnail6" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0CIO6_ntQDhXt-Whvp7VYlSu9vraSLf-IKg&s" alt={grupo.nomeDoGrupo} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
-                      {
-                        (<CIcon icon={cilMediaPlay} className="play-icon" />)
-                      }
+              {selectedGrupos.map((grupo) => {
+                if (grupo.fkUtilizador === user.codUtilizador) {
+                  return (
+                    <div className="group-card" key={grupo.codListaDePartilha}>
+                      <Link to={`/grupoDeAmigos/${grupo.codListaDePartilha}`} className='ligacao'>
+                        <div className="thumbnail-wrapper">
+                          <CImage className="thumbnail6" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0CIO6_ntQDhXt-Whvp7VYlSu9vraSLf-IKg&s" alt={grupo.nomeDoGrupo} onError={(e) => e.target.src = '/img/default-thumbnail.png'} />
+                          {
+                            (<CIcon icon={cilMediaPlay} className="play-icon" />)
+                          }
 
+                        </div>
+                        <div className="group-info">
+                          <h5>{grupo.nomeDaLista}</h5>
+                          <p>{grupo.utilizador?.username}</p>
+                          <p>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</p>
+                        </div>
+                      </Link>
+                      <div className="group-actions">
+
+                        <>
+                          <Link className='ligacao' onClick={() => handleEdit(grupo.codListaDePartilha)}><CIcon icon={cilPen} /></Link>
+                          <Link className='ligacao' onClick={() => handleDelete(grupo.codListaDePartilha)}><CIcon icon={cilTrash} /></Link>
+                        </>
+
+                      </div>
                     </div>
-                    <div className="group-info">
-                      <h5>{grupo.nomeDaLista}</h5>
-                      <p>{grupo.utilizador?.username}</p>
-                      <p>{new Date(grupo.dataDeCriacao).toLocaleDateString()}</p>
-                    </div>
-                  </Link>
-                  <div className="group-actions">
-
-                    <>
-                      <Link className='ligacao' onClick={() => handleEdit(grupo.codListaDePartilha)}><CIcon icon={cilPen} /></Link>
-                      <Link className='ligacao' onClick={() => handleDelete(grupo.codListaDePartilha)}><CIcon icon={cilTrash} /></Link>
-                    </>
-
-                  </div>
-                </div>
-              ))}
+                  )
+                }
+              }
+              )}
             </div>
             <CPagination align="center" className="mt-3">
               <CPaginationItem disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
