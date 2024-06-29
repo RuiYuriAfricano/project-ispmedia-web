@@ -23,7 +23,7 @@ import {
     CDropdownItem,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMediaPlay, cilPlus } from '@coreui/icons';
+import { cilMediaPlay, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
 import ReactPlayer from 'react-player';
 import { service } from '../../services';
 import './PlaylistPublicaAlbum.css';
@@ -40,8 +40,9 @@ const PlaylistPublicaAlbum = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const { id } = useParams();
     const user = JSON.parse(localStorage.getItem("loggedUser"));
-
-    const [comments, setComments] = useState([]);
+    const [album, setAlbum] = useState(null)
+    const [comments, setComments] = useState({});
+    const [editingComment, setEditingComment] = useState(null);
     const [rating, setRating] = useState(0);
     const [newComment, setNewComment] = useState('');
     const [currentUser, setCurrentUser] = useState({
@@ -55,6 +56,7 @@ const PlaylistPublicaAlbum = () => {
     const player2Ref = useRef(null);
     const [tituloAlbum, setTituloAlbum] = useState("");
 
+
     const handlePause = () => {
         setPlaying(false);
     };
@@ -67,6 +69,7 @@ const PlaylistPublicaAlbum = () => {
         const fetchVideos = async () => {
             try {
                 const responseAlbum = await service.album.pesquisaporid(id)
+                setAlbum(responseAlbum.data)
                 setTituloAlbum(responseAlbum.data.tituloAlbum)
                 const response = await service.musica.listar();
                 const filtro = response.data.filter(item => item.visibilidade === 'Publico' && item.fkAlbum === parseInt(id))
@@ -86,19 +89,86 @@ const PlaylistPublicaAlbum = () => {
         };
 
         fetchVideos();
+        fetchComments();
     }, [id]);
 
-    const handleAddComment = () => {
+
+
+    const handleAddComment = async (albumId) => {
         if (newComment.trim()) {
-            setComments([...comments, {
-                text: newComment,
-                rating,
-                user: currentUser
-            }]);
-            setNewComment('');
-            setRating(0);
+            const newCommentData = {
+                fkAlbum: albumId,
+                fkUtilizador: user.codUtilizador,
+                pontuacao: rating,
+                comentario: newComment
+            };
+            try {
+                if (editingComment) {
+                    const newCommentData = {
+                        fkAlbum: albumId,
+                        fkUtilizador: user.codUtilizador,
+                        pontuacao: rating,
+                        comentario: newComment,
+                        codCritica: Number(editingComment.codCritica)
+                    };
+                    // Editing existing comment
+                    await service.criticas.update(newCommentData);
+                    setEditingComment(null);
+                } else {
+                    // Adding new comment
+                    await service.criticas.add(newCommentData);
+                }
+                setNewComment('');
+                setRating(0);
+                fetchComments(albumId); // Refresh comments
+            } catch (error) {
+                console.error("Error adding comment:", error);
+            }
         }
     };
+
+    const handleEditComment = (comment) => {
+        setNewComment(comment.comentario);
+        setRating(comment.pontuacao);
+        setEditingComment(comment);
+    };
+
+    const handleDeleteComment = async (commentId, albumId) => {
+        try {
+            await service.criticas.excluir(commentId);
+            fetchComments(albumId); // Refresh comments
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+        }
+    };
+
+    const toggleComments = (index, albumId) => {
+        setExpandedAlbum(expandedAlbum === index ? null : index);
+        if (expandedAlbum !== index) {
+            fetchComments(albumId);
+        }
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchComments(album.codAlbum);
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, [album]);
+
+
+
+    const fetchComments = async (albumId) => {
+        try {
+            const response = await service.criticas.listar();
+            const albumComments = response.data.filter(comment => comment.fkAlbum === albumId);
+            setComments(prevComments => ({ ...prevComments, [albumId]: albumComments }));
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
 
 
     if (loading) return <div>Loading...</div>;
@@ -165,18 +235,43 @@ const PlaylistPublicaAlbum = () => {
                     </CCardBody>
                     <CCardFooter>
                         <h5>{selectedTitulo}</h5>
-                        <div>
-                            <h6>Comentários:</h6>
-                            {comments.map((comment, index) => (
-                                <div key={index} className="comment">
-                                    <div className="comment-header">
-                                        <CImage src={comment.user.photo} alt={comment.user.name} className="user-photo" />
-                                        <span className="user-name">{comment.user.name}</span>
-                                        <StarRating rating={comment.rating} setRating={() => { }} />
+                        <div style={{ padding: '0' }}>
+                            <h6>{comments[album.codAlbum]?.length} Comentários:</h6>
+                            {comments[album.codAlbum] && comments[album.codAlbum].length > 0 ? (
+                                comments[album.codAlbum].map((comment, commentIndex) => (
+                                    <div key={commentIndex} className="comment">
+                                        <div className="comment-header">
+                                            <CImage width="50" height="50" src={'http://localhost:3333/utilizador/download/' + comment.utilizador.username} alt={comment.nameUtilizador} className="user-photo" />
+                                            <span className="user-name">{comment.utilizador.username}</span>
+                                            <StarRating rating={comment.pontuacao} setRating={() => { }} />
+
+                                        </div>
+
+                                        <CRow>
+                                            <CCol xl='8'><p className="comment-text">{comment.comentario}</p></CCol>
+                                            <CCol>
+                                                {comment.fkUtilizador === user.codUtilizador && (
+                                                    <CRow>
+                                                        <CCol xl='2' ><CIcon icon={cilPencil} onClick={() => handleEditComment(comment)} style={{ cursor: 'pointer' }} /></CCol>
+                                                        <CCol xl='2'><CIcon icon={cilTrash} onClick={() => handleDeleteComment(comment.codCritica, album.codAlbum)} style={{ cursor: 'pointer' }} /></CCol>
+                                                    </CRow>
+                                                )
+
+                                                }
+                                            </CCol>
+
+
+
+                                        </CRow>
+
+
+
+
                                     </div>
-                                    <p>{comment.text}</p>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <p>Sem comentários.</p>
+                            )}
                             <CForm>
                                 <CInputGroup>
                                     <CFormInput
@@ -186,7 +281,7 @@ const PlaylistPublicaAlbum = () => {
                                     />
                                 </CInputGroup>
                                 <StarRating rating={rating} setRating={setRating} />
-                                <CButton color="primary" onClick={handleAddComment}>Comentar</CButton>
+                                <CButton color="primary" onClick={() => handleAddComment(album.codAlbum)}>Comentar</CButton>
                             </CForm>
                         </div>
                     </CCardFooter>
