@@ -116,3 +116,15 @@
     left: auto;
     right: 0;
 }
+
+.control-icone {
+    border-radius: 50%;
+    background-color: #000;
+    margin: 10px;
+}
+
+.control-icone2 {
+    border-radius: 50%;
+    margin: 2px;
+    margin-top: 5px;
+}

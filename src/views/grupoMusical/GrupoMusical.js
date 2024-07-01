@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import {
   CCard,
   CCardBody,
@@ -31,8 +31,12 @@ import { service } from './../../services';
 import ConfigGrupoMusical from './ConfigGrupoMusical';
 import './GrupoMusical.css';
 import thumbnail from './img/default-thumbnail.jpeg';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const GrupoMusical = () => {
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
   const [grupos, setGrupos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -133,7 +137,7 @@ const GrupoMusical = () => {
                             <Link>
                               <CImage
                                 className="thumbnail"
-                                src={thumbnail} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
+                                src={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShSzprQCZ58UNKjhlnJ2f0yU-ZKfs6jBo15A&s"} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                 alt={grupo.nomeGrupoMusical}
                               />
                               <CIcon icon={cilMediaPlay} className="play-icon" />

@@ -23,7 +23,7 @@ import {
   CPagination,
   CPaginationItem
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { cilPen, cilPeople, cilPlus, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
@@ -34,7 +34,13 @@ import avatar3 from 'src/assets/images/avatars/3.jpg'
 import avatar4 from 'src/assets/images/avatars/4.jpg'
 import avatar5 from 'src/assets/images/avatars/5.jpg'
 import avatar6 from 'src/assets/images/avatars/6.jpg'
+import { isNullOrUndef } from 'chart.js/helpers';
 const Artista = () => {
+
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
+
   const [artistas, setArtistas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

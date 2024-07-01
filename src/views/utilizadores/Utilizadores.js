@@ -23,12 +23,26 @@ import {
   CPagination,
   CPaginationItem
 } from '@coreui/react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { cilPen, cilPeople, cilPlus, cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const Utilizadores = () => {
+
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
+
+  if (!isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    const user = JSON.parse(localStorage.getItem("loggedUser"));
+    if (user.tipoDeUtilizador !== 'admin') {
+      return <Navigate to="/login"></Navigate>;
+    }
+
+  }
+
   const [utilizadores, setUtilizadores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

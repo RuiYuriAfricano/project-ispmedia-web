@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import {
     CCard,
     CCardBody,
@@ -38,8 +38,14 @@ import thumbnail from './img/default-thumbnail.png';
 import './GrupoConteudo.css';
 import StarRating from './StarRating';
 import video2 from './img/animacaoDeAudio.mp4'
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const GrupoConteudo = () => {
+
+    if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+        return <Navigate to="/login"></Navigate>;
+    }
+
     const { grupoId } = useParams();
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -109,6 +115,7 @@ const GrupoConteudo = () => {
                 const response = await service.grupoDeAmigos.getVideosMusicasEAlbunsDoGrupo(grupoId);
 
                 setVideos(response.data.success ? response.data.data : []);
+                console.log(response.data.data)
                 if (response.data.data.length > 0) {
                     if (response.data.data[0].tipo === 'video') {
                         setSelectedVideo(`https://localhost:3333/video/downloadVideo/${response.data.data[0].codigo}`);
@@ -126,13 +133,15 @@ const GrupoConteudo = () => {
                             setSelectedVideo('');
                             setSelectedUrlCapa(`https://localhost:3333/album/downloadCapa/${response.data.data[0].codigo}`);
                             setSelectedTitulo(response.data.data[0].titulo);
+                            setSelectedItem(response.data.data[0])
                         } else {
                             setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
                             setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${response.data.data[0].musicasDoAlbum[0].codMusica}`);
                             setSelectedTitulo(response.data.data[0].musicasDoAlbum[0].tituloMusica);
+                            setSelectedItem(response.data.data[0].musicasDoAlbum[0])
                         }
 
-                        setSelectedItem(response.data.data[0].musicasDoAlbum[0])
+
                     }
                     setSelectedTipo(response.data.data[0].tipo);
 
@@ -418,7 +427,7 @@ const GrupoConteudo = () => {
                     </CCardBody>
                     <CCardFooter>
                         <h5>{selectedTitulo}</h5>
-                        <div style={{ padding: '0' }}>
+                        {videos.length > 0 && (<div style={{ padding: '0' }}>
                             <h6>{comments[selectedItem.codigo]?.length} Comentários:</h6>
                             {comments[selectedItem.codigo] && comments[selectedItem.codigo].length > 0 ? (
                                 comments[selectedItem.codigo].map((comment, commentIndex) => (
@@ -467,7 +476,8 @@ const GrupoConteudo = () => {
                                 <StarRating rating={rating} setRating={setRating} />
                                 <CButton color="primary" onClick={() => handleAddComment(selectedItem.codigo)}>Comentar</CButton>
                             </CForm>
-                        </div>
+                        </div>)}
+
                     </CCardFooter>
 
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import {
   CCard,
   CCardBody,
@@ -20,8 +20,14 @@ import { service } from './../../services';
 import ConfigGrupoDeAmigos from './ConfigGrupoDeAmigos';
 import './GrupoDeAmigos.css';
 import thumbnail from './img/default-thumbnail.png';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const GrupoDeAmigos = () => {
+
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
+
   const { id } = useParams();
 
   const [grupos, setGrupos] = useState([]);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import {
   CCard,
   CCardBody,
@@ -20,8 +20,14 @@ import { service } from '../../services';
 import ConfigListaDePartilha from './ConfigListaDePartilha';
 import './ListaDePartilha.css';
 import thumbnail from './img/listaDePartilha.png';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const ListaDePartilha = () => {
+
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
+
   const [grupos, setGrupos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

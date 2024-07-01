@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import {
     CCard,
     CCardBody,
@@ -31,15 +31,22 @@ import {
     CDropdownItem,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMediaPlay, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
+import { cilCaretLeft, cilCaretRight, cilMediaPause, cilMediaPlay, cilPencil, cilPlus, cilTrash } from '@coreui/icons';
 import ReactPlayer from 'react-player';
 import { service } from './../../services';
 import thumbnail from './img/default-thumbnail.png';
 import './PlaylistConteudo.css';
 import StarRating from '../starRating/StarRating';
 import video2 from './img/animacaoDeAudio.mp4'
+import { isNullOrUndef } from 'chart.js/helpers';
+import { bottom, left } from '@popperjs/core';
 
 const PlaylistConteudo = () => {
+
+    if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+        return <Navigate to="/login"></Navigate>;
+    }
+
     const { playlistId } = useParams();
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -55,6 +62,9 @@ const PlaylistConteudo = () => {
     const [msgDoAlert, setMsgDoAlert] = useState('');
     const [corDoAlert, setCorDoAlert] = useState('');
     const [nomePlayList, setNomePlayList] = useState(null);
+    const [isRandom, setIsRandom] = useState(false);
+    const [showControls, setShowControls] = useState(false);
+
 
     const user = JSON.parse(localStorage.getItem("loggedUser"));
 
@@ -103,6 +113,7 @@ const PlaylistConteudo = () => {
                 setLoading(false);
             }
         };
+
 
         const fetchNomePlaylist = async () => {
             try {
@@ -246,6 +257,75 @@ const PlaylistConteudo = () => {
         }
     };
 
+    const handleMouseEnter = () => {
+        setShowControls(true);
+    };
+
+    const handleMouseLeave = () => {
+        setShowControls(false);
+    };
+    const handlePlayNext = () => {
+        let nextVideo;
+        if (isRandom) {
+            // Selecionar aleatoriamente um vídeo diferente do atual
+            do {
+                nextVideo = videos[Math.floor(Math.random() * videos.length)];
+            } while (nextVideo.codigo === selectedItem.codigo && nextVideo.tipo === selectedItem.tipo);
+        } else {
+            // Selecionar o próximo vídeo na lista sequencialmente
+            const currentIndex = videos.findIndex(v => v.codigo === selectedItem.codigo && v.tipo === selectedItem.tipo);
+            const nextIndex = (currentIndex + 1) % videos.length;
+            nextVideo = videos[nextIndex];
+        }
+
+        if (nextVideo.tipo === 'video') {
+            setSelectedVideo(`https://localhost:3333/video/downloadVideo/${nextVideo.codigo}`);
+            setSelectedUrlCapa(`https://localhost:3333/video/${nextVideo.codigo}/thumbnail`);
+        } else {
+            setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${nextVideo.codigo}`);
+            setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${nextVideo.codigo}`);
+            setPlaying(true)
+        }
+        setSelectedTipo(nextVideo.tipo);
+        setSelectedTitulo(nextVideo.titulo);
+        setSelectedItem(nextVideo);
+    };
+
+    const handleNext = () => {
+        const currentIndex = videos.findIndex(v => v.codigo === selectedItem.codigo && v.tipo === selectedItem.tipo);
+        const nextIndex = (currentIndex + 1) % videos.length;
+        const nextVideo = videos[nextIndex];
+
+        if (nextVideo.tipo === 'video') {
+            setSelectedVideo(`https://localhost:3333/video/downloadVideo/${nextVideo.codigo}`);
+            setSelectedUrlCapa(`https://localhost:3333/video/${nextVideo.codigo}/thumbnail`);
+        } else {
+            setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${nextVideo.codigo}`);
+            setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${nextVideo.codigo}`);
+        }
+        setSelectedTipo(nextVideo.tipo);
+        setSelectedTitulo(nextVideo.titulo);
+        setSelectedItem(nextVideo);
+    };
+
+    const handlePrevious = () => {
+        const currentIndex = videos.findIndex(v => v.codigo === selectedItem.codigo && v.tipo === selectedItem.tipo);
+        const previousIndex = (currentIndex - 1 + videos.length) % videos.length;
+        const previousVideo = videos[previousIndex];
+
+        if (previousVideo.tipo === 'video') {
+            setSelectedVideo(`https://localhost:3333/video/downloadVideo/${previousVideo.codigo}`);
+            setSelectedUrlCapa(`https://localhost:3333/video/${previousVideo.codigo}/thumbnail`);
+        } else {
+            setSelectedVideo(`https://localhost:3333/musica/downloadMusica/${previousVideo.codigo}`);
+            setSelectedUrlCapa(`https://localhost:3333/musica/downloadCapa/${previousVideo.codigo}`);
+        }
+        setSelectedTipo(previousVideo.tipo);
+        setSelectedTitulo(previousVideo.titulo);
+        setSelectedItem(previousVideo);
+    };
+
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
 
@@ -284,7 +364,7 @@ const PlaylistConteudo = () => {
                     <CCardBody className="player-container">
                         {
                             selectedTipo === 'musica' ? (
-                                <ReactPlayer
+                                <><ReactPlayer
                                     ref={player1Ref}
                                     url={video2}
                                     controls={false}
@@ -303,19 +383,31 @@ const PlaylistConteudo = () => {
                                     }}
 
                                 />
+
+                                </>
+
                             ) : (
                                 <div className="no-video"></div>
                             )
                         }
                         {
                             selectedTipo === 'musica' && selectedUrlCapa ? (
-                                <CImage
+                                <><CImage
                                     src={selectedUrlCapa}
                                     width="100%"
                                     alt={selectedUrlCapa}
                                     height="85%"
                                     style={{ width: "180px", height: '120px', position: 'absolute', padding: '15px', borderRadius: '20px', top: '60%', left: '0', zIndex: '1' }}
                                 />
+                                    <div className="video-controls" style={{ paddingBottom: '10px', borderRadius: '30px', width: '100px', height: '50px', backgroundColor: '#444', position: 'absolute', top: '186px', left: '656px', zIndex: '1', textAlign: 'center', marginTop: '200px' }}>
+
+                                        <CButton onClick={handlePrevious} className='control-icone2'><CIcon icon={cilCaretLeft} /></CButton>
+
+                                        <CButton onClick={handleNext} className='control-icone2'><CIcon icon={cilCaretRight} /></CButton>
+
+                                    </div>
+                                </>
+
                             ) : (
                                 <div className="no-video"></div>
                             )
@@ -323,12 +415,15 @@ const PlaylistConteudo = () => {
 
                         {
                             selectedVideo && selectedTipo === 'video' ? (
-                                <ReactPlayer
+                                <><ReactPlayer
                                     url={selectedVideo}
                                     controls={true}
                                     width="100%"
                                     height="100%"
-                                    playing={true}
+                                    playing={playing}
+                                    onEnded={handlePlayNext}
+                                    onMouseOver={handleMouseEnter}
+                                    onMouseLeave={handleMouseLeave}
                                     config={{
                                         file: {
                                             attributes: {
@@ -338,18 +433,27 @@ const PlaylistConteudo = () => {
                                     }}
 
                                 />
+                                    <div className="video-controls" style={{ textAlign: 'center', marginTop: '200px', display: showControls ? 'block' : 'none' }}>
+                                        <CButton onClick={handlePrevious} className='control-icone'><CIcon icon={cilCaretLeft} /></CButton>
+                                        <CButton onClick={playing ? handlePause : handlePlay} className='control-icone'><CIcon icon={playing ? cilMediaPause : cilMediaPlay} /></CButton>
+                                        <CButton onClick={handleNext} className='control-icone'><CIcon icon={cilCaretRight} /></CButton>
+
+                                    </div>
+                                </>
+
                             ) :
                                 selectedVideo && selectedTipo === 'musica' ? (
-                                    <ReactPlayer
+                                    <><ReactPlayer
                                         ref={player2Ref}
                                         className="react-player"
                                         url={selectedVideo}
                                         controls={true}
-                                        width="98%"
+                                        width="84%"
                                         height="98%"
                                         playing={playing}
                                         onPlay={handlePlay}
                                         onPause={handlePause}
+                                        onEnded={handlePlayNext}
                                         style={{ marginLeft: '6px' }}
                                         config={{
                                             file: {
@@ -361,6 +465,11 @@ const PlaylistConteudo = () => {
 
                                     />
 
+
+
+                                    </>
+
+
                                 ) :
                                     (
                                         <div className="no-video">Adicione videos e ou músicas à sua playList</div>
@@ -369,7 +478,7 @@ const PlaylistConteudo = () => {
                     </CCardBody>
                     <CCardFooter>
                         <h5>{selectedTitulo}</h5>
-                        <div style={{ padding: '0' }}>
+                        {videos.length > 0 && (<div style={{ padding: '0' }}>
                             <h6>{comments[selectedItem.codigo]?.length} Comentários:</h6>
                             {comments[selectedItem.codigo] && comments[selectedItem.codigo].length > 0 ? (
                                 comments[selectedItem.codigo].map((comment, commentIndex) => (
@@ -418,7 +527,8 @@ const PlaylistConteudo = () => {
                                 <StarRating rating={rating} setRating={setRating} />
                                 <CButton color="primary" onClick={() => handleAddComment(selectedItem.codigo)}>Comentar</CButton>
                             </CForm>
-                        </div>
+                        </div>)}
+
                     </CCardFooter>
                 </CCard>
             </CCol>
@@ -428,6 +538,14 @@ const PlaylistConteudo = () => {
                         <CRow>
                             <CCol>
                                 <strong>{nomePlayList}</strong>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={isRandom}
+                                        onChange={() => setIsRandom(!isRandom)}
+                                    />
+                                    <label style={{ marginLeft: '8px' }}>Aleatória</label>
+                                </div>
                             </CCol>
                             <CCol style={{ textAlign: 'right' }}>
                                 <CButton color="primary" onClick={() => setModal(true)}>
@@ -551,7 +669,7 @@ const PlaylistConteudo = () => {
                     <CButton color="secondary" onClick={() => setModal(false)}>Cancelar</CButton>
                 </CModalFooter>
             </CModal>
-        </CRow>
+        </CRow >
     );
 };
 

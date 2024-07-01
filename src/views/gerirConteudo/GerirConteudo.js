@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import {
   CRow,
   CCol,
@@ -19,8 +19,12 @@ import CIcon from '@coreui/icons-react';
 import albumImage from './images/image1.jpeg';
 import musicImage from './images/image2.jpeg';
 import videoImage from './images/image3.png';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const GerirConteudo = () => {
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
   const menuItems = [
     { name: 'Gestão de Álbuns', icon: cilLibrary, link: '/album', image: albumImage },
     { name: 'Gestão de Músicas', icon: cilMusicNote, link: '/musica', image: musicImage },

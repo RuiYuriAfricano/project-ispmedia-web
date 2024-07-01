@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
   CCard,
   CCardBody,
@@ -19,8 +19,14 @@ import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus, cilEyedropp
 import CIcon from '@coreui/icons-react';
 import { service } from './../../services';
 import ConfigAlbum from './ConfigAlbum';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const Album = () => {
+
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
+
   const navigate = useNavigate(); // Initialize useNavigateconst navigate = useNavigate(); // Initialize useNavigate
   const [albuns, setAlbuns] = useState([]);
   const [loading, setLoading] = useState(true);

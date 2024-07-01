@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import {
     CCard,
     CCardBody,
@@ -29,9 +29,14 @@ import { service } from '../../services';
 import './PlaylistPublicaAlbum.css';
 import StarRating from '../starRating/StarRating';
 import video2 from './img/animacaoDeAudio.mp4'
-import { isNumber } from 'chart.js/helpers';
+import { isNullOrUndef, isNumber } from 'chart.js/helpers';
 
 const PlaylistPublicaAlbum = () => {
+
+    if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+        return <Navigate to="/login"></Navigate>;
+    }
+
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

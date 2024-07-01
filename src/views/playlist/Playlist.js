@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { CCard, CCardBody, CCardHeader, CCol, CRow, CButton, CModal, CModalHeader, CModalBody, CImage, CPagination, CPaginationItem } from '@coreui/react';
 import { cilPlus, cilMediaPlay, cilTrash, cilPen } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
@@ -7,8 +7,14 @@ import { service } from './../../services';
 import ConfigPlaylist from './ConfigPlaylist';
 import './Playlist.css';
 import thumbnail from './img/default-thumbnail.png';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 const Playlist = () => {
+
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
+
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

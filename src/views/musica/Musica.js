@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
   CButton,
   CCard,
@@ -21,10 +21,15 @@ import { cilPencil, cilTrash, cilShare, cilMagnifyingGlass, cilPlus, cilMediaPla
 import CIcon from '@coreui/icons-react';
 import ReactPlayer from 'react-player';
 import { service } from './../../services';
-import { color } from 'chart.js/helpers';
+import { color, isNullOrUndef } from 'chart.js/helpers';
 import ConfigMusica from './ConfigMusica';
 
 const Musica = () => {
+
+  if (isNullOrUndef(localStorage.getItem("loggedUser"))) {
+    return <Navigate to="/login"></Navigate>;
+  }
+
   const navigate = useNavigate(); // Initialize useNavigate
   const [musicas, setMusicas] = useState([]);
   const [loading, setLoading] = useState(true);
