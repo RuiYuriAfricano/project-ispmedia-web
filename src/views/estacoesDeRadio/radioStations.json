@@ -1,0 +1,234 @@
+[
+    {
+        "name": "Radio 5",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio5.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radio_5.jpg",
+        "frequencia": "91.5 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Mais",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio10.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radio_mais.jpg",
+        "frequencia": "88.1 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio UNIA",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio2.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radio_unia.png",
+        "frequencia": "92.3 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Keirós",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio9.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/kairos.jpg",
+        "frequencia": "95.5 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Escola",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio1.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radio_escola.jpg",
+        "frequencia": "98.5 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio FM Stéreo",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio7.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/fmstereo.jpg",
+        "frequencia": "103.3 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio LAC",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio14.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/lac.jpg",
+        "frequencia": "95.5 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Cazenga",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio13.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/cazenga.jpg",
+        "frequencia": "93.3 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Viana",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio16.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radio-viana.jpg",
+        "frequencia": "100.3 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Cacuaco",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio17.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radio-cacuaco.jpg",
+        "frequencia": "98.1 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Sem Anestesia",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio19.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radiosemanestesia.png",
+        "frequencia": "97.5 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Romântica",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio4.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/r_romantica.png",
+        "frequencia": "90.7 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio RDP ÁFRICA",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/CV/radio12.mp3",
+        "image": "https://thumbs.web.sapo.io/?pic=http%3A%2F%2Fimgs.sapo.pt%2Fradiosonlineao%2Fcontent%2Fimg%2Frdp_africa_2.jpg&W=100&H=75&crop=center",
+        "frequencia": "98.5 FM",
+        "pais": "Cabo Verde"
+    },
+    {
+        "name": "Radio RFI",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/CV/radio8.mp3",
+        "image": "https://thumbs.web.sapo.io/?pic=http%3A%2F%2Fimgs.sapo.pt%2Fradiosonlineao%2Fcontent%2Fimg%2Flogo.png&W=100&H=75&crop=center&png=1",
+        "frequencia": "99.7 FM",
+        "pais": "Cabo Verde"
+    },
+    {
+        "name": "Radio de Cabo Verde",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/CV/radio7.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/img/radio-placeholder.png",
+        "frequencia": "100.5 FM",
+        "pais": "Cabo Verde"
+    },
+    {
+        "name": "Radio CV Mais",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/CV/radio6.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/img/radio-placeholder.png",
+        "frequencia": "102.3 FM",
+        "pais": "Cabo Verde"
+    },
+    {
+        "name": "Rádio Despertar",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio15.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/logo_despertarangola.jpg",
+        "frequencia": "91.0 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Canal A",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio3.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/canala.jpg",
+        "frequencia": "90.3 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio de Cabo Verde",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/CV/radio7.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/img/radio-placeholder.png",
+        "frequencia": "100.5 FM",
+        "pais": "Cabo Verde"
+    },
+    {
+        "name": "Radio Cidade",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/CV/radio1.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/img/radio-placeholder.png",
+        "frequencia": "99.9 FM",
+        "pais": "Cabo Verde"
+    },
+    {
+        "name": "Radio Comercial",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/CV/radio9.mp3",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ6QotJvEkcZJ27A4VQoYAlu2s6r6lbMq5EQ&s",
+        "frequencia": "101.7 FM",
+        "pais": "Cabo Verde"
+    },
+    {
+        "name": "Radio Tuganet",
+        "icon": "cilWifiSignal3",
+        "link": "https://ssl.stmxp.net:8006/;?type=http&nocache=208333",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmgxM7QiDKgDFV8O24d7qa97zFfxnrmC2M3Q&s",
+        "frequencia": "104.9 FM",
+        "pais": "Portugal"
+    },
+    {
+        "name": "Radio Ecclesia",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio8.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radio_ecclesia.jpg",
+        "frequencia": "97.5 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio N'Gola Yetu",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio12.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/n_gola_yetu.jpg",
+        "frequencia": "95.3 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio Luanda",
+        "icon": "cilWifiSignal3",
+        "link": "https://radios.vpn.sapo.pt/AO/radio11.mp3",
+        "image": "https://imgs.sapo.pt/radiosonlineao/content/img/radioluanda.jpg",
+        "frequencia": "99.9 FM",
+        "pais": "Angola"
+    },
+    {
+        "name": "Radio WHTZ",
+        "icon": "cilWifiSignal3",
+        "link": "http://playerservices.streamtheworld.com/api/livestream-redirect/WHTZFM.mp3",
+        "image": "https://static.radios.com.br/img/navbar-logo-96-transparent.png",
+        "frequencia": "100.3 FM",
+        "pais": "Estados Unidos"
+    },
+    {
+        "name": "Radio KISS FM",
+        "icon": "cilWifiSignal3",
+        "link": "http://playerservices.streamtheworld.com/api/livestream-redirect/WKSCFM.mp3",
+        "image": "https://kissfm.com.br/wp-content/themes/KISSFM/img/kisslogo.png",
+        "frequencia": "101.9 FM",
+        "pais": "Brasil"
+    },
+    {
+        "name": "Radio KEXP",
+        "icon": "cilWifiSignal3",
+        "link": "https://live-mp3-128.kexp.org/kexp128.mp3",
+        "image": "https://www.kexp.org/static/assets/img/logo-header.svg",
+        "frequencia": "90.3 FM",
+        "pais": "Estados Unidos"
+    },
+    {
+        "name": "Radio RTL",
+        "icon": "cilWifiSignal3",
+        "link": "https://streamer-04.rtl.fr/rtl-1-44-128",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREjt9povR6ZB6ohsps-3jqCn3RaTxw6xGyEQ&s",
+        "frequencia": "104.3 FM",
+        "pais": "França"
+    }
+]
