@@ -86,12 +86,12 @@ const DynamicNav = () => {
           to: '/playlist',
           icon: <CIcon icon={cilFeaturedPlaylist} customClassName="nav-icon" />,
         },
-        {
+        /*{
           component: CNavItem,
           name: 'Downloads',
           to: '/charts',
           icon: <CIcon icon={cilCloudDownload} customClassName="nav-icon" />,
-        },
+        },*/
         {
           component: CNavItem,
           name: 'Lista de Partilhas',
@@ -163,12 +163,12 @@ const DynamicNav = () => {
           to: '/playlist',
           icon: <CIcon icon={cilFeaturedPlaylist} customClassName="nav-icon" />,
         },
-        {
+        /*{
           component: CNavItem,
           name: 'Downloads',
           to: '/charts',
           icon: <CIcon icon={cilCloudDownload} customClassName="nav-icon" />,
-        },
+        },*/
         {
           component: CNavItem,
           name: 'Lista de Partilhas',
