@@ -95,6 +95,7 @@ const PlaylistPublicaVideo = () => {
             const response = await service.criticas.listar();
             const videoComments = response.data.filter(comment => comment.fkVideo === videoId);
             setComments(prevComments => ({ ...prevComments, [videoId]: videoComments }));
+
         } catch (err) {
             console.error(err);
         }
@@ -178,7 +179,8 @@ const PlaylistPublicaVideo = () => {
                             ) :
                                 (
                                     <div className="no-video">Nenhum video selecionado</div>
-                                )}
+                                )
+                        }
 
                     </CCardBody>
                     <CCardFooter>
