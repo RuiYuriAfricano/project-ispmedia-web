@@ -47,7 +47,12 @@ const Video = () => {
     const fetchVideos = async () => {
       try {
         const response = await service.video.listar();
-        setVideos(response.data);
+        if (user.tipoDeUtilizador === 'admin') {
+          setVideos(response.data);
+        } else {
+          setVideos(response.data.filter(item => item.fkUtilizador === user.codUtilizador));
+        }
+
         setLoading(false);
       } catch (err) {
         setError(err);

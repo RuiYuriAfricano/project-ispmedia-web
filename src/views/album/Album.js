@@ -42,7 +42,11 @@ const Album = () => {
       try {
         const response = await service.album.listar();
         if (response.status === 201) {
-          setAlbuns(response.data);
+          if (user.tipoDeUtilizador === 'admin') {
+            setAlbuns(response.data);
+          } else {
+            setAlbuns(response.data.filter(item => item.fkUtilizador === user.codUtilizador));
+          }
           setLoading(false);
         }
 

@@ -41,12 +41,17 @@ const Musica = () => {
   const [artistasDisponiveis, setArtistasDisponiveis] = useState([]);
   const [modalConfigVisible, setModalConfigVisible] = useState(false);
   const [editMusicaId, setEditMusicaId] = useState(null);
+  const user = JSON.parse(localStorage.getItem("loggedUser"));
 
   useEffect(() => {
     const fetchMusicas = async () => {
       try {
         const response = await service.musica.listar();
-        setMusicas(response.data);
+        if (user.tipoDeUtilizador === 'admin') {
+          setMusicas(response.data);
+        } else {
+          setMusicas(response.data.filter(item => item.fkUtilizador === user.codUtilizador));
+        }
         setLoading(false);
       } catch (err) {
         setError(err);
@@ -223,7 +228,7 @@ const Musica = () => {
   const participacaoButtonStyle = {
     marginLeft: '10px',
   };
-  const user = JSON.parse(localStorage.getItem("loggedUser"));
+
 
 
   return (
