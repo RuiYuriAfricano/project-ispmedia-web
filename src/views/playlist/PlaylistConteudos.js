@@ -428,7 +428,7 @@ const PlaylistConteudo = () => {
 
                                         <CButton onClick={handlePrevious} className='control-icone2'><CIcon icon={cilCaretLeft} /></CButton>
 
-                                        <CButton onClick={handleNext} className='control-icone2'><CIcon icon={cilCaretRight} /></CButton>
+                                        <CButton onClick={handlePlayNext} className='control-icone2'><CIcon icon={cilCaretRight} /></CButton>
 
                                     </div>
                                 </>
@@ -461,7 +461,7 @@ const PlaylistConteudo = () => {
                                     <div className="video-controls" style={{ textAlign: 'center', marginTop: '200px', display: showControls ? 'block' : 'none' }}>
                                         <CButton onClick={handlePrevious} className='control-icone'><CIcon icon={cilCaretLeft} /></CButton>
                                         <CButton onClick={playing ? handlePause : handlePlay} className='control-icone'><CIcon icon={playing ? cilMediaPause : cilMediaPlay} /></CButton>
-                                        <CButton onClick={handleNext} className='control-icone'><CIcon icon={cilCaretRight} /></CButton>
+                                        <CButton onClick={handlePlayNext} className='control-icone'><CIcon icon={cilCaretRight} /></CButton>
 
                                     </div>
                                 </>
