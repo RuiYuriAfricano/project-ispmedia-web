@@ -59,6 +59,23 @@ const PlaylistPublicaMusica = () => {
     const player1Ref = useRef(null);
     const player2Ref = useRef(null);
     const [editingComment, setEditingComment] = useState(null);
+    const [musicaDurations, setMusicaDurations] = useState({});
+    const loadMusicaDuration = (musicaId) => {
+        const audioElement = document.createElement('audio');
+        audioElement.src = `https://localhost:3333/musica/downloadMusica/${musicaId}`;
+        audioElement.addEventListener('loadedmetadata', () => {
+            setMusicaDurations((prevDurations) => ({
+                ...prevDurations,
+                [musicaId]: formatDuration(audioElement.duration),
+            }));
+        });
+    };
+    const formatDuration = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    };
+
     const handlePause = () => {
         setPlaying(false);
     };
@@ -304,6 +321,7 @@ const PlaylistPublicaMusica = () => {
                                                         src={`https://localhost:3333/musica/downloadCapa/${video.codMusica}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                         alt={video.tituloMusica}
                                                         style={{ width: "160px", height: '100px', borderRadius: "5px" }}
+                                                        onLoad={() => loadMusicaDuration(video.codMusica)}
                                                     />
                                                     <div className="play-icon-wrapper">
                                                         <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
@@ -314,6 +332,7 @@ const PlaylistPublicaMusica = () => {
                                                             setSelectedItem(video); // Define o item selecionado
                                                         }} />
                                                     </div>
+                                                    <div className="musica-duration">{musicaDurations[video.codMusica]}</div> {/* Adicione esta linha */}
                                                 </div>
                                             </CTableDataCell>
                                             <CTableDataCell>

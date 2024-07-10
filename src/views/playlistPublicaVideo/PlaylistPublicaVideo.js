@@ -53,6 +53,23 @@ const PlaylistPublicaVideo = () => {
         name: 'Rui Malemba', // Substitua pelo nome do usuário atual
         photo: 'https://localhost:3333/utilizador/download/' + user.username // Substitua pela URL da foto do usuário atual
     });
+    const [videoDurations, setVideoDurations] = useState({});
+    const loadVideoDuration = (videoId) => {
+        const videoElement = document.createElement('video');
+        videoElement.src = `https://localhost:3333/video/downloadVideo/${videoId}`;
+        videoElement.addEventListener('loadedmetadata', () => {
+            setVideoDurations((prevDurations) => ({
+                ...prevDurations,
+                [videoId]: formatDuration(videoElement.duration),
+            }));
+        });
+    };
+    const formatDuration = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    };
+
     useEffect(() => {
         const fetchVideos = async () => {
             try {
@@ -266,6 +283,7 @@ const PlaylistPublicaVideo = () => {
                                                         className="thumbnail"
                                                         src={`https://localhost:3333/video/${video.codVideo}/thumbnail`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                         alt={video.tituloVideo}
+                                                        onLoad={() => loadVideoDuration(video.codVideo)}
                                                         style={{ width: "160px", height: '100px', borderRadius: "5px" }}
                                                     />
                                                     <div className="play-icon-wrapper">
@@ -277,6 +295,7 @@ const PlaylistPublicaVideo = () => {
                                                             setSelectedItem(video); // Define o item selecionado
                                                         }} />
                                                     </div>
+                                                    <div className="video-duration">{videoDurations[video.codVideo]}</div> {/* Adicione esta linha */}
                                                 </div>
                                             </CTableDataCell>
                                             <CTableDataCell>
