@@ -64,7 +64,32 @@ const GrupoConteudo = () => {
 
     const user = JSON.parse(localStorage.getItem("loggedUser"));
     const [cart, setCart] = useState([]);
-
+    const [musicaDurations, setMusicaDurations] = useState({});
+    const loadMusicaDuration = (musicaId) => {
+        const audioElement = document.createElement('audio');
+        audioElement.src = `https://localhost:3333/musica/downloadMusica/${musicaId}`;
+        audioElement.addEventListener('loadedmetadata', () => {
+            setMusicaDurations((prevDurations) => ({
+                ...prevDurations,
+                [musicaId]: formatDuration(audioElement.duration),
+            }));
+        });
+    };
+    const loadVideoDuration = (videoId) => {
+        const videoElement = document.createElement('video');
+        videoElement.src = `https://localhost:3333/video/downloadVideo/${videoId}`;
+        videoElement.addEventListener('loadedmetadata', () => {
+            setMusicaDurations((prevDurations) => ({
+                ...prevDurations,
+                [videoId]: formatDuration(videoElement.duration),
+            }));
+        });
+    };
+    const formatDuration = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    };
     const [comments, setComments] = useState({});
     const [editingComment, setEditingComment] = useState(null);
     const [rating, setRating] = useState(0);
@@ -528,6 +553,7 @@ const GrupoConteudo = () => {
                                                                         src={`https://localhost:3333/album/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                         alt={musica.tituloMusica}
                                                                         style={{ width: "160px", height: '100px', borderRadius: "5px" }}
+                                                                        onLoad={() => loadMusicaDuration(video.codigo)}
                                                                     />
                                                                     <div className="play-icon-wrapper">
                                                                         <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
@@ -540,6 +566,7 @@ const GrupoConteudo = () => {
                                                                             setSelectedItem(musica); // Define o item selecionado
                                                                         }} />
                                                                     </div>
+                                                                    <div className="musica-duration">{musicaDurations[video.codigo]}</div>
                                                                 </div>
                                                             </CTableDataCell>
                                                             <CTableDataCell>
@@ -629,6 +656,7 @@ const GrupoConteudo = () => {
                                                                 src={video.tipo === 'video' ? `https://localhost:3333/video/${video.codigo}/thumbnail` : `https://localhost:3333/musica/downloadCapa/${video.codigo}`} // Placeholder thumbnail 'http://img.youtube.com/vi/<video-id>/hqdefault.jpg'
                                                                 alt={video.nome}
                                                                 style={{ width: "160px", height: '100px', borderRadius: "5px" }}
+                                                                onLoad={video.tipo === 'video' ? () => loadVideoDuration(video.codigo) : () => loadMusicaDuration(video.codigo)}
                                                             />
                                                             <div className="play-icon-wrapper">
                                                                 <CIcon icon={cilMediaPlay} className="play-icon" onClick={() => {
@@ -645,6 +673,7 @@ const GrupoConteudo = () => {
                                                                     setSelectedItem(video); // Define o item selecionado
                                                                 }} />
                                                             </div>
+                                                            <div className="musica-duration">{musicaDurations[video.codigo]}</div>
                                                         </div>
                                                     </CTableDataCell>
                                                     <CTableDataCell>
