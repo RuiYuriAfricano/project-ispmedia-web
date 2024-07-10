@@ -15,6 +15,7 @@ import {
   cilHome,
   cilList,
   cilMediaPlay,
+  cilMic,
   cilMusicNote,
   cilNotes,
   cilPencil,
@@ -84,7 +85,7 @@ const DynamicNav = () => {
           component: CNavItem,
           name: 'PlayLists',
           to: '/playlist',
-          icon: <CIcon icon={cilFeaturedPlaylist} customClassName="nav-icon" />,
+          icon: <CIcon icon={cilMediaPlay} customClassName="nav-icon" />,
         },
         /*{
           component: CNavItem,
@@ -108,11 +109,11 @@ const DynamicNav = () => {
           component: CNavItem,
           name: 'Artistas',
           to: '/artistas',
-          icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+          icon: <CIcon icon={cilMic} customClassName="nav-icon" />,
         },
         {
           component: CNavItem,
-          name: 'Rádio',
+          name: 'Rádios',
           to: '/estacoesDeRadio',
           icon: <CIcon icon={cilWifiSignal1} customClassName="nav-icon" />,
         },
@@ -135,12 +136,7 @@ const DynamicNav = () => {
           to: '/gerirConteudo',
           icon: <CIcon icon={cilList} customClassName="nav-icon" />,
         },
-        {
-          component: CNavItem,
-          name: 'Pesquisar Conteúdo',
-          to: '/theme/typography',
-          icon: <CIcon icon={cilSearch} customClassName="nav-icon" />,
-        },
+
         {
           component: CNavTitle,
           name: 'Avançado',
@@ -161,7 +157,7 @@ const DynamicNav = () => {
           component: CNavItem,
           name: 'PlayLists',
           to: '/playlist',
-          icon: <CIcon icon={cilFeaturedPlaylist} customClassName="nav-icon" />,
+          icon: <CIcon icon={cilMediaPlay} customClassName="nav-icon" />,
         },
         /*{
           component: CNavItem,
@@ -179,11 +175,11 @@ const DynamicNav = () => {
           component: CNavItem,
           name: 'Artistas',
           to: '/artistas',
-          icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+          icon: <CIcon icon={cilMic} customClassName="nav-icon" />,
         },
         {
           component: CNavItem,
-          name: 'Rádio',
+          name: 'Rádios',
           to: '/estacoesDeRadio',
           icon: <CIcon icon={cilWifiSignal1} customClassName="nav-icon" />,
         },
