@@ -50,7 +50,7 @@ const Musica = () => {
         if (user.tipoDeUtilizador === 'admin') {
           setMusicas(response.data);
         } else {
-          setMusicas(response.data.filter(item => item.fkUtilizador === user.codUtilizador));
+          setMusicas(response.data.filter(item => parseInt(item.fkUtilizador) === parseInt(user.codUtilizador)));
         }
         setLoading(false);
       } catch (err) {
@@ -245,7 +245,7 @@ const Musica = () => {
       </CRow>
       <CRow className="justify-content-center mt-3">
         {selectedMusicas.map((musica) => {
-          if (selectedMusicas.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
+          if (1) {
             return (
               <CCol lg="4" sm="12" xl="4" md="6" key={musica.codMusica}>
                 <CCard style={cardStyle}>

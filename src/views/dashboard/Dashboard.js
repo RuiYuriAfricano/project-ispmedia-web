@@ -135,7 +135,7 @@ const VideoList = () => {
   return (
     <CCol md={6}>
       <CCard className="mb-4">
-        <CCardHeader>Vídeos Recentes</CCardHeader>
+        <CCardHeader>Vídeos - Publicações Recentes</CCardHeader>
         <CCardBody>
           <InfiniteScroll
             dataLength={videos.length}
@@ -366,7 +366,7 @@ const MusicList = () => {
   return (
     <CCol md={3} >
       <CCard className="mb-4" >
-        <CCardHeader>Músicas Recentes</CCardHeader>
+        <CCardHeader>Músicas - Publicações Recentes</CCardHeader>
         <CCardBody className='pt-1'>
           <InfiniteScroll
             dataLength={musicas.length}
@@ -603,7 +603,7 @@ const AlbumList = () => {
   return (
     <CCol md={3}>
       <CCard className="mb-4">
-        <CCardHeader>Álbuns Recentes</CCardHeader>
+        <CCardHeader>Álbuns  - Publicações Recentes</CCardHeader>
         <CCardBody>
           <InfiniteScroll
             dataLength={albuns.length}

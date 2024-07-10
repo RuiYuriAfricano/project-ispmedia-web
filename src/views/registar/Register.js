@@ -47,7 +47,7 @@ const Register = () => {
   };
 
   const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const regex = /^[^\s@]+@isptec\.co\.ao$/;
     return regex.test(email);
   };
 

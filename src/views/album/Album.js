@@ -45,7 +45,7 @@ const Album = () => {
           if (user.tipoDeUtilizador === 'admin') {
             setAlbuns(response.data);
           } else {
-            setAlbuns(response.data.filter(item => item.fkUtilizador === user.codUtilizador));
+            setAlbuns(response.data.filter(item => parseInt(item.fkUtilizador) === parseInt(user.codUtilizador)));
           }
           setLoading(false);
         }
@@ -168,7 +168,7 @@ const Album = () => {
       </CRow>
       <CRow className="justify-content-center mt-3">
         {selectedGAlbuns.map((album) => {
-          if (album.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
+          if (1) {
             return (
 
               <CCol lg="6" sm="12" xl="4" md="6" key={album.codAlbum}>

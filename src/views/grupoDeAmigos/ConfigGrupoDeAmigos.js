@@ -97,12 +97,6 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
 
 
   const handleAddUtilizador = () => {
-    if (utilizadoresAdicionados.length + membros.length >= 3) {
-      setMsgDoAlert("O grupo não pode ter mais de 3 utilizadores");
-      setCorDoAlert("danger");
-      return;
-    }
-
     const utilizador = utilizadores.find(u => u.codUtilizador === parseInt(utilizadorSelecionado));
     if (!utilizador) {
       setMsgDoAlert("Por favor, selecione um utilizador válido");
@@ -344,24 +338,48 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
           <div className="mb-3">
             <h5>Utilizadores adicionados:</h5>
             {membros.length === 0 && <p>Nenhum utilizador adicionado</p>}
-            <ul>
+            <table style={{ width: '100%' }}>
 
-              {membros.map((membro) => {
+              {membros.map((membro, index) => {
                 if (membro.fkUtilizador !== user.codUtilizador && membro.estado === 1) {
-                  return (
-                    <li key={membro.codUtilizador}>
-                      {membro.utilizador.username} {membro.isOwner === 1 ? '(Owner)' : ''}
-                      <CButton
-                        type="button"
-                        color="danger"
-                        size="sm"
-                        onClick={() => handleExcluirMembro(membro.codMembro, membro.fkUtilizador)}
-                        className="ms-2"
-                      >
-                        <CIcon icon={cilTrash} />
-                      </CButton>
-                    </li>
-                  )
+                  if (index % 2 === 0) {
+                    return (
+                      <tr style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }} key={membro.codUtilizador}>
+                        <td style={{ width: '100%' }}>{membro.utilizador.username} {membro.isOwner === 1 ? '(Owner)' : ''}</td>
+                        <td style={{ width: '100%' }}>
+                          <CButton
+                            type="button"
+                            color="danger"
+                            size="sm"
+                            onClick={() => handleExcluirMembro(membro.codMembro, membro.fkUtilizador)}
+                            className="ms-2"
+                          >
+                            <CIcon icon={cilTrash} />
+                          </CButton>
+                        </td>
+                      </tr>
+                    )
+                  } else {
+                    return (
+                      <>
+                        <tr key={membro.codUtilizador}>
+                          <td style={{ width: '100%' }}>{membro.utilizador.username} {membro.isOwner === 1 ? '(Owner)' : ''}</td>
+                          <td style={{ width: '100%' }}>
+                            <CButton
+                              type="button"
+                              color="danger"
+                              size="sm"
+                              onClick={() => handleExcluirMembro(membro.codMembro, membro.fkUtilizador)}
+                              className="ms-2"
+                            >
+                              <CIcon icon={cilTrash} />
+                            </CButton>
+                          </td>
+                        </tr>
+                      </>
+
+                    )
+                  }
                 }
 
               }
@@ -387,14 +405,14 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
 
 
               })}
-            </ul>
+            </table>
           </div>
           {
             idEditGrupo && (<div className="mb-3">
 
               <h5>Pedidos de Adesão:</h5>
               {membros.length === 0 && <p>Nenhum Pedido</p>}
-              <ul>
+              <table style={{ width: '100%' }}>
 
                 {membros.map((membro) => {
 
@@ -402,36 +420,42 @@ const ConfigGrupoDeAmigos = ({ idEditGrupo, onClose }) => {
                   if (membro.fkUtilizador !== user.codUtilizador && membro.estado === 0) {
                     return (
 
-                      <li key={membro.codUtilizador}>
-                        {membro.utilizador.username}
+                      <tr key={membro.codUtilizador}>
+                        <td style={{ width: '100%' }}>{membro.utilizador.username}</td>
+                        <td></td>
+                        <td >
+                          <CButton
+                            type="button"
+                            color="primary"
+                            size="sm"
+                            onClick={() => handleAceitar(membro.codMembro, membro.fkUtilizador)}
+                            className="ms-2"
+                          >
+                            Aceitar
+                          </CButton>
+                        </td>
+                        <td>
+                          <CButton
+                            type="button"
+                            color="danger"
+                            size="sm"
+                            onClick={() => handleRejeitar(membro.codMembro, membro.fkUtilizador)}
+                            className="ms-2"
+                          >
+                            Rejeitar
+                          </CButton>
+                        </td>
 
-                        <CButton
-                          type="button"
-                          color="primary"
-                          size="sm"
-                          onClick={() => handleAceitar(membro.codMembro, membro.fkUtilizador)}
-                          className="ms-2"
-                        >
-                          Aceitar
-                        </CButton>
 
-                        <CButton
-                          type="button"
-                          color="danger"
-                          size="sm"
-                          onClick={() => handleRejeitar(membro.codMembro, membro.fkUtilizador)}
-                          className="ms-2"
-                        >
-                          Rejeitar
-                        </CButton>
-                      </li>
+
+                      </tr>
                     )
                   }
 
                 }
 
                 )}
-              </ul>
+              </table>
             </div>)
           }
 

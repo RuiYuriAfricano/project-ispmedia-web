@@ -50,7 +50,7 @@ const Video = () => {
         if (user.tipoDeUtilizador === 'admin') {
           setVideos(response.data);
         } else {
-          setVideos(response.data.filter(item => item.fkUtilizador === user.codUtilizador));
+          setVideos(response.data.filter(item => parseInt(item.fkUtilizador) === parseInt(user.codUtilizador)));
         }
 
         setLoading(false);
@@ -254,7 +254,7 @@ const Video = () => {
       </CRow>
       <CRow className="justify-content-center mt-3">
         {selectedVideos.map((video, index) => {
-          if (video.registadopor?.username === user.username || user.tipoDeUtilizador === "admin") {
+          if (1) {
             return (
               <CCol lg="6" sm="12" xl="4" md="6" key={video.codVideo}>
                 <CCard style={cardStyle}>
