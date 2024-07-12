@@ -242,6 +242,7 @@ Página Inicial
  
 Detalhes do Conteúdo
 
-![Uploading Captura de Ecrã (756).png…]()
+![Captura de Ecrã (756)](https://github.com/user-attachments/assets/34099334-ea95-4aed-b1fe-c2f3bba0c91f)
+
 
 
