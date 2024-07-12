@@ -232,6 +232,8 @@ yarn start:dev
 
 # Capturas de Tela
 
+# Web
+
 Página de Login
 ![image](https://github.com/user-attachments/assets/e6be31ee-6f35-4e92-a177-f2f3ff585197)
 
@@ -244,5 +246,17 @@ Detalhes do Conteúdo
 
 ![Captura de Ecrã (756)](https://github.com/user-attachments/assets/34099334-ea95-4aed-b1fe-c2f3bba0c91f)
 
+# Mobile
+
+Home
+<center>
+ 
+![Imagem WhatsApp 2024-07-12 às 10 03 21_48a123ce](https://github.com/user-attachments/assets/62385f68-7bdc-4305-8a0f-64986641613d)
+ 
+</center>
+ 
+Listas de Músicas
+
+![Imagem WhatsApp 2024-07-12 às 10 03 22_fc16b54d](https://github.com/user-attachments/assets/489f9536-0280-4d65-a650-6cdb9abdc3f2)
 
 
